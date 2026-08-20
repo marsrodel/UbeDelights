@@ -1,0 +1,48 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# PHP / composer
+/vendor/
+composer.lock
+.env
+*.log
+
+# Node / build
+node_modules/
+dist/
+
+# XAMPP uploads / DB dumps
+*.sql
+/uploads/
+
+# Project-specific ignore folder requested by user
+.ignorefiles/
+
+# Misc
+*.cache
+tmp/
+thumbs.db# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# PHP / composer
+/vendor/
+composer.lock
+.env
+*.log
+
+# Node / build
+node_modules/
+dist/
+
+# XAMPP uploads / DB dumps
+*.sql
+/uploads/
+
+# Keep project-specific ignores folder
+.ignorefiles/

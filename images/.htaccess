@@ -1,0 +1,13 @@
+
+# Protect common image types: only allow requests that originate from the same site
+# (match the friend's style: allow when Referer starts with http://localhost/UbeDelights/)
+<FilesMatch "\.(?:jpg|jpeg|png|gif|svg|webp)$">
+	Require all denied
+	<If "%{HTTP_REFERER} =~ m#^https?://localhost/UbeDelights/#">
+		Require all granted
+	</If>
+</FilesMatch>
+
+# Use an absolute ErrorDocument like the friend's setup
+ErrorDocument 403 http://localhost/UbeDelights/views/error.html
+

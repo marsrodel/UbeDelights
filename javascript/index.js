@@ -1,0 +1,46 @@
+// Disable browser back navigation while on the dashboard (logged-in state)
+(function disableBackOnDashboard(){
+  try {
+    // On a successful login, the user lands on the dashboard. Reset any
+    // client-side login lock escalation so the next lock starts at 15s.
+    try {
+      localStorage.setItem('lock_level', '0');
+      localStorage.removeItem('lock_deadline');
+      // Reset both transient and persistent login attempt counters on success
+      sessionStorage.setItem('login_err_count', '0');
+      localStorage.setItem('login_err_count', '0');
+    } catch(e) {}
+
+    if (!(window.history && window.history.pushState)) return;
+
+    // Handler that triggers only on actual back navigation
+    var backHandler = function(){
+      try { history.pushState(null, document.title, window.location.href); } catch(e) {}
+      try { window.location.replace(window.location.pathname); } catch(e) {}
+    };
+
+    // Re-apply guard without redirect (used on refresh/tab visibility changes)
+    var reapplyGuard = function(){
+      try {
+        window.history.pushState(null, document.title, window.location.href);
+        window.history.pushState(null, document.title, window.location.href);
+      } catch(e) {}
+      window.onpopstate = backHandler;
+    };
+
+    reapplyGuard();
+    try { window.addEventListener('popstate', backHandler, true); } catch(e) {}
+    try { window.addEventListener('pageshow', reapplyGuard, true); } catch(e) {}
+    try { document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') reapplyGuard(); }, true); } catch(e) {}
+
+    // Prevent Backspace from navigating back when not typing
+    try {
+      document.addEventListener('keydown', function(e){
+        var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (e.key === 'Backspace' && tag !== 'input' && tag !== 'textarea') {
+          e.preventDefault();
+        }
+      }, true);
+    } catch(e) {}
+  } catch(e) {}
+})();
