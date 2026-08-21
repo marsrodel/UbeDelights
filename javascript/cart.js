@@ -30,20 +30,24 @@
         return '₱' + num.toLocaleString();
     }
 
+    var cartLayout = document.querySelector('.cart-layout');
+
+    var cartLayout = document.querySelector('.cart-layout');
+
     function renderCart() {
         var cart = getCart();
         if (cart.length === 0) {
             emptyCart.style.display = '';
             cartList.style.display = 'none';
             cartSummary.style.display = 'none';
+            cartLayout.classList.add('empty');
             return;
         }
 
         emptyCart.style.display = 'none';
         cartList.style.display = '';
         cartSummary.style.display = '';
-
-        cartItemsList.innerHTML = '';
+        cartLayout.classList.remove('empty');
         var subtotal = 0;
 
         cart.forEach(function(item, index) {
