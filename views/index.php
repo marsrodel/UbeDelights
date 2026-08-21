@@ -22,22 +22,24 @@ if ($connect) {
     mysqli_close($connect);
 }
 
-$products = [
-    ['name' => 'Ube Cheesecake', 'price' => '₱850', 'category' => 'cakes', 'description' => 'Creamy cheesecake with authentic ube swirl on a graham crust', 'badge' => 'Best Seller'],
-    ['name' => 'Ube Roll', 'price' => '₱450', 'category' => 'rolls', 'description' => 'Soft sponge roll filled with smooth ube jam and cream', 'badge' => 'Popular'],
-    ['name' => 'Ube Crinkles', 'price' => '₱280', 'category' => 'pastries', 'description' => 'Soft, chewy purple yam cookies coated in powdered sugar', 'badge' => ''],
-    ['name' => 'Ube Halo-Halo', 'price' => '₱180', 'category' => 'beverages', 'description' => 'Refreshing shaved ice dessert with ube ice cream topping', 'badge' => 'New'],
-    ['name' => 'Classic Ube Cake', 'price' => '₱950', 'category' => 'cakes', 'description' => 'Classic ube layer cake with smooth cream cheese frosting', 'badge' => ''],
-    ['name' => 'Ube Pandesal', 'price' => '₱120', 'category' => 'pastries', 'description' => 'Soft purple yam bread rolls, perfect for breakfast', 'badge' => ''],
-    ['name' => 'Ube Latte', 'price' => '₱150', 'category' => 'beverages', 'description' => 'Creamy ube-flavored milk tea with latte art', 'badge' => ''],
-    ['name' => 'Ube Macapuno Cake', 'price' => '₱1,100', 'category' => 'cakes', 'description' => 'Rich ube cake with sweet coconut strings and latik', 'badge' => 'Premium'],
+$stats = [
+    ['label' => 'Total Orders', 'value' => '12', 'icon' => '📦', 'color' => '#667eea'],
+    ['label' => 'Pending', 'value' => '3', 'icon' => '⏳', 'color' => '#f59e0b'],
+    ['label' => 'Delivered', 'value' => '8', 'icon' => '✅', 'color' => '#10b981'],
+    ['label' => 'Total Spent', 'value' => '₱4,250', 'icon' => '💰', 'color' => '#8b5cf6'],
 ];
 
-$categories = [
-    ['name' => 'Cakes', 'icon' => '🎂', 'count' => 3, 'description' => 'Signature ube cakes'],
-    ['name' => 'Pastries', 'icon' => '🥐', 'count' => 2, 'description' => 'Freshly baked goods'],
-    ['name' => 'Rolls', 'icon' => '🍰', 'count' => 1, 'description' => 'Soft sponge rolls'],
-    ['name' => 'Beverages', 'icon' => '🧋', 'count' => 2, 'description' => 'Refreshing drinks'],
+$featuredProducts = [
+    ['name' => 'Ube Cheesecake', 'price' => '₱850', 'badge' => 'Best Seller'],
+    ['name' => 'Ube Roll', 'price' => '₱450', 'badge' => 'Popular'],
+    ['name' => 'Classic Ube Cake', 'price' => '₱950', 'badge' => ''],
+    ['name' => 'Ube Crinkles', 'price' => '₱280', 'badge' => 'New'],
+];
+
+$recentOrders = [
+    ['id' => 'ORD-001', 'date' => 'Aug 18, 2025', 'items' => 'Ube Cheesecake, Ube Latte', 'total' => '₱1,000', 'status' => 'delivered'],
+    ['id' => 'ORD-002', 'date' => 'Aug 15, 2025', 'items' => 'Ube Roll, Ube Crinkles', 'total' => '₱730', 'status' => 'pending'],
+    ['id' => 'ORD-003', 'date' => 'Aug 12, 2025', 'items' => 'Classic Ube Cake', 'total' => '₱950', 'status' => 'confirmed'],
 ];
 
 $features = [
@@ -53,7 +55,7 @@ $features = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Dashboard</title>
-    <link rel="stylesheet" href="../css/dashboard.css?v=2.0">
+    <link rel="stylesheet" href="../css/dashboard.css?v=3.0">
 </head>
 <body>
     <nav class="navbar">
@@ -65,8 +67,12 @@ $features = [
                 </a>
             </div>
             <div class="nav-menu">
-                <span class="nav-link greeting">Hi <?php echo htmlspecialchars($firstName !== '' ? $firstName : 'there');?>!</span>
-                <a onclick="getLogout()" class="nav-link logout">Log Out</a>
+                <a onclick="getIndex()" class="nav-link active">Dashboard</a>
+                <a onclick="getShop()" class="nav-link">Shop</a>
+                <a onclick="getCart()" class="nav-link cart-link">Cart <span class="cart-badge" id="cartBadge" style="display:none;">0</span></a>
+                <a onclick="getOrders()" class="nav-link">My Orders</a>
+                <a onclick="getProfile()" class="nav-link">Profile</a>
+                <a onclick="getLogout()" class="nav-link">Log Out</a>
             </div>
         </div>
     </nav>
@@ -79,32 +85,47 @@ $features = [
     </section>
 
     <main class="main-content">
-        <div class="section-header">
-            <div>
-                <h2>Categories</h2>
-                <p>Browse by your favorite treats</p>
-            </div>
-        </div>
-        <div class="categories-grid">
-            <?php foreach ($categories as $cat): ?>
-            <div class="category-card" data-category="<?php echo strtolower($cat['name']); ?>">
-                <div class="category-icon"><?php echo $cat['icon']; ?></div>
-                <h3><?php echo $cat['name']; ?></h3>
-                <p><?php echo $cat['count']; ?> items</p>
+        <div class="stats-grid">
+            <?php foreach ($stats as $stat): ?>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: <?php echo $stat['color']; ?>15; color: <?php echo $stat['color']; ?>;"><?php echo $stat['icon']; ?></div>
+                <div class="stat-info">
+                    <span class="stat-value"><?php echo $stat['value']; ?></span>
+                    <span class="stat-label"><?php echo $stat['label']; ?></span>
+                </div>
             </div>
             <?php endforeach; ?>
         </div>
 
-        <div class="section-header">
-            <div>
-                <h2>Our Menu</h2>
-                <p>Fresh ube delicacies made with love</p>
-            </div>
+        <div class="quick-actions">
+            <a onclick="getShop()" class="action-card">
+                <span class="action-icon">🛒</span>
+                <span class="action-title">Browse Shop</span>
+                <span class="action-desc">Explore our ube treats</span>
+            </a>
+            <a onclick="getOrders()" class="action-card">
+                <span class="action-icon">📋</span>
+                <span class="action-title">My Orders</span>
+                <span class="action-desc">Track your orders</span>
+            </a>
+            <a onclick="getProfile()" class="action-card">
+                <span class="action-icon">👤</span>
+                <span class="action-title">My Profile</span>
+                <span class="action-desc">Manage your account</span>
+            </a>
         </div>
 
-        <div class="products-grid" id="productsGrid">
-            <?php foreach ($products as $product): ?>
-            <div class="product-card" data-category="<?php echo $product['category']; ?>" data-name="<?php echo strtolower($product['name']); ?>">
+        <div class="section-header">
+            <div>
+                <h2>Featured Products</h2>
+                <p>Our most popular ube treats</p>
+            </div>
+            <a onclick="getShop()" class="view-all">View All →</a>
+        </div>
+
+        <div class="products-grid featured-products">
+            <?php foreach ($featuredProducts as $product): ?>
+            <div class="product-card">
                 <div class="product-image">
                     <img src="../images/cake.png" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     <?php if ($product['badge']): ?>
@@ -116,19 +137,43 @@ $features = [
                     <div class="product-price">
                         <span class="current"><?php echo $product['price']; ?></span>
                     </div>
-                    <p class="description"><?php echo htmlspecialchars($product['description']); ?></p>
-                    <div class="product-actions">
-                        <button class="btn-add-cart" data-name="<?php echo htmlspecialchars($product['name']); ?>" data-price="<?php echo $product['price']; ?>">Add to Cart</button>
-                        <button class="btn-wishlist" data-name="<?php echo htmlspecialchars($product['name']); ?>">♡</button>
-                    </div>
+                    <button class="btn-add-cart" data-name="<?php echo htmlspecialchars($product['name']); ?>" data-price="<?php echo $product['price']; ?>" onclick="addToCart(this)">Add to Cart</button>
                 </div>
             </div>
             <?php endforeach; ?>
-            <div class="no-results" id="noResults" style="display: none;">
-                <div class="icon">🔍</div>
-                <h3>No products found</h3>
-                <p>Try searching with different keywords</p>
+        </div>
+
+        <div class="section-header">
+            <div>
+                <h2>Recent Orders</h2>
+                <p>Your latest purchases</p>
             </div>
+            <a onclick="getOrders()" class="view-all">View All →</a>
+        </div>
+
+        <div class="orders-table-container">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="recentOrdersBody">
+                    <?php foreach ($recentOrders as $order): ?>
+                    <tr>
+                        <td class="order-id"><?php echo $order['id']; ?></td>
+                        <td><?php echo $order['date']; ?></td>
+                        <td><?php echo $order['items']; ?></td>
+                        <td class="order-total"><?php echo $order['total']; ?></td>
+                        <td><span class="status-badge status-<?php echo $order['status']; ?>"><?php echo ucfirst($order['status']); ?></span></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
 
         <div class="features-section">
