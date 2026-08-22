@@ -23,17 +23,17 @@ if ($connect) {
 }
 
 $stats = [
-    ['label' => 'Total Orders', 'value' => '12', 'icon' => '📦', 'color' => '#667eea'],
-    ['label' => 'Pending', 'value' => '3', 'icon' => '⏳', 'color' => '#f59e0b'],
-    ['label' => 'Delivered', 'value' => '8', 'icon' => '✅', 'color' => '#10b981'],
-    ['label' => 'Total Spent', 'value' => '₱4,250', 'icon' => '💰', 'color' => '#8b5cf6'],
+    ['label' => 'Total Orders', 'value' => '12',     'icon' => 'fa-solid fa-bag-shopping',  'color' => '#7c3aed'],
+    ['label' => 'Pending',      'value' => '3',       'icon' => 'fa-solid fa-clock',          'color' => '#a855f7'],
+    ['label' => 'Delivered',    'value' => '8',       'icon' => 'fa-solid fa-circle-check',   'color' => '#6d28d9'],
+    ['label' => 'Total Spent',  'value' => '₱4,250', 'icon' => 'fa-solid fa-wallet',         'color' => '#8b5cf6'],
 ];
 
 $featuredProducts = [
-    ['name' => 'Ube Cheesecake', 'price' => '₱850', 'badge' => 'Best Seller'],
-    ['name' => 'Ube Roll', 'price' => '₱450', 'badge' => 'Popular'],
-    ['name' => 'Classic Ube Cake', 'price' => '₱950', 'badge' => ''],
-    ['name' => 'Ube Crinkles', 'price' => '₱280', 'badge' => 'New'],
+    ['name' => 'Ube Cheesecake', 'price' => '₱850', 'badge' => 'Best Seller', 'image' => '../images/items/cheesecake.jpg'],
+    ['name' => 'Ube Roll', 'price' => '₱450', 'badge' => 'Popular', 'image' => '../images/items/uberoll.jpg'],
+    ['name' => 'Classic Ube Cake', 'price' => '₱950', 'badge' => '', 'image' => '../images/items/classic.jpg'],
+    ['name' => 'Ube Crinkles', 'price' => '₱280', 'badge' => 'New', 'image' => '../images/items/crinkles.jpg'],
 ];
 
 $recentOrders = [
@@ -43,10 +43,10 @@ $recentOrders = [
 ];
 
 $features = [
-    ['icon' => '✨', 'title' => 'Fresh Daily', 'description' => 'All products made fresh every day with authentic ube'],
-    ['icon' => '🚚', 'title' => 'Free Delivery', 'description' => 'Free delivery on orders above ₱500'],
-    ['icon' => '🎁', 'title' => 'Custom Orders', 'description' => 'Custom cake orders accepted 3 days in advance'],
-    ['icon' => '💜', 'title' => '100% Ube', 'description' => 'Real purple yam, no artificial flavors'],
+    ['icon' => 'fa-solid fa-star',        'title' => 'Fresh Daily',     'description' => 'All products made fresh every day with authentic ube'],
+    ['icon' => 'fa-solid fa-truck-fast',  'title' => 'Free Delivery',   'description' => 'Free delivery on orders above ₱500'],
+    ['icon' => 'fa-solid fa-gift',        'title' => 'Custom Orders',   'description' => 'Custom cake orders accepted 3 days in advance'],
+    ['icon' => 'fa-solid fa-heart',       'title' => '100% Ube',        'description' => 'Real purple yam, no artificial flavors'],
 ];
 ?>
 <!DOCTYPE html>
@@ -55,7 +55,8 @@ $features = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Dashboard</title>
-    <link rel="stylesheet" href="../css/dashboard.css?v=4.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/dashboard.css?v=5.4">
 </head>
 <body>
     <nav class="navbar">
@@ -88,9 +89,9 @@ $features = [
         <div class="stats-grid">
             <?php foreach ($stats as $stat): ?>
             <div class="stat-card">
-                <div class="stat-icon" style="background: <?php echo $stat['color']; ?>15; color: <?php echo $stat['color']; ?>;"><?php echo $stat['icon']; ?></div>
+                <div class="stat-icon" style="background: <?php echo $stat['color']; ?>18; color: <?php echo $stat['color']; ?>;"><i class="<?php echo $stat['icon']; ?>"></i></div>
                 <div class="stat-info">
-                    <span class="stat-value"><?php echo $stat['value']; ?></span>
+                    <span class="stat-value" id="stat-<?php echo strtolower(str_replace(' ', '-', $stat['label'])); ?>"><?php echo $stat['value']; ?></span>
                     <span class="stat-label"><?php echo $stat['label']; ?></span>
                 </div>
             </div>
@@ -99,17 +100,17 @@ $features = [
 
         <div class="quick-actions">
             <a onclick="getShop()" class="action-card">
-                <span class="action-icon">🛒</span>
+                <span class="action-icon"><i class="fa-solid fa-store"></i></span>
                 <span class="action-title">Browse Shop</span>
                 <span class="action-desc">Explore our ube treats</span>
             </a>
             <a onclick="getOrders()" class="action-card">
-                <span class="action-icon">📋</span>
+                <span class="action-icon"><i class="fa-solid fa-receipt"></i></span>
                 <span class="action-title">My Orders</span>
                 <span class="action-desc">Track your orders</span>
             </a>
             <a onclick="getProfile()" class="action-card">
-                <span class="action-icon">👤</span>
+                <span class="action-icon"><i class="fa-solid fa-user"></i></span>
                 <span class="action-title">My Profile</span>
                 <span class="action-desc">Manage your account</span>
             </a>
@@ -127,7 +128,7 @@ $features = [
             <?php foreach ($featuredProducts as $product): ?>
             <div class="product-card">
                 <div class="product-image">
-                    <img src="../images/cake.png" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                    <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     <?php if ($product['badge']): ?>
                     <span class="product-badge"><?php echo $product['badge']; ?></span>
                     <?php endif; ?>
@@ -180,7 +181,7 @@ $features = [
             <div class="features-grid">
                 <?php foreach ($features as $item): ?>
                 <div class="feature-card">
-                    <div class="feature-icon"><?php echo $item['icon']; ?></div>
+                    <div class="feature-icon"><i class="<?php echo $item['icon']; ?>"></i></div>
                     <div>
                         <h3><?php echo $item['title']; ?></h3>
                         <p><?php echo $item['description']; ?></p>

@@ -27,6 +27,21 @@
         return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
     }
 
+    function getItemImage(itemName) {
+        var imageMap = {
+            'Ube Cheesecake': '../images/items/cheesecake.jpg',
+            'Ube Roll': '../images/items/uberoll.jpg',
+            'Ube Crinkles': '../images/items/crinkles.jpg',
+            'Ube Halo-Halo': '../images/items/halohalo.jpg',
+            'Classic Ube Cake': '../images/items/classic.jpg',
+            'Ube Pandesal': '../images/items/pandesal.jpg',
+            'Ube Latte': '../images/items/latte.jpg',
+            'Ube Macapuno Cake': '../images/items/macapuno.jpg'
+        };
+
+        return imageMap[itemName] || '../images/cake.png';
+    }
+
     // Render localStorage orders (placed via checkout)
     function renderLocalOrders() {
         var localOrders = JSON.parse(localStorage.getItem('ube_orders') || '[]');
@@ -41,7 +56,7 @@
             order.items.forEach(function(item) {
                 itemsHtml +=
                     '<div class="order-item">' +
-                        '<img src="../images/cake.png" alt="" class="item-thumb">' +
+                        '<img src="' + getItemImage(item.name) + '" alt="" class="item-thumb">' +
                         '<div class="item-details">' +
                             '<span class="item-name">' + item.name + '</span>' +
                             '<span class="item-qty">Qty: ' + item.qty + '</span>' +

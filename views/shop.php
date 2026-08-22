@@ -6,22 +6,22 @@ if (!isset($_SESSION['auth_user_id'])) {
 }
 
 $products = [
-    ['name' => 'Ube Cheesecake', 'price' => '₱850', 'category' => 'cakes', 'description' => 'Creamy cheesecake with authentic ube swirl on a graham crust', 'badge' => 'Best Seller'],
-    ['name' => 'Ube Roll', 'price' => '₱450', 'category' => 'rolls', 'description' => 'Soft sponge roll filled with smooth ube jam and cream', 'badge' => 'Popular'],
-    ['name' => 'Ube Crinkles', 'price' => '₱280', 'category' => 'pastries', 'description' => 'Soft, chewy purple yam cookies coated in powdered sugar', 'badge' => ''],
-    ['name' => 'Ube Halo-Halo', 'price' => '₱180', 'category' => 'beverages', 'description' => 'Refreshing shaved ice dessert with ube ice cream topping', 'badge' => 'New'],
-    ['name' => 'Classic Ube Cake', 'price' => '₱950', 'category' => 'cakes', 'description' => 'Classic ube layer cake with smooth cream cheese frosting', 'badge' => ''],
-    ['name' => 'Ube Pandesal', 'price' => '₱120', 'category' => 'pastries', 'description' => 'Soft purple yam bread rolls, perfect for breakfast', 'badge' => ''],
-    ['name' => 'Ube Latte', 'price' => '₱150', 'category' => 'beverages', 'description' => 'Creamy ube-flavored milk tea with latte art', 'badge' => ''],
-    ['name' => 'Ube Macapuno Cake', 'price' => '₱1,100', 'category' => 'cakes', 'description' => 'Rich ube cake with sweet coconut strings and latik', 'badge' => 'Premium'],
+    ['name' => 'Ube Cheesecake', 'price' => '₱850', 'category' => 'cakes', 'description' => 'Creamy cheesecake with authentic ube swirl on a graham crust', 'badge' => 'Best Seller', 'image' => '../images/items/cheesecake.jpg'],
+    ['name' => 'Ube Roll', 'price' => '₱450', 'category' => 'rolls', 'description' => 'Soft sponge roll filled with smooth ube jam and cream', 'badge' => 'Popular', 'image' => '../images/items/uberoll.jpg'],
+    ['name' => 'Ube Crinkles', 'price' => '₱280', 'category' => 'pastries', 'description' => 'Soft, chewy purple yam cookies coated in powdered sugar', 'badge' => '', 'image' => '../images/items/crinkles.jpg'],
+    ['name' => 'Ube Halo-Halo', 'price' => '₱180', 'category' => 'beverages', 'description' => 'Refreshing shaved ice dessert with ube ice cream topping', 'badge' => 'New', 'image' => '../images/items/halohalo.jpg'],
+    ['name' => 'Classic Ube Cake', 'price' => '₱950', 'category' => 'cakes', 'description' => 'Classic ube layer cake with smooth cream cheese frosting', 'badge' => '', 'image' => '../images/items/classic.jpg'],
+    ['name' => 'Ube Pandesal', 'price' => '₱120', 'category' => 'pastries', 'description' => 'Soft purple yam bread rolls, perfect for breakfast', 'badge' => '', 'image' => '../images/items/pandesal.jpg'],
+    ['name' => 'Ube Latte', 'price' => '₱150', 'category' => 'beverages', 'description' => 'Creamy ube-flavored milk tea with latte art', 'badge' => '', 'image' => '../images/items/latte.jpg'],
+    ['name' => 'Ube Macapuno Cake', 'price' => '₱1,100', 'category' => 'cakes', 'description' => 'Rich ube cake with sweet coconut strings and latik', 'badge' => 'Premium', 'image' => '../images/items/macapuno.jpg'],
 ];
 
 $categories = [
-    ['name' => 'All', 'icon' => '🍽️'],
-    ['name' => 'Cakes', 'icon' => '🎂'],
-    ['name' => 'Pastries', 'icon' => '🥐'],
-    ['name' => 'Rolls', 'icon' => '🍰'],
-    ['name' => 'Beverages', 'icon' => '🧋'],
+    ['name' => 'All',       'icon' => 'fa-solid fa-border-all'],
+    ['name' => 'Cakes',     'icon' => 'fa-solid fa-cake-candles'],
+    ['name' => 'Pastries',  'icon' => 'fa-solid fa-bread-slice'],
+    ['name' => 'Rolls',     'icon' => 'fa-solid fa-cookie'],
+    ['name' => 'Beverages', 'icon' => 'fa-solid fa-mug-hot'],
 ];
 ?>
 <!DOCTYPE html>
@@ -30,7 +30,8 @@ $categories = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Shop</title>
-    <link rel="stylesheet" href="../css/dashboard.css?v=4.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/dashboard.css?v=5.4">
 </head>
 <body>
     <nav class="navbar">
@@ -63,7 +64,7 @@ $categories = [
         <div class="category-tabs">
             <?php foreach ($categories as $index => $cat): ?>
             <button class="tab-btn <?php echo $index === 0 ? 'active' : ''; ?>" data-category="<?php echo strtolower($cat['name']); ?>">
-                <span class="tab-icon"><?php echo $cat['icon']; ?></span>
+                <span class="tab-icon"><i class="<?php echo $cat['icon']; ?>"></i></span>
                 <?php echo $cat['name']; ?>
             </button>
             <?php endforeach; ?>
@@ -73,7 +74,7 @@ $categories = [
             <?php foreach ($products as $product): ?>
             <div class="product-card" data-category="<?php echo $product['category']; ?>" data-name="<?php echo strtolower($product['name']); ?>">
                 <div class="product-image">
-                    <img src="../images/cake.png" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                    <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     <?php if ($product['badge']): ?>
                     <span class="product-badge"><?php echo $product['badge']; ?></span>
                     <?php endif; ?>

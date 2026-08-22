@@ -30,6 +30,21 @@
         return '₱' + num.toLocaleString();
     }
 
+    function getItemImage(itemName) {
+        var imageMap = {
+            'Ube Cheesecake': '../images/items/cheesecake.jpg',
+            'Ube Roll': '../images/items/uberoll.jpg',
+            'Ube Crinkles': '../images/items/crinkles.jpg',
+            'Ube Halo-Halo': '../images/items/halohalo.jpg',
+            'Classic Ube Cake': '../images/items/classic.jpg',
+            'Ube Pandesal': '../images/items/pandesal.jpg',
+            'Ube Latte': '../images/items/latte.jpg',
+            'Ube Macapuno Cake': '../images/items/macapuno.jpg'
+        };
+
+        return imageMap[itemName] || '../images/cake.png';
+    }
+
     var cartLayout = document.querySelector('.cart-layout');
 
     function renderCart() {
@@ -57,7 +72,7 @@
             row.className = 'cart-item-row';
             row.innerHTML =
                 '<div class="col-product">' +
-                    '<img src="../images/cake.png" class="item-thumb" alt="">' +
+                    '<img src="' + getItemImage(item.name) + '" class="item-thumb" alt="">' +
                     '<span>' + item.name + '</span>' +
                 '</div>' +
                 '<span class="col-price">' + item.price + '</span>' +

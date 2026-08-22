@@ -317,17 +317,17 @@ body {
 .product-image {
     height: 200px;
     background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
     position: relative;
     overflow: hidden;
 }
 
 .product-image img {
-    width: 70%;
-    height: 70%;
-    object-fit: contain;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
     transition: transform 0.4s ease;
 }
 
@@ -472,6 +472,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 1.8rem;
+    color: var(--accent);
     margin: 0 auto 18px;
     transition: var(--transition);
 }
@@ -700,6 +701,7 @@ body {
 .action-icon {
     font-size: 2rem;
     margin-bottom: 4px;
+    color: var(--accent);
 }
 
 .action-title {
@@ -828,6 +830,11 @@ body {
 
 .tab-icon {
     font-size: 1rem;
+    color: var(--accent);
+}
+
+.tab-btn.active .tab-icon {
+    color: #ffffff;
 }
 
 /* ── CART LAYOUT ── */
