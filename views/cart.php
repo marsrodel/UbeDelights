@@ -11,7 +11,7 @@ if (!isset($_SESSION['auth_user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Cart</title>
-    <link rel="stylesheet" href="../css/dashboard.css?v=5.0">
+    <link rel="stylesheet" href="../css/dashboard.css?v=5.4">
 </head>
 <body>
     <nav class="navbar">

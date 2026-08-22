@@ -15,34 +15,17 @@ node_modules/
 dist/
 
 # XAMPP uploads / DB dumps
-*.sql
 /uploads/
 
-# Project-specific ignore folder requested by user
+# Project-specific ignore folder
 .ignorefiles/
+
+# Keep the database schema files tracked in Git
+!database/
+!database/*.sql
+!database/**/*.sql
 
 # Misc
 *.cache
 tmp/
-thumbs.db# OS / editors
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-# PHP / composer
-/vendor/
-composer.lock
-.env
-*.log
-
-# Node / build
-node_modules/
-dist/
-
-# XAMPP uploads / DB dumps
-*.sql
-/uploads/
-
-# Keep project-specific ignores folder
-.ignorefiles/
+thumbs.db
