@@ -37,7 +37,7 @@ if ($connect) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Checkout</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css/dashboard.css?v=4.0">
+    <link rel="stylesheet" href="../css/dashboard.css?v=5.4">
 </head>
 <body>
     <nav class="navbar">
@@ -102,13 +102,11 @@ if ($connect) {
                                 <input type="text" id="coZip" value="<?php echo htmlspecialchars($zip); ?>" required>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="checkout-contact-payment">
-                        <div class="checkout-card">
-                            <h3><i class="fa-solid fa-phone"></i> Contact Information</h3>
-                            <div class="form-grid">
-                                <div class="form-group full-width">
+                        <div class="checkout-two-col" style="margin-top: 16px;">
+                            <div>
+                                <h3><i class="fa-solid fa-phone"></i> Contact Information</h3>
+                                <div class="form-group full-width" style="margin-bottom: 16px;">
                                     <label for="coEmail">Email Address</label>
                                     <input type="email" id="coEmail" value="<?php echo htmlspecialchars($email); ?>" required>
                                 </div>
@@ -117,49 +115,13 @@ if ($connect) {
                                     <input type="tel" id="coPhone" placeholder="09XX XXX XXXX" required>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="checkout-card">
-                            <h3><i class="fa-solid fa-credit-card"></i> Payment Method</h3>
-                            <div class="payment-options">
-                                <label class="payment-option selected">
-                                    <input type="radio" name="payment" value="cod" checked>
-                                    <div class="payment-info">
-                                        <i class="fa-solid fa-money-bill-wave"></i>
-                                        <div>
-                                            <strong>Cash on Delivery</strong>
-                                            <span>Pay when your order arrives</span>
-                                        </div>
-                                    </div>
-                                </label>
-                                <label class="payment-option">
-                                    <input type="radio" name="payment" value="gcash">
-                                    <div class="payment-info">
-                                        <i class="fa-solid fa-mobile-screen-button"></i>
-                                        <div>
-                                            <strong>GCash</strong>
-                                            <span>Pay via GCash mobile wallet</span>
-                                        </div>
-                                    </div>
-                                </label>
-                                <label class="payment-option">
-                                    <input type="radio" name="payment" value="maya">
-                                    <div class="payment-info">
-                                        <i class="fa-solid fa-wallet"></i>
-                                        <div>
-                                            <strong>Maya (PayMaya)</strong>
-                                            <span>Pay via Maya mobile wallet</span>
-                                        </div>
-                                    </div>
-                                </label>
+                            <div>
+                                <h3><i class="fa-solid fa-comment"></i> Order Notes</h3>
+                                <div class="form-group full-width">
+                                    <label for="coNotes">Special Instructions</label>
+                                    <textarea id="coNotes" rows="4" placeholder="Special instructions (e.g., gift message, delivery time preference)"></textarea>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="checkout-card">
-                        <h3><i class="fa-solid fa-comment"></i> Order Notes</h3>
-                        <div class="form-group full-width">
-                            <textarea id="coNotes" rows="3" placeholder="Special instructions (e.g., gift message, delivery time preference)"></textarea>
                         </div>
                     </div>
                 </form>

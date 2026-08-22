@@ -107,9 +107,10 @@
                 return;
             }
 
-            var payment = document.querySelector('input[name="payment"]:checked').value;
+            var paymentInput = document.querySelector('input[name="payment"]:checked');
             var paymentLabels = { cod: 'Cash on Delivery', gcash: 'GCash', maya: 'Maya (PayMaya)' };
-            var notes = document.getElementById('coNotes').value.trim();
+            var payment = paymentInput ? (paymentLabels[paymentInput.value] || paymentInput.value) : 'Order Placed';
+            var notes = document.getElementById('coNotes') ? document.getElementById('coNotes').value.trim() : '';
 
             // Generate order ID
             var orderId = 'UBD-' + Date.now().toString(36).toUpperCase();
@@ -127,7 +128,7 @@
                 subtotal: subtotal,
                 shipping: shipping,
                 total: subtotal + shipping,
-                payment: paymentLabels[payment] || payment,
+                payment: payment,
                 notes: notes,
                 address: {
                     firstName: firstName,

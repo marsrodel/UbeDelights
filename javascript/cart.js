@@ -32,8 +32,6 @@
 
     var cartLayout = document.querySelector('.cart-layout');
 
-    var cartLayout = document.querySelector('.cart-layout');
-
     function renderCart() {
         var cart = getCart();
         if (cart.length === 0) {
