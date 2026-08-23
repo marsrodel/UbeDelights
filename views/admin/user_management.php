@@ -48,7 +48,7 @@ $mockUsers = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin_security.css?v=1.3">
+    <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
     <style>
         .card-header-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); gap: 16px; flex-wrap: wrap; }
         .card-header-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
@@ -98,11 +98,13 @@ $mockUsers = [
         .info-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
         .info-value { font-size: 14px; color: var(--text-primary); font-weight: 600; }
 
-        /* Add User Modal — reuse register page form styles */
-        .add-user-modal .modal { max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; }
+        /* Add User Modal — compact header, matching form corners, bigger buttons */
+        .add-user-modal .modal { max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; border-radius: 12px; }
         .add-user-modal .modal-body { padding: 0; overflow-y: auto; flex: 1; }
-        .add-user-modal .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
-        .add-user-modal .modal-header h2 { font-size: 1.1rem; }
+        .add-user-modal .modal-header { padding: 10px 20px; border-bottom: 1px solid var(--border); border-radius: 12px 12px 0 0; }
+        .add-user-modal .modal-header h2 { font-size: 1.05rem; }
+        .add-user-modal .modal-close { width: 30px; height: 30px; border-radius: 50%; background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: var(--transition); }
+        .add-user-modal .modal-close:hover { background: var(--bg-main); color: var(--text-primary); }
         .add-user-modal .register-container {
             background: rgb(214, 212, 212); border-radius: 10px; border: 3px solid rgba(102, 126, 234, 0.6);
             padding: 4px 15px 2px; margin: 0; width: 100%; box-sizing: border-box;
@@ -141,16 +143,20 @@ $mockUsers = [
             position: absolute; right: 12px; font-size: 18px; cursor: pointer; color: #6B7280; transition: color 0.3s ease;
         }
         .add-user-modal .field-error { color: #dc2626; font-size: 0.8rem; margin-top: 0; padding-left: 12px; }
-        .add-user-modal .form-actions { text-align: center; margin-top: 8px; margin-bottom: 4px; }
+        .add-user-modal .form-actions { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 10px; margin-bottom: 8px; }
+        .add-user-modal .btn-cancel {
+            background: #fff; border: 1.5px solid #d1d5db; color: #374151;
+            padding: 10px 30px; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+            font-family: 'Poppins', sans-serif; cursor: pointer; transition: all 0.2s;
+        }
+        .add-user-modal .btn-cancel:hover { background: #f3f4f6; border-color: #9ca3af; }
         .add-user-modal .add-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;
-            padding: 6px 16px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; font-family: 'Poppins', sans-serif;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-width: 110px; position: relative;
-            overflow: hidden; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            padding: 10px 30px; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+            font-family: 'Poppins', sans-serif; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .add-user-modal .add-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4), 0 4px 10px rgba(0, 0, 0, 0.1); }
         .add-user-modal .add-btn:active { transform: translateY(-1px); }
-        .add-user-modal .cancel-link { color: #000000; font-size: 0.9rem; margin-top: 4px; display: inline-block; margin-right: 12px; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body class="admin-body">
@@ -450,8 +456,8 @@ $mockUsers = [
                     </div>
 
                     <div class="form-actions">
-                        <span class="cancel-link" onclick="closeModal('addUserModal')">Cancel</span>
-                        <button type="button" class="add-btn" id="addUserSubmit">Next</button>
+                        <button type="button" class="btn-cancel" onclick="closeModal('addUserModal')">Cancel</button>
+                        <button type="button" class="add-btn" id="addUserSubmit">Add User</button>
                     </div>
                 </div>
             </div>
