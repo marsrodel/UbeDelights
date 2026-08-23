@@ -48,7 +48,7 @@ $mockUsers = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin_security.css?v=1.2">
+    <link rel="stylesheet" href="../../css/admin_security.css?v=1.3">
     <style>
         .card-header-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); gap: 16px; flex-wrap: wrap; }
         .card-header-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
@@ -97,6 +97,60 @@ $mockUsers = [
         .info-item { background: var(--bg-main); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
         .info-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
         .info-value { font-size: 14px; color: var(--text-primary); font-weight: 600; }
+
+        /* Add User Modal — reuse register page form styles */
+        .add-user-modal .modal { max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; }
+        .add-user-modal .modal-body { padding: 0; overflow-y: auto; flex: 1; }
+        .add-user-modal .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+        .add-user-modal .modal-header h2 { font-size: 1.1rem; }
+        .add-user-modal .register-container {
+            background: rgb(214, 212, 212); border-radius: 10px; border: 3px solid rgba(102, 126, 234, 0.6);
+            padding: 4px 15px 2px; margin: 0; width: 100%; box-sizing: border-box;
+        }
+        .add-user-modal h1 {
+            font-size: 0.95rem; margin: 0; padding: 0; border-bottom: none; color: #340146c2; font-weight: 600;
+        }
+        .add-user-modal .form-sections { display: block; width: 100%; }
+        .add-user-modal .section { margin-bottom: 8px; }
+        .add-user-modal .form-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px 3px; margin: 0; }
+        .add-user-modal .form-box { position: relative; margin: 0; }
+        .add-user-modal .form-box label {
+            position: absolute; top: 2px; left: 12px; font-weight: 600; color: #340146c2; font-size: 0.9rem;
+            line-height: 1.3; pointer-events: none; transition: all 0.2s ease; z-index: 1; margin: 0;
+        }
+        .add-user-modal .form-box input,
+        .add-user-modal .form-box select {
+            width: 100%; padding: 18px 12px 2px; border: 1px solid #cda7e6; border-radius: 6px; font-size: 0.875rem;
+            background-color: #f9fafb; transition: border-color 0.2s ease; height: 40px; box-sizing: border-box;
+            font-family: inherit; color: #1a1a2e;
+        }
+        .add-user-modal .form-box input:focus,
+        .add-user-modal .form-box select:focus {
+            outline: none; border-color: #667eea; box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+        .add-user-modal .form-box input:hover,
+        .add-user-modal .form-box select:hover { border-color: #b98fe0; background-color: #ffffff; }
+        .add-user-modal .form-box input::placeholder { color: #4b4c4e; font-style: italic; }
+        .add-user-modal .form-box select { cursor: pointer; appearance: auto; padding-right: 10px; }
+        .add-user-modal .form-box input[readonly] { background: #f7fafc; color: #a0aec0; }
+        .add-user-modal .required { color: #dc2626; font-weight: bold; margin-left: 2px; }
+        .add-user-modal .optional { color: #dc2626; font-weight: 500; font-size: 0.7rem; margin-left: 2px; }
+        .add-user-modal .password-wrapper { position: relative; display: flex; align-items: center; }
+        .add-user-modal .password-wrapper input { width: 100%; padding-right: 45px; }
+        .add-user-modal .password-wrapper i {
+            position: absolute; right: 12px; font-size: 18px; cursor: pointer; color: #6B7280; transition: color 0.3s ease;
+        }
+        .add-user-modal .field-error { color: #dc2626; font-size: 0.8rem; margin-top: 0; padding-left: 12px; }
+        .add-user-modal .form-actions { text-align: center; margin-top: 8px; margin-bottom: 4px; }
+        .add-user-modal .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;
+            padding: 6px 16px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; font-family: 'Poppins', sans-serif;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-width: 110px; position: relative;
+            overflow: hidden; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .add-user-modal .add-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4), 0 4px 10px rgba(0, 0, 0, 0.1); }
+        .add-user-modal .add-btn:active { transform: translateY(-1px); }
+        .add-user-modal .cancel-link { color: #000000; font-size: 0.9rem; margin-top: 4px; display: inline-block; margin-right: 12px; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body class="admin-body">
@@ -278,10 +332,137 @@ $mockUsers = [
         </div>
     </div>
 
+    <!-- Add New User Modal -->
+    <div class="modal-overlay add-user-modal" id="addUserModal" role="dialog" aria-modal="true">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-user-plus" style="color:var(--accent);"></i> Add New User</h2>
+                <button class="modal-close" onclick="closeModal('addUserModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="register-container">
+                    <div class="form-sections">
+                        <div class="section">
+                            <h1>Personal Information</h1>
+                            <div class="form-group">
+                                <div class="form-box">
+                                    <label for="id">ID Number <span class="required">*</span></label>
+                                    <input type="text" id="id" placeholder="xxxx-xxxx" readonly>
+                                </div>
+                                <div class="form-box">
+                                    <label for="fname">First Name <span class="required">*</span></label>
+                                    <input type="text" id="fname">
+                                </div>
+                                <div class="form-box">
+                                    <label for="mname">Middle Name <span class="optional">(optional)</span></label>
+                                    <input type="text" id="mname">
+                                </div>
+                                <div class="form-box">
+                                    <label for="lname">Last Name <span class="required">*</span></label>
+                                    <input type="text" id="lname">
+                                </div>
+                                <div class="form-box">
+                                    <label for="ename">Extension Name <span class="optional">(optional)</span></label>
+                                    <input type="text" id="ename">
+                                </div>
+                                <div class="form-box">
+                                    <label for="bday">Date of Birth <span class="required">*</span></label>
+                                    <input type="date" id="bday" onchange="calculateAge()">
+                                </div>
+                                <div class="form-box">
+                                    <label for="age">Age <span class="required">*</span></label>
+                                    <input type="text" id="age" readonly>
+                                </div>
+                                <div class="form-box">
+                                    <label for="sex">Sex <span class="required">*</span></label>
+                                    <select id="sex">
+                                        <option value="">-Select Sex-</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                                <div class="form-box">
+                                    <label for="email">Email Address <span class="required">*</span></label>
+                                    <input type="text" id="email">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <h1>Address Information</h1>
+                            <div class="form-group">
+                                <div class="form-box">
+                                    <label for="street">Purok/Street <span class="required">*</span></label>
+                                    <input type="text" id="street">
+                                </div>
+                                <div class="form-box">
+                                    <label for="brgy">Barangay <span class="required">*</span></label>
+                                    <input type="text" id="brgy">
+                                </div>
+                                <div class="form-box">
+                                    <label for="city">City/Municipality <span class="required">*</span></label>
+                                    <input type="text" id="city">
+                                </div>
+                                <div class="form-box">
+                                    <label for="province">Province <span class="required">*</span></label>
+                                    <input type="text" id="province">
+                                </div>
+                                <div class="form-box">
+                                    <label for="country">Country <span class="required">*</span></label>
+                                    <input type="text" id="country">
+                                </div>
+                                <div class="form-box">
+                                    <label for="zipcode">Zip Code <span class="required">*</span></label>
+                                    <input type="number" id="zipcode">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <h1>Account Information</h1>
+                            <div class="form-group">
+                                <div class="form-box">
+                                    <label for="user">Username <span class="required">*</span></label>
+                                    <input type="text" id="user">
+                                </div>
+                                <div class="form-box">
+                                    <label for="role">Role <span class="required">*</span></label>
+                                    <select id="role">
+                                        <option value="">Select Role</option>
+                                        <option value="customer">Customer</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="super_admin">Super Admin</option>
+                                    </select>
+                                </div>
+                                <div class="form-box">
+                                    <label for="pass">Password <span class="required">*</span> <span id="pass-strength" class="field-hint"></span></label>
+                                    <div class="password-wrapper">
+                                        <input type="password" id="pass">
+                                        <i class="fa-solid fa-eye-slash" id="eyeicon-register"></i>
+                                    </div>
+                                </div>
+                                <div class="form-box">
+                                    <label for="repass">Re-Enter Password <span class="required">*</span> <span id="repass-match" class="field-hint"></span></label>
+                                    <input type="password" id="repass">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <span class="cancel-link" onclick="closeModal('addUserModal')">Cancel</span>
+                        <button type="button" class="add-btn" id="addUserSubmit">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
+    <script src="../../javascript/register.js"></script>
     <script>
         var allUsers = <?php echo json_encode($mockUsers); ?>;
         var currentUserRole = <?php echo json_encode($_SESSION['role'] ?? 'admin'); ?>;
@@ -451,6 +632,64 @@ $mockUsers = [
             t.textContent = msg; t.className = 'toast show';
             setTimeout(function() { t.classList.remove('show'); }, 3000);
         }
+
+        function generateNextId() {
+            var year = new Date().getFullYear();
+            var maxSeq = 0;
+            for (var i = 0; i < allUsers.length; i++) {
+                var parts = allUsers[i].id.split('-');
+                if (parts[0] === String(year)) {
+                    var seq = parseInt(parts[1], 10);
+                    if (seq > maxSeq) maxSeq = seq;
+                }
+            }
+            var next = maxSeq + 1;
+            var suffix = String(next).padStart(4, '0');
+            return year + '-' + suffix;
+        }
+
+        document.getElementById('btnAddUser').addEventListener('click', function() {
+            var fields = ['fname', 'mname', 'lname', 'ename', 'bday', 'age', 'sex', 'email',
+                'street', 'brgy', 'city', 'province', 'country', 'zipcode',
+                'user', 'pass', 'repass'];
+            for (var i = 0; i < fields.length; i++) {
+                var el = document.getElementById(fields[i]);
+                if (el) el.value = '';
+                var err = document.getElementById(fields[i] + '-error');
+                if (err && err.parentNode) err.parentNode.removeChild(err);
+            }
+            var hint1 = document.getElementById('pass-strength');
+            if (hint1) hint1.textContent = '';
+            var hint2 = document.getElementById('repass-match');
+            if (hint2) hint2.textContent = '';
+            var eyeIcon = document.getElementById('eyeicon-register');
+            if (eyeIcon) { eyeIcon.className = 'fa-solid fa-eye-slash'; }
+            var passField = document.getElementById('pass');
+            if (passField) passField.type = 'password';
+            document.getElementById('id').value = generateNextId();
+            document.getElementById('addUserModal').classList.add('active');
+        });
+
+        document.getElementById('addUserSubmit').addEventListener('click', function() {
+            var fn = document.getElementById('fname').value.trim();
+            var mn = document.getElementById('mname').value.trim();
+            var ln = document.getElementById('lname').value.trim();
+            var en = document.getElementById('ename').value.trim();
+            var fullName = fn + (mn ? ' ' + mn : '') + ' ' + ln + (en ? ' ' + en : '');
+            var newUser = {
+                id: document.getElementById('id').value.trim(),
+                username: document.getElementById('user').value.trim(),
+                fullName: fullName.replace(/\s+/g, ' ').trim(),
+                email: document.getElementById('email').value.trim(),
+                role: document.getElementById('role').value,
+                status: 'active'
+            };
+            allUsers.unshift(newUser);
+            closeModal('addUserModal');
+            state.page = 1;
+            render();
+            showToast('User added successfully.', 'success');
+        });
 
         document.getElementById('btnSearchUsers').addEventListener('click', function() {
             state.filters.search = document.getElementById('userSearch').value.trim();

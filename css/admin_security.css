@@ -817,7 +817,7 @@ body.admin-body {
     transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
-.modal-overlay.show {
+.modal-overlay.active {
     opacity: 1;
     visibility: visible;
 }
@@ -836,7 +836,7 @@ body.admin-body {
     transition: transform 0.2s ease;
 }
 
-.modal-overlay.show .modal {
+.modal-overlay.active .modal {
     transform: scale(1) translateY(0);
 }
 
