@@ -10,8 +10,16 @@ const getAdminOrders = () => {
     window.location.href = "./orders.php";
 };
 
-const getAdminCustomers = () => {
-    window.location.href = "./customers.php";
+const getAdminUserManagement = () => {
+    window.location.href = "./user_management.php";
+};
+
+const getAdminPendingApprovals = () => {
+    window.location.href = "./pending_approvals.php";
+};
+
+const getAdminSystemLogs = () => {
+    window.location.href = "./system_logs.php";
 };
 
 const getAdminLogout = () => {

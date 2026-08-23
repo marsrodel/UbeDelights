@@ -326,25 +326,4 @@
         });
     });
 
-    // ===== CUSTOMER BLOCK/UNBLOCK =====
-    document.querySelectorAll('.btn-toggle-block').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var row = this.closest('tr');
-            var badge = row.querySelector('.status-badge');
-            var name = row.querySelector('.customer-name').textContent;
-            if (badge.classList.contains('badge-active')) {
-                badge.classList.remove('badge-active');
-                badge.classList.add('badge-blocked');
-                badge.textContent = 'Blocked';
-                this.textContent = 'Unblock';
-                showToast(name + ' has been blocked.', 'error');
-            } else {
-                badge.classList.remove('badge-blocked');
-                badge.classList.add('badge-active');
-                badge.textContent = 'Active';
-                this.textContent = 'Block';
-                showToast(name + ' has been unblocked.', 'success');
-            }
-        });
-    });
 })();

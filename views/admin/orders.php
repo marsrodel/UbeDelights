@@ -62,7 +62,7 @@ $mockOrders = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Admin Orders</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin.css?v=1.0">
+    <link rel="stylesheet" href="../../css/admin.css?v=1.2">
 </head>
 <body class="admin-body">
     <aside class="admin-sidebar">
@@ -78,7 +78,9 @@ $mockOrders = [
             <a onclick="getAdminDashboard()" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
             <a onclick="getAdminProducts()" class="sidebar-link"><i class="fa-solid fa-box"></i><span>Products</span></a>
             <a onclick="getAdminOrders()" class="sidebar-link active"><i class="fa-solid fa-bag-shopping"></i><span>Orders</span></a>
-            <a onclick="getAdminCustomers()" class="sidebar-link"><i class="fa-solid fa-users"></i><span>Customers</span></a>
+            <a onclick="getAdminUserManagement()" class="sidebar-link"><i class="fa-solid fa-users-cog"></i><span>User Management</span></a>
+            <a onclick="getAdminPendingApprovals()" class="sidebar-link"><i class="fa-solid fa-user-clock"></i><span>Pending Approvals</span></a>
+            <a onclick="getAdminSystemLogs()" class="sidebar-link"><i class="fa-solid fa-list-alt"></i><span>System Logs</span></a>
         </nav>
 
         <div class="sidebar-footer">
