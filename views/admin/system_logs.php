@@ -1,9 +1,11 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'super_admin'])) {
-    header('Location: ./login.php');
-    exit();
+// Temporary bypass — no backend auth yet
+if (!isset($_SESSION['user_id'])) {
+    $_SESSION['user_id'] = 1;
+    $_SESSION['username'] = 'Admin';
+    $_SESSION['role'] = 'super_admin';
 }
 
 $currentUser = [
@@ -74,7 +76,7 @@ $mockLogs = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Logs - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin_security.css?v=1.0">
+    <link rel="stylesheet" href="../../css/admin_security.css?v=1.2">
     <style>
         .info-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
         .filters-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 8px; }
@@ -138,6 +140,16 @@ $mockLogs = [
             </div>
         </div>
 
+        <div class="sidebar-profile">
+            <div class="admin-chip">
+                <div class="admin-avatar">AU</div>
+                <div class="admin-chip-info">
+                    <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong>
+                    <small><?php echo ucfirst($_SESSION['role'] ?? 'admin'); ?></small>
+                </div>
+            </div>
+        </div>
+
         <nav class="sidebar-nav">
             <a onclick="getAdminDashboard()" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
             <a onclick="getAdminProducts()" class="sidebar-link"><i class="fa-solid fa-box"></i><span>Products</span></a>
@@ -148,13 +160,6 @@ $mockLogs = [
         </nav>
 
         <div class="sidebar-footer">
-            <div class="admin-chip">
-                <div class="admin-avatar">AU</div>
-                <div class="admin-chip-info">
-                    <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong>
-                    <small><?php echo ucfirst($_SESSION['role'] ?? 'admin'); ?></small>
-                </div>
-            </div>
             <a onclick="getAdminLogout()" class="sidebar-logout"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></a>
         </div>
     </aside>

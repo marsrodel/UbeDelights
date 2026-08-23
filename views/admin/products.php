@@ -45,7 +45,7 @@ function statusClass($status) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Admin Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin.css?v=1.2">
+    <link rel="stylesheet" href="../../css/admin.css?v=1.4">
 </head>
 <body class="admin-body">
     <aside class="admin-sidebar">
@@ -54,6 +54,16 @@ function statusClass($status) {
             <div>
                 <h2>Ube Delights</h2>
                 <span class="sidebar-tag">Admin Panel</span>
+            </div>
+        </div>
+
+        <div class="sidebar-profile">
+            <div class="admin-chip">
+                <div class="admin-avatar">AU</div>
+                <div class="admin-chip-info">
+                    <strong>Admin User</strong>
+                    <small>Administrator</small>
+                </div>
             </div>
         </div>
 
@@ -67,13 +77,6 @@ function statusClass($status) {
         </nav>
 
         <div class="sidebar-footer">
-            <div class="admin-chip">
-                <div class="admin-avatar">AU</div>
-                <div class="admin-chip-info">
-                    <strong>Admin User</strong>
-                    <small>Administrator</small>
-                </div>
-            </div>
             <a onclick="getAdminLogout()" class="sidebar-logout"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></a>
         </div>
     </aside>
@@ -95,7 +98,7 @@ function statusClass($status) {
                     <button class="filter-btn" data-category="pastries">Pastries</button>
                     <button class="filter-btn" data-category="beverages">Beverages</button>
                 </div>
-                <button class="btn-primary" id="btnAddProduct"><i class="fa-solid fa-plus"></i> Add Product</button>
+                <button class="btn-primary" id="btnAddProduct" style="padding:10px 12px; font-size:0.95rem; border-radius:10px;" title="Add Product"><i class="fa-solid fa-plus"></i></button>
             </div>
 
             <div class="products-grid" id="productsGrid">
