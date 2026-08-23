@@ -10,6 +10,12 @@ $currentUser = [
     'username' => $_SESSION['username'] ?? 'Admin',
     'role' => $_SESSION['role'] ?? 'admin'
 ];
+
+$mockPending = [
+    ['id' => '2025-0012', 'username' => 'ana.ramos', 'fullName' => 'Ana Ramos', 'email' => 'ana.ramos@gmail.com'],
+    ['id' => '2025-0015', 'username' => 'carlos.m', 'fullName' => 'Carlos Mendoza', 'email' => 'carlos.m@yahoo.com'],
+    ['id' => '2025-0018', 'username' => 'liza.santos', 'fullName' => 'Liza Santos', 'email' => 'liza.s@outlook.com'],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,9 +25,29 @@ $currentUser = [
     <title>Pending Approvals - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.0">
+    <style>
+        .info-item { background: var(--bg-main); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+        .info-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .info-value { font-size: 14px; color: var(--text-primary); font-weight: 600; }
+        .pending-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 12px;
+        }
+        .pending-action-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .pending-action-btn.btn-view { background: var(--text-primary); color: #fff; }
+        .pending-action-btn.btn-approve { background: #dcfce7; color: #16a34a; }
+        .pending-action-btn.btn-reject { background: #fee2e2; color: #dc2626; }
+    </style>
 </head>
 <body class="admin-body">
-    <!-- Sidebar -->
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-header">
             <img src="../../images/logo.png" alt="Ube Delights" class="sidebar-logo">
@@ -52,7 +78,6 @@ $currentUser = [
         </div>
     </aside>
 
-    <!-- Main Content -->
     <div class="admin-main">
         <header class="admin-topbar">
             <h1>Pending Approvals</h1>
@@ -62,74 +87,58 @@ $currentUser = [
         </header>
 
         <main class="admin-content">
-            <!-- Page Header -->
-            <div class="content-header">
-                <div>
-                    <h2>Pending Registrations</h2>
-                    <p>Review and approve or reject new user registrations</p>
-                </div>
-            </div>
 
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #f59e0b15; color: #f59e0b;"><i class="fa-solid fa-user-clock"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="statTotalPending">-</span>
-                        <span class="stat-label">Total Pending</span>
+            <div class="users-section">
+                <div class="card">
+                    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+                        <h2 style="margin:0; font-size:1.1rem; font-weight:700; color:var(--text-primary);">
+                            <i class="fa-solid fa-user-clock" style="color:var(--accent);"></i> Pending Accounts
+                        </h2>
+                        <form method="GET" class="filters-bar" style="margin:0; padding:0; background:none; border:none; gap:10px;">
+                            <div class="search-box" style="min-width:220px; max-width:280px;">
+                                <i class="fa-solid fa-search"></i>
+                                <input type="text" name="search" value="" placeholder="Search pending...">
+                            </div>
+                            <button type="submit" class="btn-primary" style="padding:10px 18px; font-size:0.85rem;">Search</button>
+                        </form>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="pendingTable">
+                            <thead>
+                                <tr>
+                                    <th>ID NUMBER</th>
+                                    <th>USERNAME</th>
+                                    <th>FULL NAME</th>
+                                    <th>EMAIL</th>
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingTableBody">
+                                <?php foreach ($mockPending as $user): ?>
+                                <tr data-user-id="<?php echo htmlspecialchars($user['id']); ?>">
+                                    <td class="cell-id"><?php echo htmlspecialchars($user['id']); ?></td>
+                                    <td><?php echo htmlspecialchars($user['username']); ?></td>
+                                    <td class="cell-strong"><?php echo htmlspecialchars($user['fullName']); ?></td>
+                                    <td class="cell-muted"><?php echo htmlspecialchars($user['email']); ?></td>
+                                    <td class="actions-cell">
+                                        <button class="pending-action-btn btn-view" onclick="viewPendingUser('<?php echo htmlspecialchars($user['id']); ?>')" title="View Details">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="pending-action-btn btn-approve" onclick="approvePendingUser('<?php echo htmlspecialchars($user['id']); ?>')" title="Approve">
+                                            <i class="fa-solid fa-check"></i>
+                                        </button>
+                                        <button class="pending-action-btn btn-reject" onclick="rejectPendingUser('<?php echo htmlspecialchars($user['id']); ?>')" title="Reject">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #22c55e15; color: #22c55e;"><i class="fa-solid fa-check-circle"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="statApprovedToday">-</span>
-                        <span class="stat-label">Approved Today</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #ef444415; color: #ef4444;"><i class="fa-solid fa-times-circle"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="statRejectedToday">-</span>
-                        <span class="stat-label">Rejected Today</span>
-                    </div>
-                </div>
             </div>
 
-            <!-- Filters -->
-            <div class="filters-bar">
-                <div class="search-box">
-                    <i class="fa-solid fa-search"></i>
-                    <input type="text" id="pendingSearch" placeholder="Search pending users...">
-                </div>
-            </div>
-
-            <!-- Pending Users Table -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Pending Registrations</h2>
-                </div>
-                <div class="table-container">
-                    <table class="data-table" id="pendingTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Username</th>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pendingTableBody">
-                            <!-- Populated via JS -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination-container" id="pendingPaginationContainer">
-                    <!-- Pagination rendered via JS -->
-                </div>
-            </div>
-
-            <!-- Empty State -->
             <div class="empty-state" id="emptyPending" style="display:none;">
                 <div class="empty-icon">👥</div>
                 <h3>No pending registrations</h3>
@@ -140,7 +149,7 @@ $currentUser = [
 
     <!-- View Pending User Modal -->
     <div class="modal-overlay" id="viewPendingModal" role="dialog" aria-modal="true" aria-labelledby="viewPendingModalTitle">
-        <div class="modal" style="max-width: 700px;">
+        <div class="modal" style="max-width: 650px;">
             <div class="modal-header">
                 <h2 id="viewPendingModalTitle">Registration Details</h2>
                 <button class="modal-close" id="viewPendingModalClose" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
@@ -172,21 +181,95 @@ $currentUser = [
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-outline" id="approvalModalCancel">Cancel</button>
-                <button type="button" class="btn-primary" id="approvalConfirmBtn" style="background: var(--success);"><i class="fa-solid fa-check"></i> <span id="approvalConfirmText">Approve</span></button>
+                <button type="button" class="btn-primary" id="approvalConfirmBtn"><i class="fa-solid fa-check"></i> <span id="approvalConfirmText">Approve</span></button>
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
-    <!-- Scripts -->
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof initPendingApprovals === 'function') {
-                initPendingApprovals();
+        var pendingUsers = <?php echo json_encode($mockPending); ?>;
+
+        function viewPendingUser(userId) {
+            var user = pendingUsers.find(function(u) { return u.id === userId; });
+            if (!user) return;
+            var body = document.getElementById('viewPendingBody');
+            body.innerHTML =
+                '<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">' +
+                    '<div class="info-item"><div class="info-label">ID Number</div><div class="info-value">' + user.id + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Username</div><div class="info-value">' + user.username + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Full Name</div><div class="info-value">' + user.fullName + '</div></div>' +
+                    '<div class="info-item"><div class="info-label">Email</div><div class="info-value">' + user.email + '</div></div>' +
+                '</div>';
+            document.getElementById('viewPendingModal').classList.add('active');
+        }
+
+        function closeViewPendingModal() {
+            document.getElementById('viewPendingModal').classList.remove('active');
+        }
+
+        function approvePendingUser(userId) {
+            var user = pendingUsers.find(function(u) { return u.id === userId; });
+            if (!user) return;
+            document.getElementById('approvalModalTitle').textContent = 'Approve Registration';
+            document.getElementById('approvalMessage').textContent = 'Are you sure you want to approve this registration?';
+            document.getElementById('approvalUserName').textContent = user.fullName;
+            document.getElementById('approvalUserId').value = userId;
+            document.getElementById('approvalAction').value = 'approve';
+            document.getElementById('approvalConfirmBtn').style.background = 'var(--success)';
+            document.getElementById('approvalConfirmBtn').innerHTML = '<i class="fa-solid fa-check"></i> <span>Approve</span>';
+            document.getElementById('approvalModal').classList.add('active');
+        }
+
+        function rejectPendingUser(userId) {
+            var user = pendingUsers.find(function(u) { return u.id === userId; });
+            if (!user) return;
+            document.getElementById('approvalModalTitle').textContent = 'Reject Registration';
+            document.getElementById('approvalMessage').textContent = 'Are you sure you want to reject and delete this registration request?';
+            document.getElementById('approvalUserName').textContent = user.fullName;
+            document.getElementById('approvalUserId').value = userId;
+            document.getElementById('approvalAction').value = 'reject';
+            document.getElementById('approvalConfirmBtn').style.background = 'var(--danger)';
+            document.getElementById('approvalConfirmBtn').innerHTML = '<i class="fa-solid fa-xmark"></i> <span>Reject</span>';
+            document.getElementById('approvalModal').classList.add('active');
+        }
+
+        document.getElementById('approvalConfirmBtn').addEventListener('click', function() {
+            var userId = document.getElementById('approvalUserId').value;
+            var action = document.getElementById('approvalAction').value;
+            var row = document.querySelector('tr[data-user-id="' + userId + '"]');
+            if (row) row.remove();
+            closeApprovalModal();
+            var t = document.getElementById('toast');
+            t.textContent = action === 'approve' ? 'Registration approved!' : 'Registration rejected.';
+            t.className = 'toast show';
+            setTimeout(function() { t.classList.remove('show'); }, 3000);
+        });
+
+        function closeApprovalModal() {
+            document.getElementById('approvalModal').classList.remove('active');
+        }
+
+        document.getElementById('approvalModalCancel').addEventListener('click', closeApprovalModal);
+        document.getElementById('viewPendingModalClose').addEventListener('click', closeViewPendingModal);
+        document.getElementById('viewPendingModalCloseBtn').addEventListener('click', closeViewPendingModal);
+
+        document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(function(m) {
+                    m.classList.remove('active');
+                });
             }
         });
     </script>
