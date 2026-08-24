@@ -104,7 +104,7 @@
             modalSubmitBtn.textContent = 'Add Product';
         }
 
-        modal.classList.add('show');
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
         // Focus first input
         setTimeout(function() {
@@ -113,7 +113,7 @@
     }
 
     function closeModal() {
-        modal.classList.remove('show');
+        modal.classList.remove('active');
         document.body.style.overflow = '';
     }
 
@@ -149,7 +149,7 @@
 
     // Close on Escape
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal && modal.classList.contains('show')) {
+        if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
             closeModal();
         }
     });

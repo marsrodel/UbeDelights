@@ -24,7 +24,7 @@
     function openModal(modalId) {
         var modal = document.getElementById(modalId);
         if (modal) {
-            modal.classList.add('show');
+            modal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
     }
@@ -32,7 +32,7 @@
     function closeModal(modalId) {
         var modal = document.getElementById(modalId);
         if (modal) {
-            modal.classList.remove('show');
+            modal.classList.remove('active');
             document.body.style.overflow = '';
         }
     }
@@ -41,7 +41,7 @@
     document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) {
-                overlay.classList.remove('show');
+                overlay.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });
@@ -50,8 +50,8 @@
     // Close modal on Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            document.querySelectorAll('.modal-overlay.show').forEach(function(modal) {
-                modal.classList.remove('show');
+            document.querySelectorAll('.modal-overlay.active').forEach(function(modal) {
+                modal.classList.remove('active');
                 document.body.style.overflow = '';
             });
         }
@@ -62,7 +62,7 @@
         btn.addEventListener('click', function() {
             var modal = btn.closest('.modal-overlay');
             if (modal) {
-                modal.classList.remove('show');
+                modal.classList.remove('active');
                 document.body.style.overflow = '';
             }
         });
@@ -116,7 +116,7 @@
             addUserForm.reset();
             document.getElementById('addUserModalTitle').textContent = 'Add New User';
             addUserSubmitBtn.textContent = 'Add User';
-            document.getElementById('addUserModal').classList.add('show');
+            document.getElementById('addUserModal').classList.add('active');
             document.body.style.overflow = 'hidden';
         });
     }

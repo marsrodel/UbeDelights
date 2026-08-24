@@ -101,12 +101,15 @@ $mockUsers = [
         /* Add User Modal — compact header, matching form corners, bigger buttons */
         .add-user-modal .modal { max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; border-radius: 12px; }
         .add-user-modal .modal-body { padding: 0; overflow-y: auto; flex: 1; }
-        .add-user-modal .modal-header { padding: 10px 20px; border-bottom: 1px solid var(--border); border-radius: 12px 12px 0 0; }
-        .add-user-modal .modal-header h2 { font-size: 1.05rem; }
+        .add-user-modal .form-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; margin-bottom: 4px;
+        }
+        .add-user-modal .form-header h2 { font-size: 1.05rem; margin: 0; border-bottom: none; color: #764ba2; }
         .add-user-modal .modal-close { width: 30px; height: 30px; border-radius: 50%; background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: var(--transition); }
         .add-user-modal .modal-close:hover { background: var(--bg-main); color: var(--text-primary); }
         .add-user-modal .register-container {
-            background: rgb(214, 212, 212); border-radius: 10px; border: 3px solid rgba(102, 126, 234, 0.6);
+            background: #ffffff; border-radius: 10px; border: 3px solid rgba(102, 126, 234, 0.6);
             padding: 4px 15px 2px; margin: 0; width: 100%; box-sizing: border-box;
         }
         .add-user-modal h1 {
@@ -133,8 +136,11 @@ $mockUsers = [
         .add-user-modal .form-box input:hover,
         .add-user-modal .form-box select:hover { border-color: #b98fe0; background-color: #ffffff; }
         .add-user-modal .form-box input::placeholder { color: #4b4c4e; font-style: italic; }
-        .add-user-modal .form-box select { cursor: pointer; appearance: auto; padding-right: 10px; }
-        .add-user-modal .form-box input[readonly] { background: #f7fafc; color: #a0aec0; }
+        .add-user-modal .form-box select { cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none; padding-right: 10px; }
+        .add-user-modal .form-box input[type="number"]::-webkit-inner-spin-button,
+        .add-user-modal .form-box input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .add-user-modal .form-box input[type="number"] { -moz-appearance: textfield; }
+        .add-user-modal .form-box input[readonly] { background: #f9fafb; color: #1a1a2e; }
         .add-user-modal .required { color: #dc2626; font-weight: bold; margin-left: 2px; }
         .add-user-modal .optional { color: #dc2626; font-weight: 500; font-size: 0.7rem; margin-left: 2px; }
         .add-user-modal .password-wrapper { position: relative; display: flex; align-items: center; }
@@ -341,12 +347,12 @@ $mockUsers = [
     <!-- Add New User Modal -->
     <div class="modal-overlay add-user-modal" id="addUserModal" role="dialog" aria-modal="true">
         <div class="modal">
-            <div class="modal-header">
-                <h2><i class="fa-solid fa-user-plus" style="color:var(--accent);"></i> Add New User</h2>
-                <button class="modal-close" onclick="closeModal('addUserModal')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
             <div class="modal-body">
                 <div class="register-container">
+                    <div class="form-header">
+                        <h2><i class="fa-solid fa-user-plus" style="color:var(--accent);"></i> Add New User</h2>
+                        <button class="modal-close" onclick="closeModal('addUserModal')"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
                     <div class="form-sections">
                         <div class="section">
                             <h1>Personal Information</h1>
@@ -434,7 +440,7 @@ $mockUsers = [
                                 <div class="form-box">
                                     <label for="role">Role <span class="required">*</span></label>
                                     <select id="role">
-                                        <option value="">Select Role</option>
+                                        <option value="">-Select Role-</option>
                                         <option value="customer">Customer</option>
                                         <option value="admin">Admin</option>
                                         <option value="super_admin">Super Admin</option>
@@ -672,11 +678,56 @@ $mockUsers = [
             if (eyeIcon) { eyeIcon.className = 'fa-solid fa-eye-slash'; }
             var passField = document.getElementById('pass');
             if (passField) passField.type = 'password';
-            document.getElementById('id').value = generateNextId();
+            document.getElementById('id').value = 'Loading...';
             document.getElementById('addUserModal').classList.add('active');
+
+            fetch('../../server/generate_id.php')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    document.getElementById('id').value = data.id || '0000-0000';
+                })
+                .catch(function() {
+                    document.getElementById('id').value = generateNextId();
+                });
+        });
+
+        function clearAllRequiredErrors() {
+            var errs = document.querySelectorAll('#addUserModal [id$="-error"]');
+            for (var i = 0; i < errs.length; i++) {
+                if (/this field is required/i.test(errs[i].textContent || '')) {
+                    errs[i].parentNode && errs[i].parentNode.removeChild(errs[i]);
+                }
+            }
+        }
+        document.getElementById('addUserModal').addEventListener('focusin', function() {
+            clearAllRequiredErrors();
+        });
+        document.getElementById('addUserModal').addEventListener('input', function() {
+            clearAllRequiredErrors();
+        });
+        document.getElementById('addUserModal').addEventListener('change', function() {
+            clearAllRequiredErrors();
         });
 
         document.getElementById('addUserSubmit').addEventListener('click', function() {
+            var prevErrors = document.querySelectorAll('#addUserModal [id$="-error"]');
+            for (var c = 0; c < prevErrors.length; c++) {
+                prevErrors[c].parentNode && prevErrors[c].parentNode.removeChild(prevErrors[c]);
+            }
+            var requiredFields = ['fname','lname','bday','age','sex','email','street','brgy','city','province','country','zipcode','user','role','pass','repass'];
+            var anyEmpty = false;
+            for (var i = 0; i < requiredFields.length; i++) {
+                var f = document.getElementById(requiredFields[i]);
+                if (!f) continue;
+                var v = (f.value || '').trim();
+                if (f.tagName === 'SELECT') v = f.value;
+                if (v === '') {
+                    showErrorMessage(requiredFields[i], 'This field is required');
+                    anyEmpty = true;
+                }
+            }
+            if (anyEmpty) return;
+
             var fn = document.getElementById('fname').value.trim();
             var mn = document.getElementById('mname').value.trim();
             var ln = document.getElementById('lname').value.trim();
