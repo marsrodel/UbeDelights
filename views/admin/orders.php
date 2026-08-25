@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../server/admin_auth.php';
+
 $mockOrders = [
     [
         'id' => 'ORD-008',
@@ -78,8 +79,8 @@ $mockOrders = [
             <div class="admin-chip">
                 <div class="admin-avatar">AU</div>
                 <div class="admin-chip-info">
-                    <strong>Admin User</strong>
-                    <small>Administrator</small>
+                    <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
+                    <small>ADMIN</small>
                 </div>
             </div>
         </div>

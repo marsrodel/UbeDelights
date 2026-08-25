@@ -1,12 +1,6 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-if (!isset($_SESSION['auth_user_id'])) {
-    header('Location: ./login.php');
-    exit();
-}
+<?php require_once __DIR__ . '/../server/customer_auth.php';
 
-include '../server/db.php';
-$userId = $_SESSION['auth_user_id'];
+$userId = $currentUser['id'];
 
 $firstName = $lastName = $email = $phone = $street = $barangay = $city = $province = $zip = '';
 if ($connect) {

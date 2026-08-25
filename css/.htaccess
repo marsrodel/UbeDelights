@@ -55,5 +55,12 @@
 	</If>
 </Files>
 
+<Files "dashboard.css">
+	Require all denied
+	<If "%{HTTP_REFERER} =~ m#^http://localhost/UbeDelights/#">
+		Require all granted
+	</If>
+</Files>
+
 ErrorDocument 403 http://localhost/UbeDelights/views/error.html
 

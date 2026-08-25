@@ -1,9 +1,4 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-if (!isset($_SESSION['auth_user_id'])) {
-    header('Location: ./login.php');
-    exit();
-}
+<?php require_once __DIR__ . '/../server/customer_auth.php';
 
 $products = [
     ['name' => 'Ube Cheesecake', 'price' => '₱850', 'category' => 'cakes', 'description' => 'Creamy cheesecake with authentic ube swirl on a graham crust', 'badge' => 'Best Seller', 'image' => '../images/items/cheesecake.jpg'],

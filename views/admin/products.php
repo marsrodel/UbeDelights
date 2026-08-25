@@ -1,4 +1,5 @@
-<?php
+<?php require_once __DIR__ . '/../../server/admin_auth.php';
+
 $products = [
     ['id' => 1, 'name' => 'Ube Cheesecake', 'price' => '₱850', 'priceNum' => 850, 'type' => 'cakes', 'status' => 'Best Seller',
      'description' => 'Creamy cheesecake with authentic ube swirl on a graham crust',
@@ -61,8 +62,8 @@ function statusClass($status) {
             <div class="admin-chip">
                 <div class="admin-avatar">AU</div>
                 <div class="admin-chip-info">
-                    <strong>Admin User</strong>
-                    <small>Administrator</small>
+                    <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
+                    <small>ADMIN</small>
                 </div>
             </div>
         </div>

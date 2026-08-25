@@ -1,17 +1,4 @@
-<?php
-session_start();
-
-// Temporary bypass — no backend auth yet
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1;
-    $_SESSION['username'] = 'Admin';
-    $_SESSION['role'] = 'super_admin';
-}
-
-$currentUser = [
-    'username' => $_SESSION['username'] ?? 'Admin',
-    'role' => $_SESSION['role'] ?? 'admin'
-];
+<?php require_once __DIR__ . '/../../server/admin_auth.php';
 
 // Mock stats - in real implementation, these would come from the database
 $stats = [
@@ -45,7 +32,7 @@ $stats = [
                 <div class="admin-avatar">AU</div>
                 <div class="admin-chip-info">
                     <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
-                    <small><?php echo ucfirst($currentUser['role']); ?></small>
+                    <small>ADMIN</small>
                 </div>
             </div>
         </div>

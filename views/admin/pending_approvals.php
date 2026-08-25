@@ -1,17 +1,4 @@
-<?php
-session_start();
-
-// Temporary bypass — no backend auth yet
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1;
-    $_SESSION['username'] = 'Admin';
-    $_SESSION['role'] = 'super_admin';
-}
-
-$currentUser = [
-    'username' => $_SESSION['username'] ?? 'Admin',
-    'role' => $_SESSION['role'] ?? 'admin'
-];
+<?php require_once __DIR__ . '/../../server/admin_auth.php';
 
 $mockPending = [
     ['id' => '2025-0012', 'username' => 'ana.ramos', 'fullName' => 'Ana Ramos', 'email' => 'ana.ramos@gmail.com'],
@@ -42,8 +29,8 @@ $mockPending = [
             <div class="admin-chip">
                 <div class="admin-avatar">AU</div>
                 <div class="admin-chip-info">
-                    <strong><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></strong>
-                    <small><?php echo ucfirst($_SESSION['role'] ?? 'admin'); ?></small>
+                    <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
+                    <small>ADMIN</small>
                 </div>
             </div>
         </div>

@@ -1,12 +1,7 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-if (!isset($_SESSION['auth_user_id'])) {
-    header('Location: ./login.php');
-    exit();
-}
-$userId = (string)$_SESSION['auth_user_id'];
+<?php require_once __DIR__ . '/../server/customer_auth.php';
+
+$userId = $currentUser['id'];
 $firstName = '';
-require_once __DIR__ . '/../server/db.php';
 if ($connect) {
     $sql = "SELECT first_name FROM users WHERE user_id = ? LIMIT 1";
     if ($stmt = mysqli_prepare($connect, $sql)) {
