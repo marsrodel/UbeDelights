@@ -243,3 +243,9 @@
         render(allLogs);
     };
 })();
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof allLogs !== 'undefined' && typeof initSystemLogs === 'function') {
+        initSystemLogs(allLogs);
+    }
+});

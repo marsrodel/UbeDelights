@@ -144,5 +144,6 @@ $stats = [
 
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin.js"></script>
+    <script src="../../javascript/inspect.js"></script>
 </body>
 </html>

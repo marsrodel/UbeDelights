@@ -34,5 +34,26 @@
 	</If>
 </Files>
 
+<Files "admin.css">
+	Require all denied
+	<If "%{HTTP_REFERER} =~ m#^http://localhost/UbeDelights/#">
+		Require all granted
+	</If>
+</Files>
+
+<Files "admin_security.css">
+	Require all denied
+	<If "%{HTTP_REFERER} =~ m#^http://localhost/UbeDelights/#">
+		Require all granted
+	</If>
+</Files>
+
+<Files "user_management.css">
+	Require all denied
+	<If "%{HTTP_REFERER} =~ m#^http://localhost/UbeDelights/#">
+		Require all granted
+	</If>
+</Files>
+
 ErrorDocument 403 http://localhost/UbeDelights/views/error.html
 

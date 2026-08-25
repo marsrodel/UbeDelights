@@ -76,59 +76,7 @@ $mockLogs = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Logs - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin_security.css?v=1.2">
-    <style>
-        .info-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
-        .filters-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 8px; }
-        .filters-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .filters-title i { color: var(--accent); }
-        .filters-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
-        .filter-field label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
-        .filter-field input,
-        .filter-field select {
-            width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-            font-family: var(--font-body); font-size: 0.85rem; color: var(--text-primary); background: var(--bg-main);
-            transition: var(--transition); outline: none;
-        }
-        .filter-field input:focus,
-        .filter-field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1); }
-        .filter-buttons { display: flex; gap: 8px; align-items: end; }
-        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 0; }
-        .section-header h2 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-        .section-header .count { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
-        .log-user-cell { font-weight: 600; color: var(--text-primary); }
-        .log-id-cell { font-size: 11px; color: var(--text-muted); }
-        .role-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
-        .role-admin { background: #dcfce7; color: #15803d; }
-        .role-super_admin { background: #dbeafe; color: #1d4ed8; }
-        .role-customer { background: #fef3c7; color: #b45309; }
-        .activity-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap; }
-        .activity-login { background: #dcfce7; color: #166534; }
-        .activity-logout { background: #fee2e2; color: #991b1b; }
-        .activity-failed_login { background: #fef3c7; color: #92400e; }
-        .activity-create { background: #dbeafe; color: #1e40af; }
-        .activity-update { background: #ede9fe; color: #5b21b6; }
-        .activity-block { background: #fee2e2; color: #dc2626; }
-        .activity-unblock { background: #dbeafe; color: #1d4ed8; }
-        .activity-delete { background: #fee2e2; color: #991b1b; }
-        .activity-approve { background: #dcfce7; color: #065f46; }
-        .activity-reject { background: #fee2e2; color: #991b1b; }
-        .activity-desc { font-size: 11px; color: var(--text-muted); margin-top: 3px; max-width: 200px; white-space: normal; line-height: 1.4; }
-        .ip-badge { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: var(--text-secondary); font-family: monospace; }
-        .device-cell { font-size: 13px; color: var(--text-secondary); }
-        .pagination-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px 20px; border-top: 1px solid var(--border); }
-        .pagination-info { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-        .pagination-info strong { color: var(--text-primary); }
-        .per-page-group { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); font-weight: 600; }
-        .per-page-group select { border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: 13px; color: var(--text-primary); background: #fff; cursor: pointer; font-weight: 600; }
-        .pagination { display: flex; gap: 6px; flex-wrap: wrap; }
-        .pagination-link { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 34px; padding: 0 8px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--text-secondary); border: 1px solid var(--border); background: #fff; cursor: pointer; transition: var(--transition); }
-        .pagination-link:hover { border-color: var(--accent); color: var(--accent); }
-        .pagination-link.current { background: var(--primary-gradient); color: #fff; border-color: transparent; }
-        .pagination-link.disabled { opacity: 0.4; pointer-events: none; }
-        @media (max-width: 900px) { .filters-grid { grid-template-columns: 1fr 1fr; } }
-        @media (max-width: 600px) { .filters-grid { grid-template-columns: 1fr; } }
-    </style>
+    <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
 </head>
 <body class="admin-body">
     <aside class="admin-sidebar" id="adminSidebar">
@@ -245,13 +193,7 @@ $mockLogs = [
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_logs.js"></script>
-    <script>
-        var allLogs = <?php echo json_encode($mockLogs); ?>;
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof initSystemLogs === 'function') {
-                initSystemLogs(allLogs);
-            }
-        });
-    </script>
+    <script>var allLogs = <?php echo json_encode($mockLogs); ?>;</script>
+    <script src="../../javascript/inspect.js"></script>
 </body>
 </html>
