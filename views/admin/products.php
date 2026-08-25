@@ -13,16 +13,16 @@ $products = [
     ['id' => 4, 'name' => 'Ube Roll', 'price' => '₱450', 'priceNum' => 450, 'type' => 'rolls', 'status' => 'Popular',
      'description' => 'Fluffy ube sponge roll wrapped around smooth ube buttercream filling',
      'image' => '../../images/items/uberoll.jpg'],
-    ['id' => 4, 'name' => 'Ube Halo-Halo', 'price' => '₱180', 'priceNum' => 180, 'type' => 'beverages', 'status' => 'Popular',
+    ['id' => 5, 'name' => 'Ube Halo-Halo', 'price' => '₱180', 'priceNum' => 180, 'type' => 'beverages', 'status' => 'Popular',
      'description' => 'Classic Filipino shaved ice dessert topped with creamy ube halaya',
      'image' => '../../images/items/halohalo.jpg'],
-    ['id' => 5, 'name' => 'Ube Crinkles', 'price' => '₱280', 'priceNum' => 280, 'type' => 'pastries', 'status' => 'New',
+    ['id' => 6, 'name' => 'Ube Crinkles', 'price' => '₱280', 'priceNum' => 280, 'type' => 'pastries', 'status' => 'New',
      'description' => 'Chewy sugar-dusted crinkle cookies bursting with ube flavor',
      'image' => '../../images/items/crinkles.jpg'],
-    ['id' => 6, 'name' => 'Ube Latte', 'price' => '₱150', 'priceNum' => 150, 'type' => 'beverages', 'status' => 'New',
+    ['id' => 7, 'name' => 'Ube Latte', 'price' => '₱150', 'priceNum' => 150, 'type' => 'beverages', 'status' => 'New',
      'description' => 'Espresso blended with steamed milk and house-made ube syrup',
      'image' => '../../images/items/latte.jpg'],
-    ['id' => 7, 'name' => 'Ube Macapuno', 'price' => '₱150', 'priceNum' => 150, 'type' => 'pastries', 'status' => 'Not Available',
+    ['id' => 8, 'name' => 'Ube Macapuno', 'price' => '₱150', 'priceNum' => 150, 'type' => 'pastries', 'status' => 'Not Available',
      'description' => 'Sweet ube and macapuno preserves in a soft, buttery pastry shell',
      'image' => '../../images/items/macapuno.jpg'],
 ];
@@ -37,6 +37,15 @@ function statusClass($status) {
         'Not Available' => 'badge-unavailable',
     ];
     return isset($map[$status]) ? $map[$status] : 'badge-unavailable';
+}
+
+$featuredFile = __DIR__ . '/../../server/featured_data.json';
+$featuredIds = [];
+if (file_exists($featuredFile)) {
+    $featuredData = json_decode(file_get_contents($featuredFile), true);
+    if (isset($featuredData['featured_ids'])) {
+        $featuredIds = $featuredData['featured_ids'];
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -129,6 +138,7 @@ function statusClass($status) {
                         </div>
                     </div>
                     <div class="product-card-actions">
+                        <button class="btn-featured <?php echo in_array($product['id'], $featuredIds) ? 'active' : ''; ?>" data-id="<?php echo $product['id']; ?>" title="<?php echo in_array($product['id'], $featuredIds) ? 'Remove from featured' : 'Add to featured'; ?>"><i class="fa-<?php echo in_array($product['id'], $featuredIds) ? 'solid' : 'regular'; ?> fa-star"></i></button>
                         <button class="btn-outline btn-edit" data-id="<?php echo $product['id']; ?>"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                         <button class="btn-outline btn-delete" data-id="<?php echo $product['id']; ?>"><i class="fa-solid fa-trash-can"></i> Delete</button>
                     </div>

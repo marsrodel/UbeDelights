@@ -2,7 +2,9 @@
 
 $userId = $currentUser['id'];
 $firstName = '';
+
 if ($connect) {
+    // Fetch first name
     $sql = "SELECT first_name FROM users WHERE user_id = ? LIMIT 1";
     if ($stmt = mysqli_prepare($connect, $sql)) {
         mysqli_stmt_bind_param($stmt, 's', $userId);
@@ -14,28 +16,123 @@ if ($connect) {
         }
         mysqli_stmt_close($stmt);
     }
-    mysqli_close($connect);
+
+    // Stats: total orders
+    $totalOrders = 0;
+    $sql = "SELECT COUNT(*) AS cnt FROM orders WHERE user_id = ?";
+    if ($stmt = mysqli_prepare($connect, $sql)) {
+        mysqli_stmt_bind_param($stmt, 's', $userId);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        if ($res && $row = mysqli_fetch_assoc($res)) { $totalOrders = (int)$row['cnt']; }
+        mysqli_stmt_close($stmt);
+    }
+
+    // Stats: pending orders
+    $pendingOrders = 0;
+    $sql = "SELECT COUNT(*) AS cnt FROM orders WHERE user_id = ? AND status = 'pending'";
+    if ($stmt = mysqli_prepare($connect, $sql)) {
+        mysqli_stmt_bind_param($stmt, 's', $userId);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        if ($res && $row = mysqli_fetch_assoc($res)) { $pendingOrders = (int)$row['cnt']; }
+        mysqli_stmt_close($stmt);
+    }
+
+    // Stats: delivered orders
+    $deliveredOrders = 0;
+    $sql = "SELECT COUNT(*) AS cnt FROM orders WHERE user_id = ? AND status = 'delivered'";
+    if ($stmt = mysqli_prepare($connect, $sql)) {
+        mysqli_stmt_bind_param($stmt, 's', $userId);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        if ($res && $row = mysqli_fetch_assoc($res)) { $deliveredOrders = (int)$row['cnt']; }
+        mysqli_stmt_close($stmt);
+    }
+
+    // Stats: total spent
+    $totalSpent = 0;
+    $sql = "SELECT COALESCE(SUM(total_amount), 0) AS total FROM orders WHERE user_id = ?";
+    if ($stmt = mysqli_prepare($connect, $sql)) {
+        mysqli_stmt_bind_param($stmt, 's', $userId);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        if ($res && $row = mysqli_fetch_assoc($res)) { $totalSpent = (float)$row['total']; }
+        mysqli_stmt_close($stmt);
+    }
+
+    // Recent orders (max 3)
+    $recentOrders = [];
+    $sql = "SELECT o.order_id, o.order_date, o.total_amount, o.status,
+                   GROUP_CONCAT(oi.product_name SEPARATOR ', ') AS items
+            FROM orders o
+            JOIN order_items oi ON o.order_id = oi.order_id
+            WHERE o.user_id = ?
+            GROUP BY o.order_id
+            ORDER BY o.order_date DESC
+            LIMIT 3";
+    if ($stmt = mysqli_prepare($connect, $sql)) {
+        mysqli_stmt_bind_param($stmt, 's', $userId);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $recentOrders[] = [
+                    'id'     => 'ORD-' . str_pad($row['order_id'], 3, '0', STR_PAD_LEFT),
+                    'date'   => date('M j, Y', strtotime($row['order_date'])),
+                    'items'  => $row['items'],
+                    'total'  => '₱' . number_format((float)$row['total_amount'], 0),
+                    'status' => $row['status'],
+                ];
+            }
+        }
+        mysqli_stmt_close($stmt);
+    }
 }
 
 $stats = [
-    ['label' => 'Total Orders', 'value' => '12',     'icon' => 'fa-solid fa-bag-shopping',  'color' => '#7c3aed'],
-    ['label' => 'Pending',      'value' => '3',       'icon' => 'fa-solid fa-clock',          'color' => '#a855f7'],
-    ['label' => 'Delivered',    'value' => '8',       'icon' => 'fa-solid fa-circle-check',   'color' => '#6d28d9'],
-    ['label' => 'Total Spent',  'value' => '₱4,250', 'icon' => 'fa-solid fa-wallet',         'color' => '#8b5cf6'],
+    ['label' => 'Total Orders', 'value' => number_format($totalOrders), 'icon' => 'fa-solid fa-bag-shopping',  'color' => '#7c3aed'],
+    ['label' => 'Pending',      'value' => number_format($pendingOrders), 'icon' => 'fa-solid fa-clock',          'color' => '#a855f7'],
+    ['label' => 'Delivered',    'value' => number_format($deliveredOrders), 'icon' => 'fa-solid fa-circle-check',   'color' => '#6d28d9'],
+    ['label' => 'Total Spent',  'value' => '₱' . number_format($totalSpent), 'icon' => 'fa-solid fa-wallet',         'color' => '#8b5cf6'],
 ];
 
-$featuredProducts = [
-    ['name' => 'Ube Cheesecake', 'price' => '₱850', 'badge' => 'Best Seller', 'image' => '../images/items/cheesecake.jpg'],
-    ['name' => 'Ube Roll', 'price' => '₱450', 'badge' => 'Popular', 'image' => '../images/items/uberoll.jpg'],
-    ['name' => 'Classic Ube Cake', 'price' => '₱950', 'badge' => '', 'image' => '../images/items/classic.jpg'],
-    ['name' => 'Ube Crinkles', 'price' => '₱280', 'badge' => 'New', 'image' => '../images/items/crinkles.jpg'],
-];
+$featuredIds = [];
+$featuredFile = __DIR__ . '/../server/featured_data.json';
+if (file_exists($featuredFile)) {
+    $featuredData = json_decode(file_get_contents($featuredFile), true);
+    if (isset($featuredData['featured_ids'])) {
+        $featuredIds = $featuredData['featured_ids'];
+    }
+}
 
-$recentOrders = [
-    ['id' => 'ORD-001', 'date' => 'Aug 18, 2025', 'items' => 'Ube Cheesecake, Ube Latte', 'total' => '₱1,000', 'status' => 'delivered'],
-    ['id' => 'ORD-002', 'date' => 'Aug 15, 2025', 'items' => 'Ube Roll, Ube Crinkles', 'total' => '₱730', 'status' => 'pending'],
-    ['id' => 'ORD-003', 'date' => 'Aug 12, 2025', 'items' => 'Classic Ube Cake', 'total' => '₱950', 'status' => 'confirmed'],
-];
+// Featured products (from DB)
+$featuredProducts = [];
+if ($connect && !empty($featuredIds)) {
+    $placeholders = implode(',', array_fill(0, count($featuredIds), '?'));
+    $types = str_repeat('i', count($featuredIds));
+    $sql = "SELECT product_id, name, price, status, image
+            FROM products
+            WHERE product_id IN ($placeholders)";
+    if ($stmt = mysqli_prepare($connect, $sql)) {
+        mysqli_stmt_bind_param($stmt, $types, ...$featuredIds);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $featuredProducts[] = [
+                    'id'    => (int)$row['product_id'],
+                    'name'  => $row['name'],
+                    'price' => '₱' . number_format((float)$row['price'], 0),
+                    'badge' => $row['status'] ?? '',
+                    'image' => '../' . ltrim($row['image'], '/'),
+                ];
+            }
+        }
+        mysqli_stmt_close($stmt);
+    }
+}
+
 
 $features = [
     ['icon' => 'fa-solid fa-star',        'title' => 'Fresh Daily',     'description' => 'All products made fresh every day with authentic ube'],
@@ -116,9 +213,12 @@ $features = [
                 <h2>Featured Products</h2>
                 <p>Our most popular ube treats</p>
             </div>
+            <?php if (count($featuredProducts) > 0): ?>
             <a onclick="getShop()" class="view-all">View All →</a>
+            <?php endif; ?>
         </div>
 
+        <?php if (count($featuredProducts) > 0): ?>
         <div class="products-grid featured-products">
             <?php foreach ($featuredProducts as $product): ?>
             <div class="product-card">
@@ -138,6 +238,12 @@ $features = [
             </div>
             <?php endforeach; ?>
         </div>
+        <?php else: ?>
+        <div class="empty-featured">
+            <p>There are no featured products.</p>
+            <a onclick="getShop()" class="view-all-inline">View All Products →</a>
+        </div>
+        <?php endif; ?>
 
         <div class="section-header">
             <div>
@@ -147,6 +253,7 @@ $features = [
             <a onclick="getOrders()" class="view-all">View All →</a>
         </div>
 
+        <?php if (count($recentOrders) > 0): ?>
         <div class="orders-table-container">
             <table class="orders-table">
                 <thead>
@@ -163,7 +270,7 @@ $features = [
                     <tr>
                         <td class="order-id"><?php echo $order['id']; ?></td>
                         <td><?php echo $order['date']; ?></td>
-                        <td><?php echo $order['items']; ?></td>
+                        <td><?php echo htmlspecialchars($order['items']); ?></td>
                         <td class="order-total"><?php echo $order['total']; ?></td>
                         <td><span class="status-badge status-<?php echo $order['status']; ?>"><?php echo ucfirst($order['status']); ?></span></td>
                     </tr>
@@ -171,6 +278,12 @@ $features = [
                 </tbody>
             </table>
         </div>
+        <?php else: ?>
+        <div class="empty-recent-orders">
+            <p>No recent orders</p>
+            <a onclick="getShop()" class="view-all-inline">Browse Shop →</a>
+        </div>
+        <?php endif; ?>
 
         <div class="features-section">
             <div class="features-grid">

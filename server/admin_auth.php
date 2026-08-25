@@ -10,7 +10,7 @@ if (!isset($_SESSION['auth_user_id'])) {
 
 // Must be admin or super_admin
 if (!isset($_SESSION['auth_role']) || !in_array($_SESSION['auth_role'], ['admin', 'super_admin'])) {
-    header('Location: ../views/index.php');
+    header('Location: ../index.php');
     exit();
 }
 

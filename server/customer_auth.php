@@ -16,6 +16,12 @@ if (isset($_SESSION['auth_status']) && $_SESSION['auth_status'] !== 'active') {
     exit();
 }
 
+// Must NOT be admin/super_admin
+if (isset($_SESSION['auth_role']) && in_array($_SESSION['auth_role'], ['admin', 'super_admin'])) {
+    header('Location: ./admin/dashboard.php');
+    exit();
+}
+
 $currentUser = [
     'id'       => $_SESSION['auth_user_id'],
     'username' => $_SESSION['auth_username'],

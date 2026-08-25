@@ -8,7 +8,7 @@
     var imagePreview = document.getElementById('imagePreview');
     var previewPlaceholder = document.querySelector('.preview-placeholder');
     var productsGrid = document.getElementById('productsGrid');
-    var nextProductId = 8;
+    var nextProductId = 9;
 
     function showToast(message, type) {
         if (!toast) return;
@@ -257,6 +257,7 @@
                     '</div>' +
                 '</div>' +
                 '<div class="product-card-actions">' +
+                    '<button class="btn-featured" data-id="' + data.id + '" title="Add to featured"><i class="fa-regular fa-star"></i></button>' +
                     '<button class="btn-outline btn-edit" data-id="' + data.id + '"><i class="fa-solid fa-pen-to-square"></i> Edit</button>' +
                     '<button class="btn-outline btn-delete" data-id="' + data.id + '"><i class="fa-solid fa-trash-can"></i> Delete</button>' +
                 '</div>' +
@@ -297,11 +298,73 @@
         if (emptyState) emptyState.style.display = visible === 0 ? '' : 'none';
     }
 
+    // ===== FEATURED TOGGLE =====
+    function updateFeaturedButtons() {
+        var allCards = productsGrid ? productsGrid.querySelectorAll('.admin-product-card') : [];
+        var featuredCount = 0;
+        allCards.forEach(function(card) {
+            var btn = card.querySelector('.btn-featured');
+            if (btn && btn.classList.contains('active')) featuredCount++;
+        });
+        allCards.forEach(function(card) {
+            var btn = card.querySelector('.btn-featured');
+            if (!btn) return;
+            if (!btn.classList.contains('active') && featuredCount >= 4) {
+                btn.classList.add('maxed');
+                btn.title = 'Max 4 featured products';
+            } else {
+                btn.classList.remove('maxed');
+            }
+        });
+    }
+
+    if (productsGrid) {
+        productsGrid.addEventListener('click', function(e) {
+            var starBtn = e.target.closest('.btn-featured');
+            if (!starBtn) return;
+            if (starBtn.classList.contains('maxed')) {
+                showToast('Maximum 4 featured products allowed.', 'error');
+                return;
+            }
+
+            var productId = parseInt(starBtn.dataset.id, 10);
+            fetch('../../server/toggle_featured.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (!data.success) {
+                    showToast(data.message || 'Could not update featured status.', 'error');
+                    return;
+                }
+                var icon = starBtn.querySelector('i');
+                if (data.added) {
+                    starBtn.classList.add('active');
+                    starBtn.title = 'Remove from featured';
+                    icon.className = 'fa-solid fa-star';
+                    showToast('Added to featured products.', 'success');
+                } else {
+                    starBtn.classList.remove('active');
+                    starBtn.title = 'Add to featured';
+                    icon.className = 'fa-regular fa-star';
+                    showToast('Removed from featured products.', 'success');
+                }
+                updateFeaturedButtons();
+            })
+            .catch(function() {
+                showToast('Network error. Please try again.', 'error');
+            });
+        });
+    }
+
     // Re-attach edit/delete event listeners for dynamically added cards
     function attachCardEvents() {
         // No need for explicit attachment since we use delegation on productsGrid
         // But need to ensure filter works on new cards
         filterItems = document.querySelectorAll('.order-card, .admin-product-card');
+        updateFeaturedButtons();
     }
 
     // ===== MOCK ACTIONS =====
