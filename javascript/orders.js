@@ -99,7 +99,6 @@
         var city = tr.dataset.city;
         var province = tr.dataset.province;
         var zip = tr.dataset.zip;
-        var payment = tr.dataset.payment;
         var notes = tr.dataset.notes;
         var subtotal = parseInt(tr.dataset.subtotal, 10);
         var shipping = parseInt(tr.dataset.shipping, 10);
@@ -142,7 +141,6 @@
                 '<div class="total-row"><span>Shipping</span><span>' + (shipping > 0 ? '\u20B1' + shipping.toLocaleString() : 'Free') + '</span></div>' +
                 '<div class="total-row grand"><span>Total</span><span>' + total + '</span></div>' +
             '</div>' +
-            '<div class="order-detail-meta"><span><strong>Payment:</strong> ' + payment + '</span></div>' +
             notesHtml;
 
         modal.classList.add('active');

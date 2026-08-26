@@ -1012,7 +1012,9 @@ body {
     width: 90%;
     max-width: 560px;
     max-height: 85vh;
-    overflow-y: auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     transform: translateY(20px);
     transition: transform 0.25s ease;
     box-shadow: var(--shadow-xl);
@@ -1059,6 +1061,8 @@ body {
 
 .modal-body {
     padding: 24px;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .modal-footer {
@@ -1066,6 +1070,7 @@ body {
     justify-content: flex-end;
     padding: 16px 24px;
     border-top: 1px solid var(--border-light);
+    flex-shrink: 0;
 }
 
 /* Order Detail inside modal */

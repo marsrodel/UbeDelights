@@ -203,11 +203,11 @@ if (file_exists($featuredFile)) {
                                 <span class="preview-placeholder">No image selected</span>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn-outline" id="modalCancel">Cancel</button>
-                            <button type="submit" class="btn-primary" id="modalSubmit">Add Product</button>
-                        </div>
                     </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-outline" id="modalCancel">Cancel</button>
+                        <button type="submit" class="btn-primary" id="modalSubmit">Add Product</button>
+                    </div>
                 </div>
             </div>
         </main>

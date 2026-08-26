@@ -41,7 +41,6 @@ CREATE TABLE `orders` (
   `subtotal` decimal(10,2) NOT NULL,
   `shipping_fee` decimal(10,2) NOT NULL DEFAULT 0.00,
   `total_amount` decimal(10,2) NOT NULL,
-  `payment_method` varchar(50) NOT NULL,
   `status` varchar(50) NOT NULL DEFAULT 'pending',
   `notes` text DEFAULT NULL,
   `order_date` timestamp NOT NULL DEFAULT current_timestamp(),

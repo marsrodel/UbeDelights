@@ -3,51 +3,51 @@
 $mockOrders = [
     ['id' => 'ORD-012', 'customer' => 'Maria Santos',    'date' => 'August 25, 2026', 'updated_at' => null, 'status' => 'pending',
      'street' => '123 Sampaguita St.', 'barangay' => 'Brgy. San Isidro', 'city' => 'Quezon City', 'province' => 'Metro Manila', 'zip_code' => '1116',
-     'payment' => 'Cash on Delivery', 'notes' => 'Please ring the bell twice.', 'subtotal' => 1000, 'shipping' => 100,
+     'notes' => 'Please ring the bell twice.', 'subtotal' => 1000, 'shipping' => 100,
      'items' => [['name' => 'Ube Cheesecake', 'qty' => 1, 'price' => 850], ['name' => 'Ube Latte', 'qty' => 2, 'price' => 75]]],
     ['id' => 'ORD-011', 'customer' => 'Juan Dela Cruz',   'date' => 'August 24, 2026', 'updated_at' => null, 'status' => 'pending',
      'street' => '456 Rosa St.', 'barangay' => 'Brgy. Maligaya', 'city' => 'Manila', 'province' => 'Metro Manila', 'zip_code' => '1008',
-     'payment' => 'GCash', 'notes' => '', 'subtotal' => 500, 'shipping' => 100,
+     'notes' => '', 'subtotal' => 500, 'shipping' => 100,
      'items' => [['name' => 'Ube Roll', 'qty' => 2, 'price' => 250]]],
     ['id' => 'ORD-010', 'customer' => 'Ana Reyes',        'date' => 'August 23, 2026', 'updated_at' => 'August 25, 2026', 'status' => 'confirmed',
      'street' => '789 Orchid Ave.', 'barangay' => 'Brgy. Liping', 'city' => 'Pasig City', 'province' => 'Metro Manila', 'zip_code' => '1607',
-     'payment' => 'Cash on Delivery', 'notes' => 'Leave at the front desk.', 'subtotal' => 365, 'shipping' => 100,
+     'notes' => 'Leave at the front desk.', 'subtotal' => 365, 'shipping' => 100,
      'items' => [['name' => 'Classic Ube Cake', 'qty' => 1, 'price' => 350], ['name' => 'Ube Pandesal', 'qty' => 3, 'price' => 5]]],
     ['id' => 'ORD-009', 'customer' => 'Carlo Mendoza',    'date' => 'August 22, 2026', 'updated_at' => 'August 23, 2026', 'status' => 'confirmed',
      'street' => '321 Mayumi Lane', 'barangay' => 'Brgy. Santol', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1550',
-     'payment' => 'GCash', 'notes' => '', 'subtotal' => 200, 'shipping' => 100,
+     'notes' => '', 'subtotal' => 200, 'shipping' => 100,
      'items' => [['name' => 'Ube Pandesal', 'qty' => 4, 'price' => 5], ['name' => 'Ube Halo-Halo', 'qty' => 1, 'price' => 180]]],
     ['id' => 'ORD-008', 'customer' => 'Lisa Garcia',      'date' => 'August 21, 2026', 'updated_at' => 'August 22, 2026', 'status' => 'delivered',
      'street' => '55 Greenhills Blvd.', 'barangay' => 'Brgy. Wack-Wack', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1554',
-     'payment' => 'Cash on Delivery', 'notes' => '', 'subtotal' => 280, 'shipping' => 100,
+     'notes' => '', 'subtotal' => 280, 'shipping' => 100,
      'items' => [['name' => 'Ube Crinkles', 'qty' => 2, 'price' => 140]]],
     ['id' => 'ORD-007', 'customer' => 'Mark Torres',      'date' => 'August 20, 2026', 'updated_at' => 'August 22, 2026', 'status' => 'delivered',
      'street' => '88 Taurus St.', 'barangay' => 'Brgy. Horseshoe', 'city' => 'Quezon City', 'province' => 'Metro Manila', 'zip_code' => '1112',
-     'payment' => 'GCash', 'notes' => '', 'subtotal' => 850, 'shipping' => 0,
+     'notes' => '', 'subtotal' => 850, 'shipping' => 0,
      'items' => [['name' => 'Ube Cheesecake', 'qty' => 1, 'price' => 850]]],
     ['id' => 'ORD-006', 'customer' => 'Sofia Ramos',      'date' => 'August 19, 2026', 'updated_at' => 'August 21, 2026', 'status' => 'delivered',
      'street' => '12 Pearl Dr.', 'barangay' => 'Brgy. Addition Hills', 'city' => 'San Juan', 'province' => 'Metro Manila', 'zip_code' => '1500',
-     'payment' => 'Cash on Delivery', 'notes' => 'Gate code is 4567.', 'subtotal' => 475, 'shipping' => 100,
+     'notes' => 'Gate code is 4567.', 'subtotal' => 475, 'shipping' => 100,
      'items' => [['name' => 'Ube Latte', 'qty' => 3, 'price' => 75], ['name' => 'Ube Roll', 'qty' => 1, 'price' => 250]]],
     ['id' => 'ORD-005', 'customer' => 'Jose Villanueva', 'date' => 'August 18, 2026', 'updated_at' => 'August 18, 2026', 'status' => 'cancelled',
      'street' => '9 Sunflower St.', 'barangay' => 'Brgy. Kabayanan', 'city' => 'Manila', 'province' => 'Metro Manila', 'zip_code' => '1007',
-     'payment' => 'GCash', 'notes' => '', 'subtotal' => 700, 'shipping' => 100,
+     'notes' => '', 'subtotal' => 700, 'shipping' => 100,
      'items' => [['name' => 'Classic Ube Cake', 'qty' => 2, 'price' => 350]]],
     ['id' => 'ORD-004', 'customer' => 'Maria Santos',    'date' => 'August 17, 2026', 'updated_at' => 'August 19, 2026', 'status' => 'delivered',
      'street' => '21 Magnolia Ave.', 'barangay' => 'Brgy. Old Zaniga', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1550',
-     'payment' => 'Cash on Delivery', 'notes' => '', 'subtotal' => 385, 'shipping' => 100,
+     'notes' => '', 'subtotal' => 385, 'shipping' => 100,
      'items' => [['name' => 'Ube Halo-Halo', 'qty' => 2, 'price' => 180], ['name' => 'Ube Pandesal', 'qty' => 5, 'price' => 5]]],
     ['id' => 'ORD-003', 'customer' => 'Juan Dela Cruz',   'date' => 'August 16, 2026', 'updated_at' => 'August 20, 2026', 'status' => 'delivered',
      'street' => '7 Bamboo Ct.', 'barangay' => 'Brgy. Plainview', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1550',
-     'payment' => 'GCash', 'notes' => 'Text me upon arrival.', 'subtotal' => 925, 'shipping' => 100,
+     'notes' => 'Text me upon arrival.', 'subtotal' => 925, 'shipping' => 100,
      'items' => [['name' => 'Ube Cheesecake', 'qty' => 1, 'price' => 850], ['name' => 'Ube Latte', 'qty' => 1, 'price' => 75]]],
     ['id' => 'ORD-002', 'customer' => 'Ana Reyes',        'date' => 'August 15, 2026', 'updated_at' => 'August 15, 2026', 'status' => 'cancelled',
      'street' => '12 Pearl Dr.', 'barangay' => 'Brgy. Addition Hills', 'city' => 'San Juan', 'province' => 'Metro Manila', 'zip_code' => '1500',
-     'payment' => 'Cash on Delivery', 'notes' => '', 'subtotal' => 750, 'shipping' => 100,
+     'notes' => '', 'subtotal' => 750, 'shipping' => 100,
      'items' => [['name' => 'Ube Roll', 'qty' => 3, 'price' => 250]]],
     ['id' => 'ORD-001', 'customer' => 'Carlo Mendoza',    'date' => 'August 14, 2026', 'updated_at' => 'August 18, 2026', 'status' => 'delivered',
      'street' => '55 Greenhills Blvd.', 'barangay' => 'Brgy. Wack-Wack', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1554',
-     'payment' => 'Cash on Delivery', 'notes' => '', 'subtotal' => 490, 'shipping' => 100,
+     'notes' => '', 'subtotal' => 490, 'shipping' => 100,
      'items' => [['name' => 'Ube Crinkles', 'qty' => 1, 'price' => 140], ['name' => 'Classic Ube Cake', 'qty' => 1, 'price' => 350]]],
 ];
 ?>
@@ -134,7 +134,6 @@ $mockOrders = [
                             data-city="<?php echo htmlspecialchars($order['city'], ENT_QUOTES); ?>"
                             data-province="<?php echo htmlspecialchars($order['province'], ENT_QUOTES); ?>"
                             data-zip="<?php echo htmlspecialchars($order['zip_code'], ENT_QUOTES); ?>"
-                            data-payment="<?php echo htmlspecialchars($order['payment'], ENT_QUOTES); ?>"
                             data-notes="<?php echo htmlspecialchars($order['notes'], ENT_QUOTES); ?>"
                             data-subtotal="<?php echo $order['subtotal']; ?>"
                             data-shipping="<?php echo $order['shipping']; ?>">
@@ -292,7 +291,6 @@ $mockOrders = [
             var city = tr.dataset.city;
             var province = tr.dataset.province;
             var zip = tr.dataset.zip;
-            var payment = tr.dataset.payment;
             var notes = tr.dataset.notes;
             var subtotal = parseInt(tr.dataset.subtotal, 10);
             var shipping = parseInt(tr.dataset.shipping, 10);
@@ -338,7 +336,6 @@ $mockOrders = [
                     '<div class="total-row"><span>Shipping</span><span>' + (shipping > 0 ? '\u20B1' + shipping.toLocaleString() : 'Free') + '</span></div>' +
                     '<div class="total-row grand"><span>Total</span><span>' + total + '</span></div>' +
                 '</div>' +
-                '<div class="order-detail-meta"><span><strong>Payment:</strong> ' + payment + '</span></div>' +
                 notesHtml;
 
             modal.classList.add('active');

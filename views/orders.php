@@ -4,7 +4,7 @@ $mockOrders = [
     [
         'id' => 'UBD-MT2IYXVL', 'date' => 'August 25, 2026', 'updated_at' => null, 'status' => 'pending',
         'street' => '123 Sampaguita St.', 'barangay' => 'Brgy. San Isidro', 'city' => 'Quezon City', 'province' => 'Metro Manila', 'zip_code' => '1116',
-        'payment' => 'Cash on Delivery', 'notes' => 'Please ring the bell twice.',
+        'notes' => 'Please ring the bell twice.',
         'subtotal' => 1000, 'shipping' => 100,
         'items' => [
             ['name' => 'Ube Cheesecake', 'qty' => 1, 'price' => 850],
@@ -14,7 +14,7 @@ $mockOrders = [
     [
         'id' => 'UBD-MT33O3BT', 'date' => 'August 22, 2026', 'updated_at' => null, 'status' => 'pending',
         'street' => '456 Rosa St.', 'barangay' => 'Brgy. Maligaya', 'city' => 'Manila', 'province' => 'Metro Manila', 'zip_code' => '1008',
-        'payment' => 'GCash', 'notes' => '',
+        'notes' => '',
         'subtotal' => 500, 'shipping' => 100,
         'items' => [
             ['name' => 'Ube Roll', 'qty' => 2, 'price' => 250],
@@ -23,7 +23,7 @@ $mockOrders = [
     [
         'id' => 'UBD-MT18Y7AP', 'date' => 'August 18, 2026', 'updated_at' => 'August 20, 2026', 'status' => 'confirmed',
         'street' => '789 Orchid Ave.', 'barangay' => 'Brgy. Liping', 'city' => 'Pasig City', 'province' => 'Metro Manila', 'zip_code' => '1607',
-        'payment' => 'Cash on Delivery', 'notes' => 'Leave at the front desk if no one is home.',
+        'notes' => 'Leave at the front desk if no one is home.',
         'subtotal' => 365, 'shipping' => 100,
         'items' => [
             ['name' => 'Classic Ube Cake', 'qty' => 1, 'price' => 350],
@@ -33,7 +33,7 @@ $mockOrders = [
     [
         'id' => 'UBD-MT09K2ZQ', 'date' => 'August 10, 2026', 'updated_at' => 'August 12, 2026', 'status' => 'delivered',
         'street' => '321 Mayumi Lane', 'barangay' => 'Brgy. Santol', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1550',
-        'payment' => 'GCash', 'notes' => '',
+        'notes' => '',
         'subtotal' => 200, 'shipping' => 0,
         'items' => [
             ['name' => 'Ube Pandesal', 'qty' => 4, 'price' => 5],
@@ -43,7 +43,7 @@ $mockOrders = [
     [
         'id' => 'ORD-001', 'date' => 'August 18, 2025', 'updated_at' => 'August 20, 2025', 'status' => 'delivered',
         'street' => '55 Greenhills Blvd.', 'barangay' => 'Brgy. Wack-Wack', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1554',
-        'payment' => 'Cash on Delivery', 'notes' => '',
+        'notes' => '',
         'subtotal' => 1000, 'shipping' => 0,
         'items' => [
             ['name' => 'Ube Cheesecake', 'qty' => 1, 'price' => 850],
@@ -53,7 +53,7 @@ $mockOrders = [
     [
         'id' => 'ORD-002', 'date' => 'August 15, 2025', 'updated_at' => 'August 15, 2025', 'status' => 'cancelled',
         'street' => '88 Taurus St.', 'barangay' => 'Brgy. Horseshoe', 'city' => 'Quezon City', 'province' => 'Metro Manila', 'zip_code' => '1112',
-        'payment' => 'GCash', 'notes' => '',
+        'notes' => '',
         'subtotal' => 730, 'shipping' => 100,
         'items' => [
             ['name' => 'Ube Roll', 'qty' => 1, 'price' => 250],
@@ -64,7 +64,7 @@ $mockOrders = [
     [
         'id' => 'ORD-003', 'date' => 'August 12, 2025', 'updated_at' => 'August 18, 2025', 'status' => 'delivered',
         'street' => '12 Pearl Dr.', 'barangay' => 'Brgy. Addition Hills', 'city' => 'San Juan', 'province' => 'Metro Manila', 'zip_code' => '1500',
-        'payment' => 'Cash on Delivery', 'notes' => 'Gate code is 4567.',
+        'notes' => 'Gate code is 4567.',
         'subtotal' => 950, 'shipping' => 100,
         'items' => [
             ['name' => 'Classic Ube Cake', 'qty' => 1, 'price' => 350],
@@ -76,7 +76,7 @@ $mockOrders = [
     [
         'id' => 'ORD-004', 'date' => 'August 5, 2025', 'updated_at' => 'August 5, 2025', 'status' => 'cancelled',
         'street' => '9 Sunflower St.', 'barangay' => 'Brgy. Kabayanan', 'city' => 'Manila', 'province' => 'Metro Manila', 'zip_code' => '1007',
-        'payment' => 'GCash', 'notes' => '',
+        'notes' => '',
         'subtotal' => 420, 'shipping' => 100,
         'items' => [
             ['name' => 'Ube Pandesal', 'qty' => 2, 'price' => 5],
@@ -86,7 +86,7 @@ $mockOrders = [
     [
         'id' => 'ORD-005', 'date' => 'July 28, 2025', 'updated_at' => 'July 30, 2025', 'status' => 'delivered',
         'street' => '21 Magnolia Ave.', 'barangay' => 'Brgy. Old Zaniga', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1550',
-        'payment' => 'Cash on Delivery', 'notes' => '',
+        'notes' => '',
         'subtotal' => 1700, 'shipping' => 0,
         'items' => [
             ['name' => 'Ube Cheesecake', 'qty' => 2, 'price' => 850],
@@ -95,7 +95,7 @@ $mockOrders = [
     [
         'id' => 'ORD-006', 'date' => 'July 20, 2025', 'updated_at' => 'July 22, 2025', 'status' => 'delivered',
         'street' => '7 Bamboo Ct.', 'barangay' => 'Brgy. Plainview', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1550',
-        'payment' => 'GCash', 'notes' => 'Text me upon arrival.',
+        'notes' => 'Text me upon arrival.',
         'subtotal' => 475, 'shipping' => 100,
         'items' => [
             ['name' => 'Ube Latte', 'qty' => 3, 'price' => 75],
@@ -170,7 +170,6 @@ $mockOrders = [
                         data-city="<?php echo htmlspecialchars($order['city'], ENT_QUOTES); ?>"
                         data-province="<?php echo htmlspecialchars($order['province'], ENT_QUOTES); ?>"
                         data-zip="<?php echo htmlspecialchars($order['zip_code'], ENT_QUOTES); ?>"
-                        data-payment="<?php echo htmlspecialchars($order['payment'], ENT_QUOTES); ?>"
                         data-notes="<?php echo htmlspecialchars($order['notes'], ENT_QUOTES); ?>"
                         data-subtotal="<?php echo $order['subtotal']; ?>"
                         data-shipping="<?php echo $order['shipping']; ?>"
