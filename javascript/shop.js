@@ -39,6 +39,11 @@
 
     document.querySelectorAll('.btn-add-cart').forEach(function(btn) {
         btn.addEventListener('click', function() {
+            var card = this.closest('.product-card');
+            if (card && card.dataset.status === 'Not Available') {
+                showToast('This product is not available.', 'error');
+                return;
+            }
             var name = this.dataset.name;
             var price = this.dataset.price;
             var cart = JSON.parse(localStorage.getItem('ube_cart') || '[]');

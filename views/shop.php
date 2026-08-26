@@ -1,15 +1,26 @@
 <?php require_once __DIR__ . '/../server/customer_auth.php';
 
-$products = [
-    ['name' => 'Ube Cheesecake', 'price' => '₱850', 'category' => 'cakes', 'description' => 'Creamy cheesecake with authentic ube swirl on a graham crust', 'badge' => 'Best Seller', 'image' => '../images/items/cheesecake.jpg'],
-    ['name' => 'Ube Roll', 'price' => '₱450', 'category' => 'rolls', 'description' => 'Soft sponge roll filled with smooth ube jam and cream', 'badge' => 'Popular', 'image' => '../images/items/uberoll.jpg'],
-    ['name' => 'Ube Crinkles', 'price' => '₱280', 'category' => 'pastries', 'description' => 'Soft, chewy purple yam cookies coated in powdered sugar', 'badge' => '', 'image' => '../images/items/crinkles.jpg'],
-    ['name' => 'Ube Halo-Halo', 'price' => '₱180', 'category' => 'beverages', 'description' => 'Refreshing shaved ice dessert with ube ice cream topping', 'badge' => 'New', 'image' => '../images/items/halohalo.jpg'],
-    ['name' => 'Classic Ube Cake', 'price' => '₱950', 'category' => 'cakes', 'description' => 'Classic ube layer cake with smooth cream cheese frosting', 'badge' => '', 'image' => '../images/items/classic.jpg'],
-    ['name' => 'Ube Pandesal', 'price' => '₱120', 'category' => 'pastries', 'description' => 'Soft purple yam bread rolls, perfect for breakfast', 'badge' => '', 'image' => '../images/items/pandesal.jpg'],
-    ['name' => 'Ube Latte', 'price' => '₱150', 'category' => 'beverages', 'description' => 'Creamy ube-flavored milk tea with latte art', 'badge' => '', 'image' => '../images/items/latte.jpg'],
-    ['name' => 'Ube Macapuno Cake', 'price' => '₱1,100', 'category' => 'cakes', 'description' => 'Rich ube cake with sweet coconut strings and latik', 'badge' => 'Premium', 'image' => '../images/items/macapuno.jpg'],
-];
+$products = [];
+if ($connect) {
+    $sql = "SELECT product_id, name, price, category, status, description, image FROM products ORDER BY name";
+    if ($stmt = mysqli_prepare($connect, $sql)) {
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $products[] = [
+                    'name'        => $row['name'],
+                    'price'       => '₱' . number_format((float)$row['price'], 0),
+                    'category'    => $row['category'],
+                    'description' => $row['description'],
+                    'badge'       => $row['status'] ?? '',
+                    'image'       => '../' . ltrim($row['image'], '/'),
+                ];
+            }
+        }
+        mysqli_stmt_close($stmt);
+    }
+}
 
 $categories = [
     ['name' => 'All',       'icon' => 'fa-solid fa-border-all'],
@@ -26,7 +37,7 @@ $categories = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Shop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css/dashboard.css?v=5.4">
+    <link rel="stylesheet" href="../css/dashboard.css?v=5.5">
 </head>
 <body>
     <nav class="navbar">
@@ -66,8 +77,9 @@ $categories = [
         </div>
 
         <div class="products-grid shop-grid" id="productsGrid">
+            <?php if (count($products) > 0): ?>
             <?php foreach ($products as $product): ?>
-            <div class="product-card" data-category="<?php echo $product['category']; ?>" data-name="<?php echo strtolower($product['name']); ?>">
+            <div class="product-card<?php echo ($product['badge'] === 'Not Available') ? ' unavailable' : ''; ?>" data-category="<?php echo $product['category']; ?>" data-name="<?php echo strtolower($product['name']); ?>" data-status="<?php echo htmlspecialchars($product['badge'], ENT_QUOTES); ?>">
                 <div class="product-image">
                     <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     <?php if ($product['badge']): ?>
@@ -89,6 +101,13 @@ $categories = [
                 <h3>No products found</h3>
                 <p>Try selecting a different category</p>
             </div>
+            <?php else: ?>
+            <div class="empty-shop">
+                <i class="fa-solid fa-store-slash"></i>
+                <h3>No products available yet</h3>
+                <p>Check back soon — we're stocking up on fresh ube treats!</p>
+            </div>
+            <?php endif; ?>
         </div>
     </main>
 

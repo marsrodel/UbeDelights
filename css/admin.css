@@ -750,6 +750,7 @@ body.admin-body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin-top: 80px;
 }
 
 .empty-state .empty-icon {
@@ -897,6 +898,12 @@ body.admin-body {
 .admin-product-card.unavailable .product-card-body,
 .admin-product-card.unavailable .product-card-actions {
     opacity: 0.55;
+}
+
+.admin-product-card.fade-out {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .product-card-body {

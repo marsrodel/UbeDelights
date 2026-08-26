@@ -1,5 +1,15 @@
 // Global add-to-cart function (used by inline onclick and event listeners)
 function addToCart(btn) {
+    var card = btn.closest('.product-card');
+    if (card && card.dataset.status === 'Not Available') {
+        var toast = document.getElementById('toast');
+        if (toast) {
+            toast.textContent = 'This product is not available.';
+            toast.className = 'toast show error';
+            setTimeout(function() { toast.className = 'toast'; }, 2500);
+        }
+        return;
+    }
     var name = btn.dataset.name;
     var price = btn.dataset.price;
     var cart = JSON.parse(localStorage.getItem('ube_cart') || '[]');

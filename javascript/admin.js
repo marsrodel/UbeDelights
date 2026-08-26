@@ -8,7 +8,7 @@
     var imagePreview = document.getElementById('imagePreview');
     var previewPlaceholder = document.querySelector('.preview-placeholder');
     var productsGrid = document.getElementById('productsGrid');
-    var nextProductId = 9;
+    var emptyState = document.getElementById('productsEmpty');
 
     function showToast(message, type) {
         if (!toast) return;
@@ -19,18 +19,21 @@
     }
     window.adminToast = showToast;
 
-    // ===== FILTER TABS (Orders & Products) =====
+    // ===== FILTER TABS =====
     var filterBtns = document.querySelectorAll('.filter-btn');
-    var filterItems = document.querySelectorAll('.order-card, .admin-product-card');
-    var emptyState = document.getElementById('ordersEmpty') || document.getElementById('productsEmpty');
+
+    function refreshFilterItems() {
+        return document.querySelectorAll('.order-card, .admin-product-card');
+    }
 
     filterBtns.forEach(function(btn) {
         btn.addEventListener('click', function() {
             filterBtns.forEach(function(b) { b.classList.remove('active'); });
             this.classList.add('active');
             var key = this.dataset.status || this.dataset.category;
+            var items = refreshFilterItems();
             var visible = 0;
-            filterItems.forEach(function(item) {
+            items.forEach(function(item) {
                 if (key === 'all' || item.dataset.status === key || item.dataset.category === key) {
                     item.style.display = '';
                     visible++;
@@ -43,6 +46,11 @@
             }
         });
     });
+
+    function checkEmptyProducts() {
+        var cards = productsGrid ? productsGrid.querySelectorAll('.admin-product-card') : [];
+        if (emptyState) emptyState.style.display = cards.length === 0 ? '' : 'none';
+    }
 
     // ===== IMAGE PREVIEW =====
     if (imageInput) {
@@ -70,11 +78,9 @@
     var modalClose = document.getElementById('modalClose');
     var modalCancel = document.getElementById('modalCancel');
     var modalSubmit = document.getElementById('modalSubmit');
-    var modalForm = document.getElementById('productForm');
     var productIdInput = document.getElementById('productId');
     var modalTitle = document.getElementById('modalTitle');
     var modalSubmitBtn = document.getElementById('modalSubmit');
-    var productsGrid = document.getElementById('productsGrid');
 
     function openModal(editCard) {
         modalForm.reset();
@@ -96,8 +102,8 @@
             if (editCard.dataset.image) {
                 imagePreview.src = editCard.dataset.image;
                 imagePreview.style.display = 'block';
-                var ph = document.querySelector('.preview-placeholder');
-                if (ph) ph.style.display = 'none';
+                var ph2 = document.querySelector('.preview-placeholder');
+                if (ph2) ph2.style.display = 'none';
             }
         } else {
             modalTitle.textContent = 'Add Product';
@@ -106,7 +112,6 @@
 
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
-        // Focus first input
         setTimeout(function() {
             document.getElementById('productName').focus();
         }, 100);
@@ -117,14 +122,12 @@
         document.body.style.overflow = '';
     }
 
-    // Open Add modal
     if (btnAddProduct) {
         btnAddProduct.addEventListener('click', function() {
             openModal(null);
         });
     }
 
-    // Open Edit modal via delegation
     if (productsGrid) {
         productsGrid.addEventListener('click', function(e) {
             var editBtn = e.target.closest('.btn-edit');
@@ -135,26 +138,23 @@
         });
     }
 
-    // Close modal
     [modalClose, modalCancel].forEach(function(btn) {
         if (btn) btn.addEventListener('click', closeModal);
     });
 
-    // Close on overlay click
     if (modal) {
         modal.addEventListener('click', function(e) {
             if (e.target === modal) closeModal();
         });
     }
 
-    // Close on Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
             closeModal();
         }
     });
 
-    // ===== FORM SUBMIT =====
+    // ===== FORM SUBMIT (ADD / EDIT) =====
     if (modalForm) {
         modalForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -172,100 +172,118 @@
                 showToast('Please fill in all required fields.', 'error');
                 return;
             }
-            if (!isEdit && !imageInput.files[0]) {
+            if (!isEdit && !imageFile) {
                 showToast('Please select a product image.', 'error');
                 return;
             }
 
-            var priceStr = '₱' + parseInt(price).toLocaleString();
-            var statusClassMap = {
-                'Premium': 'badge-premium',
-                'Best Seller': 'badge-best-seller',
-                'Popular': 'badge-popular',
-                'New': 'badge-new',
-                'Not Available': 'badge-unavailable'
-            };
-            var statusClass = status ? (statusClassMap[status] || 'badge-unavailable') : '';
-            var unavailable = status === 'Not Available';
-
-            var imageSrc = '';
+            var formData = new FormData();
+            formData.append('productName', name);
+            formData.append('productDesc', desc);
+            formData.append('productType', type);
+            formData.append('productStatus', status);
+            formData.append('productPrice', price);
             if (imageFile) {
-                imageSrc = imagePreview.src;
-            } else if (isEdit) {
-                var oldCard = document.querySelector('.admin-product-card[data-id="' + productId + '"]');
-                if (oldCard) imageSrc = oldCard.querySelector('.product-photo img').src;
+                formData.append('productImage', imageFile);
             }
-
-            var cardHtml = buildCardHtml({
-                id: isEdit ? productId : nextProductId++,
-                name: name,
-                desc: desc,
-                type: type,
-                price: price,
-                priceStr: priceStr,
-                status: status,
-                statusClass: statusClass,
-                unavailable: unavailable,
-                image: imageSrc
-            });
-
             if (isEdit) {
-                var oldCard = document.querySelector('.admin-product-card[data-id="' + productId + '"]');
-                if (oldCard) {
-                    oldCard.outerHTML = cardHtml;
-                    showToast('Product updated successfully!', 'success');
-                }
-            } else {
-                if (productsGrid.firstChild) {
-                    productsGrid.insertAdjacentHTML('afterbegin', cardHtml);
-                } else {
-                    productsGrid.innerHTML = cardHtml;
-                }
-                showToast('Product added successfully!', 'success');
+                formData.append('productId', productId);
             }
 
-            // Re-attach event listeners for the new card
-            attachCardEvents();
-            closeModal();
+            var action = isEdit ? 'edit' : 'add';
+            modalSubmitBtn.disabled = true;
+            modalSubmitBtn.textContent = 'Saving...';
+
+            fetch('../../server/product_actions.php?action=' + action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (!data.success) {
+                    showToast(data.message || 'Something went wrong.', 'error');
+                    modalSubmitBtn.disabled = false;
+                    modalSubmitBtn.textContent = isEdit ? 'Save Changes' : 'Add Product';
+                    return;
+                }
+
+                var p = data.product;
+                var cardHtml = buildCardHtml(p);
+
+                if (isEdit) {
+                    var oldCard = productsGrid.querySelector('.admin-product-card[data-id="' + productId + '"]');
+                    if (oldCard) {
+                        oldCard.outerHTML = cardHtml;
+                    }
+                    showToast('Product updated successfully!', 'success');
+                } else {
+                    if (productsGrid.firstChild) {
+                        productsGrid.insertAdjacentHTML('afterbegin', cardHtml);
+                    } else {
+                        productsGrid.innerHTML = cardHtml;
+                    }
+                    showToast('Product added successfully!', 'success');
+                }
+
+                checkEmptyProducts();
+                updateFeaturedButtons();
+                closeModal();
+                modalSubmitBtn.disabled = false;
+            })
+            .catch(function() {
+                showToast('Network error. Please try again.', 'error');
+                modalSubmitBtn.disabled = false;
+                modalSubmitBtn.textContent = isEdit ? 'Save Changes' : 'Add Product';
+            });
         });
     }
 
-    function buildCardHtml(data) {
-        var unavailableClass = data.unavailable ? ' unavailable' : '';
-        var badgeHtml = data.status ? 
-            '<span class="product-status-badge ' + data.statusClass + '">' + escapeHtml(data.status) + '</span>' : '';
+    function buildCardHtml(p) {
+        var statusMap = {
+            'Premium': 'badge-premium',
+            'Best Seller': 'badge-best-seller',
+            'Popular': 'badge-popular',
+            'New': 'badge-new',
+            'Not Available': 'badge-unavailable'
+        };
+        var badgeClass = p.status ? (statusMap[p.status] || '') : '';
+        var badgeHtml = badgeClass ?
+            '<span class="product-status-badge ' + badgeClass + '">' + escapeHtml(p.status) + '</span>' : '';
+        var unavailable = p.status === 'Not Available' ? ' unavailable' : '';
+        var imageSrc = p.image ? ('../../' + p.image.replace(/^\.\.\/+/, '')) : '';
+
         return '' +
-            '<div class="admin-product-card' + unavailableClass + '"' +
-            ' data-id="' + data.id + '"' +
-            ' data-category="' + data.type + '"' +
-            ' data-name="' + escapeHtml(data.name) + '"' +
-            ' data-desc="' + escapeHtml(data.desc) + '"' +
-            ' data-type="' + data.type + '"' +
-            ' data-price="' + data.price + '"' +
-            ' data-status="' + escapeHtml(data.status) + '"' +
-            ' data-image="' + escapeHtml(data.image) + '">' +
+            '<div class="admin-product-card' + unavailable + '"' +
+            ' data-id="' + p.id + '"' +
+            ' data-category="' + escapeHtml(p.category) + '"' +
+            ' data-name="' + escapeHtml(p.name) + '"' +
+            ' data-desc="' + escapeHtml(p.description) + '"' +
+            ' data-type="' + escapeHtml(p.category) + '"' +
+            ' data-price="' + p.priceNum + '"' +
+            ' data-status="' + escapeHtml(p.status || '') + '"' +
+            ' data-image="' + escapeHtml(imageSrc) + '">' +
                 '<div class="product-photo">' +
-                    '<img src="' + data.image + '" alt="' + escapeHtml(data.name) + '">' +
+                    '<img src="' + escapeHtml(imageSrc) + '" alt="' + escapeHtml(p.name) + '">' +
                     badgeHtml +
                 '</div>' +
                 '<div class="product-card-body">' +
-                    '<h3>' + escapeHtml(data.name) + '</h3>' +
-                    '<p class="product-desc">' + escapeHtml(data.desc) + '</p>' +
+                    '<h3>' + escapeHtml(p.name) + '</h3>' +
+                    '<p class="product-desc">' + escapeHtml(p.description) + '</p>' +
                     '<div class="product-meta">' +
-                        '<span class="product-type">' + escapeHtml(data.type) + '</span>' +
-                        '<span class="product-price">' + data.priceStr + '</span>' +
+                        '<span class="product-type">' + escapeHtml(p.category) + '</span>' +
+                        '<span class="product-price">' + p.price + '</span>' +
                     '</div>' +
                 '</div>' +
                 '<div class="product-card-actions">' +
-                    '<button class="btn-featured" data-id="' + data.id + '" title="Add to featured"><i class="fa-regular fa-star"></i></button>' +
-                    '<button class="btn-outline btn-edit" data-id="' + data.id + '"><i class="fa-solid fa-pen-to-square"></i> Edit</button>' +
-                    '<button class="btn-outline btn-delete" data-id="' + data.id + '"><i class="fa-solid fa-trash-can"></i> Delete</button>' +
+                    '<button class="btn-featured" data-id="' + p.id + '" title="Add to featured"><i class="fa-regular fa-star"></i></button>' +
+                    '<button class="btn-outline btn-edit" data-id="' + p.id + '"><i class="fa-solid fa-pen-to-square"></i> Edit</button>' +
+                    '<button class="btn-outline btn-delete" data-id="' + p.id + '"><i class="fa-solid fa-trash-can"></i> Delete</button>' +
                 '</div>' +
             '</div>';
     }
 
     function escapeHtml(str) {
-        return String(str)
+        return String(str || '')
             .replace(/&/g, '&')
             .replace(/</g, '<')
             .replace(/>/g, '>')
@@ -277,25 +295,36 @@
     if (productsGrid) {
         productsGrid.addEventListener('click', function(e) {
             var deleteBtn = e.target.closest('.btn-delete');
-            if (deleteBtn) {
-                var card = deleteBtn.closest('.admin-product-card');
-                if (!card) return;
-                var name = card.dataset.name;
-                if (confirm('Delete "' + name + '"?')) {
-                    card.remove();
-                    showToast(name + ' deleted.', 'error');
-                    checkEmptyProducts();
-                }
-            }
-        });
-    }
+            if (!deleteBtn) return;
+            var card = deleteBtn.closest('.admin-product-card');
+            if (!card) return;
+            var name = card.dataset.name;
+            var id = card.dataset.id;
 
-    function checkEmptyProducts() {
-        var emptyState = document.getElementById('productsEmpty');
-        var cards = productsGrid ? productsGrid.querySelectorAll('.admin-product-card') : [];
-        var visible = 0;
-        cards.forEach(function(c) { if (c.style.display !== 'none') visible++; });
-        if (emptyState) emptyState.style.display = visible === 0 ? '' : 'none';
+            if (!confirm('Delete "' + name + '"?')) return;
+
+            fetch('../../server/product_actions.php?action=delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: parseInt(id, 10) })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (!data.success) {
+                    showToast(data.message || 'Failed to delete product.', 'error');
+                    return;
+                }
+                card.classList.add('fade-out');
+                setTimeout(function() {
+                    card.remove();
+                    checkEmptyProducts();
+                }, 250);
+                showToast(name + ' deleted.', 'success');
+            })
+            .catch(function() {
+                showToast('Network error. Please try again.', 'error');
+            });
+        });
     }
 
     // ===== FEATURED TOGGLE =====
@@ -359,34 +388,7 @@
         });
     }
 
-    // Re-attach edit/delete event listeners for dynamically added cards
-    function attachCardEvents() {
-        // No need for explicit attachment since we use delegation on productsGrid
-        // But need to ensure filter works on new cards
-        filterItems = document.querySelectorAll('.order-card, .admin-product-card');
-        updateFeaturedButtons();
-    }
-
-    // ===== MOCK ACTIONS =====
-    document.querySelectorAll('.mock-action').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            showToast(this.dataset.msg || 'Done.', this.dataset.type);
-        });
-    });
-
-    // ===== ORDER ACTIONS =====
-    document.querySelectorAll('.btn-action[data-action]').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var action = this.dataset.action;
-            var orderId = this.closest('.order-card').querySelector('.order-id').textContent;
-            var messages = {
-                confirm: orderId + ' confirmed! Customer has been notified.',
-                deliver: orderId + ' marked as delivered.',
-                cancel: orderId + ' cancelled.'
-            };
-            var types = { confirm: 'success', deliver: 'success', cancel: 'error' };
-            showToast(messages[action] || 'Action done.', types[action]);
-        });
-    });
+    updateFeaturedButtons();
+    checkEmptyProducts();
 
 })();

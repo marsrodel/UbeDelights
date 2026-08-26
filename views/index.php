@@ -148,7 +148,7 @@ $features = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css/dashboard.css?v=5.4">
+    <link rel="stylesheet" href="../css/dashboard.css?v=5.5">
 </head>
 <body>
     <nav class="navbar">
@@ -221,7 +221,7 @@ $features = [
         <?php if (count($featuredProducts) > 0): ?>
         <div class="products-grid featured-products">
             <?php foreach ($featuredProducts as $product): ?>
-            <div class="product-card">
+            <div class="product-card<?php echo ($product['badge'] === 'Not Available') ? ' unavailable' : ''; ?>" data-status="<?php echo htmlspecialchars($product['badge'], ENT_QUOTES); ?>">
                 <div class="product-image">
                     <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                     <?php if ($product['badge']): ?>

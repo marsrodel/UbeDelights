@@ -1,31 +1,28 @@
 <?php require_once __DIR__ . '/../../server/admin_auth.php';
 
-$products = [
-    ['id' => 1, 'name' => 'Ube Cheesecake', 'price' => '₱850', 'priceNum' => 850, 'type' => 'cakes', 'status' => 'Best Seller',
-     'description' => 'Creamy cheesecake with authentic ube swirl on a graham crust',
-     'image' => '../../images/items/cheesecake.jpg'],
-    ['id' => 2, 'name' => 'Classic Ube Cake', 'price' => '₱950', 'priceNum' => 950, 'type' => 'cakes', 'status' => 'Premium',
-     'description' => 'Soft ube macapuno sponge layered with rich ube buttercream frosting',
-     'image' => '../../images/items/classic.jpg'],
-    ['id' => 3, 'name' => 'Ube Pandesal', 'price' => '₱120', 'priceNum' => 120, 'type' => 'pastries', 'status' => 'Premium',
-     'description' => 'Warm, pillowy pandesal filled with premium ube halaya, baked fresh daily',
-     'image' => '../../images/items/pandesal.jpg'],
-    ['id' => 4, 'name' => 'Ube Roll', 'price' => '₱450', 'priceNum' => 450, 'type' => 'rolls', 'status' => 'Popular',
-     'description' => 'Fluffy ube sponge roll wrapped around smooth ube buttercream filling',
-     'image' => '../../images/items/uberoll.jpg'],
-    ['id' => 5, 'name' => 'Ube Halo-Halo', 'price' => '₱180', 'priceNum' => 180, 'type' => 'beverages', 'status' => 'Popular',
-     'description' => 'Classic Filipino shaved ice dessert topped with creamy ube halaya',
-     'image' => '../../images/items/halohalo.jpg'],
-    ['id' => 6, 'name' => 'Ube Crinkles', 'price' => '₱280', 'priceNum' => 280, 'type' => 'pastries', 'status' => 'New',
-     'description' => 'Chewy sugar-dusted crinkle cookies bursting with ube flavor',
-     'image' => '../../images/items/crinkles.jpg'],
-    ['id' => 7, 'name' => 'Ube Latte', 'price' => '₱150', 'priceNum' => 150, 'type' => 'beverages', 'status' => 'New',
-     'description' => 'Espresso blended with steamed milk and house-made ube syrup',
-     'image' => '../../images/items/latte.jpg'],
-    ['id' => 8, 'name' => 'Ube Macapuno', 'price' => '₱150', 'priceNum' => 150, 'type' => 'pastries', 'status' => 'Not Available',
-     'description' => 'Sweet ube and macapuno preserves in a soft, buttery pastry shell',
-     'image' => '../../images/items/macapuno.jpg'],
-];
+$products = [];
+if ($connect) {
+    $sql = "SELECT product_id, name, price, category, status, description, image FROM products ORDER BY product_id DESC";
+    if ($stmt = mysqli_prepare($connect, $sql)) {
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $products[] = [
+                    'id'          => (int)$row['product_id'],
+                    'name'        => $row['name'],
+                    'price'       => '₱' . number_format((float)$row['price'], 0),
+                    'priceNum'    => (float)$row['price'],
+                    'type'        => $row['category'],
+                    'status'      => $row['status'] ?? '',
+                    'description' => $row['description'],
+                    'image'       => '../../' . ltrim($row['image'], '/'),
+                ];
+            }
+        }
+        mysqli_stmt_close($stmt);
+    }
+}
 
 function statusClass($status) {
     if (!$status) return '';
@@ -112,6 +109,7 @@ if (file_exists($featuredFile)) {
             </div>
 
             <div class="products-grid" id="productsGrid">
+                <?php if (count($products) > 0): ?>
                 <?php foreach ($products as $product): ?>
                 <?php $unavailable = ($product['status'] === 'Not Available'); ?>
                 <?php $badgeClass = statusClass($product['status']); ?>
@@ -124,9 +122,9 @@ if (file_exists($featuredFile)) {
                      data-type="<?php echo $product['type']; ?>"
                      data-price="<?php echo $product['priceNum']; ?>"
                      data-status="<?php echo htmlspecialchars($product['status'], ENT_QUOTES); ?>"
-                     data-image="<?php echo $product['image']; ?>">
+                     data-image="<?php echo htmlspecialchars($product['image'], ENT_QUOTES); ?>">
                     <div class="product-photo">
-                        <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                        <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                         <?php echo $badgeHtml; ?>
                     </div>
                     <div class="product-card-body">
@@ -144,12 +142,13 @@ if (file_exists($featuredFile)) {
                     </div>
                 </div>
                 <?php endforeach; ?>
+                <?php endif; ?>
             </div>
 
-            <div class="empty-state" id="productsEmpty" style="display:none;">
+            <div class="empty-state" id="productsEmpty" <?php echo count($products) > 0 ? 'style="display:none;"' : ''; ?>>
                 <div class="empty-icon">📦</div>
-                <h3>No products found</h3>
-                <p>No products match this category.</p>
+                <h3>No products yet</h3>
+                <p>Click the + button to add your first product.</p>
             </div>
 
             <!-- Add/Edit Product Modal -->
@@ -204,11 +203,11 @@ if (file_exists($featuredFile)) {
                                 <span class="preview-placeholder">No image selected</span>
                             </div>
                         </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-outline" id="modalCancel">Cancel</button>
+                            <button type="submit" class="btn-primary" id="modalSubmit">Add Product</button>
+                        </div>
                     </form>
-                    <div class="modal-footer">
-                        <button type="button" class="btn-outline" id="modalCancel">Cancel</button>
-                        <button type="button" class="btn-primary" id="modalSubmit">Add Product</button>
-                    </div>
                 </div>
             </div>
         </main>
