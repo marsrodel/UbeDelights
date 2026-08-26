@@ -121,6 +121,7 @@
 .add-user-modal .optional { color: #dc2626; font-weight: 500; font-size: 0.7rem; margin-left: 2px; }
 .add-user-modal .password-wrapper { position: relative; display: flex; align-items: center; }
 .add-user-modal .password-wrapper input { width: 100%; padding-right: 45px; }
+.add-user-modal .password-wrapper input::-ms-reveal { display: none; }
 .add-user-modal .password-wrapper i {
     position: absolute; right: 12px; font-size: 18px; cursor: pointer; color: #6B7280; transition: color 0.3s ease;
 }

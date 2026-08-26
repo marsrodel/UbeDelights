@@ -254,6 +254,8 @@ label {
     padding-right: 45px;
 }
 
+.password-wrapper input::-ms-reveal { display: none; }
+
 .password-wrapper i {
     position: absolute;
     right: 12px;

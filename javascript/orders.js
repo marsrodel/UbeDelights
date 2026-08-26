@@ -1,10 +1,14 @@
 (function() {
     'use strict';
 
-    var ordersList = document.getElementById('ordersList');
-    var emptyOrders = document.getElementById('emptyOrders');
-    var filterBtns = document.querySelectorAll('.filter-btn');
+    var ROWS_PER_PAGE = 8;
+    var currentPage = 1;
+    var currentFilter = 'all';
     var toast = document.getElementById('toast');
+    var modal = document.getElementById('orderModal');
+    var modalBody = document.getElementById('modalBody');
+    var modalClose = document.getElementById('modalClose');
+    var modalCloseBtn = document.getElementById('modalCloseBtn');
 
     function showToast(message, type) {
         toast.textContent = message;
@@ -13,119 +17,187 @@
         setTimeout(function() { toast.classList.remove('show'); }, 2500);
     }
 
-    function parsePrice(str) {
-        return parseInt(String(str).replace(/[^0-9]/g, '')) || 0;
+    function getFilteredRows() {
+        var rows = document.querySelectorAll('.order-row');
+        var filtered = [];
+        rows.forEach(function(row) {
+            if (currentFilter === 'all' || row.dataset.status === currentFilter) {
+                filtered.push(row);
+            }
+        });
+        return filtered;
     }
 
-    function formatPrice(num) {
-        return '\u20B1' + num.toLocaleString();
-    }
+    function renderTable() {
+        var rows = getFilteredRows();
+        var allRows = document.querySelectorAll('.order-row');
+        var totalPages = Math.max(1, Math.ceil(rows.length / ROWS_PER_PAGE));
+        if (currentPage > totalPages) currentPage = totalPages;
 
-    function formatDate(isoStr) {
-        var d = new Date(isoStr);
-        var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
-    }
+        var start = (currentPage - 1) * ROWS_PER_PAGE;
+        var end = start + ROWS_PER_PAGE;
 
-    function getItemImage(itemName) {
-        var imageMap = {
-            'Ube Cheesecake': '../images/items/cheesecake.jpg',
-            'Ube Roll': '../images/items/uberoll.jpg',
-            'Ube Crinkles': '../images/items/crinkles.jpg',
-            'Ube Halo-Halo': '../images/items/halohalo.jpg',
-            'Classic Ube Cake': '../images/items/classic.jpg',
-            'Ube Pandesal': '../images/items/pandesal.jpg',
-            'Ube Latte': '../images/items/latte.jpg',
-            'Ube Macapuno Cake': '../images/items/macapuno.jpg'
-        };
-
-        return imageMap[itemName] || '../images/cake.png';
-    }
-
-    // Render localStorage orders (placed via checkout)
-    function renderLocalOrders() {
-        var localOrders = JSON.parse(localStorage.getItem('ube_orders') || '[]');
-        if (localOrders.length === 0) return;
-
-        localOrders.forEach(function(order) {
-            var card = document.createElement('div');
-            card.className = 'order-card';
-            card.dataset.status = order.status.toLowerCase();
-
-            var itemsHtml = '';
-            order.items.forEach(function(item) {
-                itemsHtml +=
-                    '<div class="order-item">' +
-                        '<img src="' + getItemImage(item.name) + '" alt="" class="item-thumb">' +
-                        '<div class="item-details">' +
-                            '<span class="item-name">' + item.name + '</span>' +
-                            '<span class="item-qty">Qty: ' + item.qty + '</span>' +
-                        '</div>' +
-                        '<span class="item-price">' + item.price + '</span>' +
-                    '</div>';
-            });
-
-            card.innerHTML =
-                '<div class="order-header">' +
-                    '<div class="order-meta">' +
-                        '<span class="order-id">' + order.id + '</span>' +
-                        '<span class="order-date">' + formatDate(order.date) + '</span>' +
-                    '</div>' +
-                    '<span class="status-badge status-' + order.status.toLowerCase() + '">' + order.status + '</span>' +
-                '</div>' +
-                '<div class="order-items">' + itemsHtml + '</div>' +
-                '<div class="order-footer">' +
-                    '<span class="order-total">Total: <strong>' + formatPrice(order.total) + '</strong></span>' +
-                    '<button class="btn-reorder" data-order="' + order.id + '">Reorder</button>' +
-                '</div>';
-
-            ordersList.insertBefore(card, ordersList.firstChild);
+        allRows.forEach(function(r) { r.style.display = 'none'; });
+        rows.forEach(function(r, i) {
+            r.style.display = (i >= start && i < end) ? '' : 'none';
         });
 
-        // Rebind reorder buttons
-        bindReorderButtons();
-        bindFilterButtons();
-    }
-
-    function bindFilterButtons() {
-        var cards = document.querySelectorAll('.order-card');
-        filterBtns.forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                filterBtns.forEach(function(b) { b.classList.remove('active'); });
-                this.classList.add('active');
-                var status = this.dataset.status;
-                cards.forEach(function(card) {
-                    if (status === 'all' || card.dataset.status === status) {
-                        card.style.display = '';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        });
-    }
-
-    function bindReorderButtons() {
-        document.querySelectorAll('.btn-reorder').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                showToast('Reorder feature coming soon!');
-            });
-        });
-    }
-
-    function checkEmpty() {
-        var cards = document.querySelectorAll('.order-card');
-        if (cards.length === 0) {
-            emptyOrders.style.display = '';
-            ordersList.style.display = 'none';
+        var table = document.getElementById('ordersTable');
+        var emptyEl = document.getElementById('emptyOrders');
+        var pagBar = document.getElementById('paginationBar');
+        if (rows.length === 0) {
+            emptyEl.style.display = '';
+            table.style.display = 'none';
+            pagBar.style.display = 'none';
         } else {
-            emptyOrders.style.display = 'none';
-            ordersList.style.display = '';
+            emptyEl.style.display = 'none';
+            table.style.display = '';
+            pagBar.style.display = rows.length > ROWS_PER_PAGE ? '' : 'none';
         }
+
+        var info = document.getElementById('paginationInfo');
+        info.innerHTML = 'Showing <strong>' + (start + 1) + '&ndash;' + Math.min(end, rows.length) + '</strong> of <strong>' + rows.length + '</strong> orders';
+
+        var links = document.getElementById('paginationLinks');
+        var html = '<button class="pagination-link' + (currentPage === 1 ? ' disabled' : '') + '" data-page="' + (currentPage - 1) + '">&laquo;</button>';
+        for (var p = 1; p <= totalPages; p++) {
+            html += '<button class="pagination-link' + (p === currentPage ? ' current' : '') + '" data-page="' + p + '">' + p + '</button>';
+        }
+        html += '<button class="pagination-link' + (currentPage === totalPages ? ' disabled' : '') + '" data-page="' + (currentPage + 1) + '">&raquo;</button>';
+        links.innerHTML = html;
     }
 
-    renderLocalOrders();
-    bindFilterButtons();
-    bindReorderButtons();
-    checkEmpty();
+    // Filter tabs
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            currentFilter = this.dataset.status;
+            currentPage = 1;
+            renderTable();
+        });
+    });
+
+    // Pagination
+    document.getElementById('paginationLinks').addEventListener('click', function(e) {
+        var btn = e.target.closest('.pagination-link');
+        if (!btn || btn.classList.contains('disabled')) return;
+        currentPage = parseInt(btn.dataset.page, 10);
+        renderTable();
+    });
+
+    // Eye icon — open modal
+    function openOrderModal(tr) {
+        var orderId = tr.querySelector('.order-id').textContent;
+        var total = tr.querySelector('.order-total').textContent;
+        var date = tr.querySelector('.order-date').textContent;
+        var status = tr.querySelector('.status-badge').textContent;
+        var statusClass = tr.querySelector('.status-badge').className.replace('status-badge ', '');
+        var items = JSON.parse(tr.dataset.items || '[]');
+        var street = tr.dataset.street;
+        var barangay = tr.dataset.barangay;
+        var city = tr.dataset.city;
+        var province = tr.dataset.province;
+        var zip = tr.dataset.zip;
+        var payment = tr.dataset.payment;
+        var notes = tr.dataset.notes;
+        var subtotal = parseInt(tr.dataset.subtotal, 10);
+        var shipping = parseInt(tr.dataset.shipping, 10);
+        var updatedAt = tr.dataset.updated || '—';
+
+        var address = street + '<br>' + barangay + ', ' + city + '<br>' + province + ', ' + zip;
+
+        var itemsRows = '';
+        items.forEach(function(item) {
+            var sub = item.qty * item.price;
+            itemsRows +=
+                '<tr>' +
+                    '<td>' + item.name + '</td>' +
+                    '<td class="col-qty">' + item.qty + '</td>' +
+                    '<td class="col-price">\u20B1' + item.price.toLocaleString() + '</td>' +
+                    '<td class="col-sub">\u20B1' + sub.toLocaleString() + '</td>' +
+                '</tr>';
+        });
+
+        var notesHtml = notes ? '<div class="order-detail-meta"><span><strong>Notes:</strong> ' + notes + '</span></div>' : '';
+
+        modalBody.innerHTML =
+            '<div class="order-detail-status">' +
+                '<div><span class="order-detail-id">' + orderId + '</span><br><span class="order-detail-date">Placed: ' + date + ' &middot; Updated: ' + updatedAt + '</span></div>' +
+                '<span class="status-badge ' + statusClass + '">' + status + '</span>' +
+            '</div>' +
+            '<div class="order-detail-section">' +
+                '<h4><i class="fa-solid fa-location-dot"></i> Delivery Address</h4>' +
+                '<div class="order-detail-address">' + address + '</div>' +
+            '</div>' +
+            '<div class="order-detail-section">' +
+                '<h4><i class="fa-solid fa-bag-shopping"></i> Items</h4>' +
+                '<table class="order-detail-items">' +
+                    '<thead><tr><th>Product</th><th class="col-qty">Qty</th><th class="col-price">Price</th><th class="col-sub">Subtotal</th></tr></thead>' +
+                    '<tbody>' + itemsRows + '</tbody>' +
+                '</table>' +
+            '</div>' +
+            '<div class="order-detail-totals">' +
+                '<div class="total-row"><span>Subtotal</span><span>\u20B1' + subtotal.toLocaleString() + '</span></div>' +
+                '<div class="total-row"><span>Shipping</span><span>' + (shipping > 0 ? '\u20B1' + shipping.toLocaleString() : 'Free') + '</span></div>' +
+                '<div class="total-row grand"><span>Total</span><span>' + total + '</span></div>' +
+            '</div>' +
+            '<div class="order-detail-meta"><span><strong>Payment:</strong> ' + payment + '</span></div>' +
+            notesHtml;
+
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('ordersTable').addEventListener('click', function(e) {
+        var btn = e.target.closest('.btn-view');
+        if (!btn) return;
+        var tr = btn.closest('tr');
+        if (tr) openOrderModal(tr);
+    });
+
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeModal();
+        });
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    });
+
+    // Reorder
+    document.querySelectorAll('.btn-reorder').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            showToast('Reorder feature coming soon!');
+        });
+    });
+
+    // Cancel order
+    document.getElementById('ordersTable').addEventListener('click', function(e) {
+        var btn = e.target.closest('.btn-cancel-order');
+        if (!btn) return;
+        var tr = btn.closest('tr');
+        if (!confirm('Are you sure you want to cancel this order?')) return;
+        tr.dataset.status = 'cancelled';
+        var badge = tr.querySelector('.status-badge');
+        badge.className = 'status-badge status-cancelled';
+        badge.textContent = 'Cancelled';
+        var cell = tr.querySelector('.order-actions-cell');
+        var orderId = btn.dataset.order;
+        cell.innerHTML = '<button class="btn-icon btn-view" title="View details"><i class="fa-solid fa-eye"></i></button><button class="btn-reorder" data-order="' + orderId + '">Reorder</button>';
+        cell.querySelector('.btn-reorder').addEventListener('click', function() {
+            showToast('Reorder feature coming soon!');
+        });
+        showToast('Order cancelled.', 'error');
+        renderTable();
+    });
+
+    renderTable();
 })();

@@ -280,6 +280,8 @@ input {
     padding-right: 50px;
 }
 
+.password-wrapper input::-ms-reveal { display: none; }
+
 .password-wrapper i {
     position: absolute;
     right: 15px;

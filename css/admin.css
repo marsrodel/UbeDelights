@@ -653,11 +653,14 @@ body.admin-body {
 }
 
 .btn-action {
-    padding: 9px 18px;
-    border-radius: var(--radius-sm);
-    font-size: 0.83rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 0.85rem;
     font-weight: 600;
-    font-family: var(--font-body);
     cursor: pointer;
     transition: var(--transition);
     border: 1px solid transparent;
@@ -666,7 +669,7 @@ body.admin-body {
 }
 
 .btn-action i {
-    margin-right: 5px;
+    margin-right: 0;
 }
 
 .btn-action:hover {
@@ -698,6 +701,272 @@ body.admin-body {
 
 .btn-cancel:hover {
     background: #fecaca;
+}
+
+/* ── ORDERS TABLE ── */
+.orders-table-container {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.orders-table th {
+    text-align: left;
+    padding: 14px 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    background: #f9fafb;
+    border-bottom: 1px solid var(--border);
+}
+
+.orders-table td {
+    padding: 14px 20px;
+    font-size: 0.88rem;
+    color: var(--text-body);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.orders-table tr:last-child td {
+    border-bottom: none;
+}
+
+.orders-table tr:hover td {
+    background: #faf9fd;
+}
+
+.order-items-cell {
+    color: var(--text-secondary);
+    max-width: 280px;
+    line-height: 1.5;
+}
+
+.order-date {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.order-actions-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+/* ── PAGINATION ── */
+.pagination-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+}
+
+.pagination-info {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.pagination-info strong {
+    color: var(--text-primary);
+}
+
+.pagination {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    background: #fff;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.pagination-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.pagination-link.current {
+    background: var(--primary-gradient);
+    color: #fff;
+    border-color: transparent;
+}
+
+.pagination-link.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* ── ICON BUTTON (Eye icon) ── */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-icon:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: #f5f3ff;
+}
+
+/* ── ORDER DETAIL MODAL ── */
+.order-detail-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.order-detail-id {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.95rem;
+}
+
+.order-detail-date {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+}
+
+.order-detail-section {
+    margin-bottom: 20px;
+}
+
+.order-detail-section h4 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.order-detail-section h4 i {
+    color: var(--accent-light);
+}
+
+.order-detail-address {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.order-detail-items {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.order-detail-items th {
+    text-align: left;
+    padding: 8px 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.order-detail-items td {
+    padding: 10px 0;
+    font-size: 0.85rem;
+    color: var(--text-body);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.order-detail-items tr:last-child td {
+    border-bottom: none;
+}
+
+.order-detail-items .col-qty,
+.order-detail-items .col-price,
+.order-detail-items .col-sub {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.order-detail-items .col-price {
+    color: var(--text-muted);
+}
+
+.order-detail-items .col-sub {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.order-detail-totals {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-light);
+}
+
+.order-detail-totals .total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.order-detail-totals .total-row.grand {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    padding-top: 8px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border);
+}
+
+.order-detail-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-light);
+    font-size: 0.83rem;
+    color: var(--text-secondary);
+}
+
+.order-detail-meta strong {
+    color: var(--text-primary);
 }
 
 /* ── BUTTONS ── */
@@ -1263,6 +1532,11 @@ body.admin-body {
     .products-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .orders-table th:nth-child(4),
+    .orders-table td:nth-child(4) {
+        display: none;
+    }
 }
 
 @media (max-width: 600px) {
@@ -1282,9 +1556,13 @@ body.admin-body {
         display: none;
     }
 
-    .order-header,
-    .order-footer {
+    .orders-table th:nth-child(2),
+    .orders-table td:nth-child(2) {
+        display: none;
+    }
+
+    .pagination-bar {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
     }
 }
