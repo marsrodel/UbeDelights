@@ -137,8 +137,8 @@ if (file_exists($featuredFile)) {
                     </div>
                     <div class="product-card-actions">
                         <button class="btn-featured <?php echo in_array($product['id'], $featuredIds) ? 'active' : ''; ?>" data-id="<?php echo $product['id']; ?>" title="<?php echo in_array($product['id'], $featuredIds) ? 'Remove from featured' : 'Add to featured'; ?>"><i class="fa-<?php echo in_array($product['id'], $featuredIds) ? 'solid' : 'regular'; ?> fa-star"></i></button>
-                        <button class="btn-outline btn-edit" data-id="<?php echo $product['id']; ?>"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                        <button class="btn-outline btn-delete" data-id="<?php echo $product['id']; ?>"><i class="fa-solid fa-trash-can"></i> Delete</button>
+                        <button class="btn-outline btn-edit" data-id="<?php echo $product['id']; ?>" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-outline btn-delete" data-id="<?php echo $product['id']; ?>" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>
                 <?php endforeach; ?>

@@ -333,3 +333,6 @@
     window.adminValidatePasswordMatch = validatePasswordMatch;
     window.adminUpdatePasswordStrength = updatePasswordStrength;
     window.adminTogglePassword = togglePassword;
+
+    // Also expose closeModal globally for inline onclick handlers
+    window.closeModal = closeModal;

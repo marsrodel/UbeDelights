@@ -1,108 +1,47 @@
 <?php require_once __DIR__ . '/../server/customer_auth.php';
 
-$mockOrders = [
-    [
-        'id' => 'UBD-MT2IYXVL', 'date' => 'August 25, 2026', 'updated_at' => null, 'status' => 'pending',
-        'street' => '123 Sampaguita St.', 'barangay' => 'Brgy. San Isidro', 'city' => 'Quezon City', 'province' => 'Metro Manila', 'zip_code' => '1116',
-        'notes' => 'Please ring the bell twice.',
-        'subtotal' => 1000, 'shipping' => 100,
-        'items' => [
-            ['name' => 'Ube Cheesecake', 'qty' => 1, 'price' => 850],
-            ['name' => 'Ube Latte', 'qty' => 2, 'price' => 75],
-        ],
-    ],
-    [
-        'id' => 'UBD-MT33O3BT', 'date' => 'August 22, 2026', 'updated_at' => null, 'status' => 'pending',
-        'street' => '456 Rosa St.', 'barangay' => 'Brgy. Maligaya', 'city' => 'Manila', 'province' => 'Metro Manila', 'zip_code' => '1008',
-        'notes' => '',
-        'subtotal' => 500, 'shipping' => 100,
-        'items' => [
-            ['name' => 'Ube Roll', 'qty' => 2, 'price' => 250],
-        ],
-    ],
-    [
-        'id' => 'UBD-MT18Y7AP', 'date' => 'August 18, 2026', 'updated_at' => 'August 20, 2026', 'status' => 'confirmed',
-        'street' => '789 Orchid Ave.', 'barangay' => 'Brgy. Liping', 'city' => 'Pasig City', 'province' => 'Metro Manila', 'zip_code' => '1607',
-        'notes' => 'Leave at the front desk if no one is home.',
-        'subtotal' => 365, 'shipping' => 100,
-        'items' => [
-            ['name' => 'Classic Ube Cake', 'qty' => 1, 'price' => 350],
-            ['name' => 'Ube Pandesal', 'qty' => 3, 'price' => 5],
-        ],
-    ],
-    [
-        'id' => 'UBD-MT09K2ZQ', 'date' => 'August 10, 2026', 'updated_at' => 'August 12, 2026', 'status' => 'delivered',
-        'street' => '321 Mayumi Lane', 'barangay' => 'Brgy. Santol', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1550',
-        'notes' => '',
-        'subtotal' => 200, 'shipping' => 0,
-        'items' => [
-            ['name' => 'Ube Pandesal', 'qty' => 4, 'price' => 5],
-            ['name' => 'Ube Halo-Halo', 'qty' => 1, 'price' => 180],
-        ],
-    ],
-    [
-        'id' => 'ORD-001', 'date' => 'August 18, 2025', 'updated_at' => 'August 20, 2025', 'status' => 'delivered',
-        'street' => '55 Greenhills Blvd.', 'barangay' => 'Brgy. Wack-Wack', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1554',
-        'notes' => '',
-        'subtotal' => 1000, 'shipping' => 0,
-        'items' => [
-            ['name' => 'Ube Cheesecake', 'qty' => 1, 'price' => 850],
-            ['name' => 'Ube Latte', 'qty' => 1, 'price' => 75],
-        ],
-    ],
-    [
-        'id' => 'ORD-002', 'date' => 'August 15, 2025', 'updated_at' => 'August 15, 2025', 'status' => 'cancelled',
-        'street' => '88 Taurus St.', 'barangay' => 'Brgy. Horseshoe', 'city' => 'Quezon City', 'province' => 'Metro Manila', 'zip_code' => '1112',
-        'notes' => '',
-        'subtotal' => 730, 'shipping' => 100,
-        'items' => [
-            ['name' => 'Ube Roll', 'qty' => 1, 'price' => 250],
-            ['name' => 'Ube Crinkles', 'qty' => 1, 'price' => 140],
-            ['name' => 'Ube Cheesecake', 'qty' => 1, 'price' => 850],
-        ],
-    ],
-    [
-        'id' => 'ORD-003', 'date' => 'August 12, 2025', 'updated_at' => 'August 18, 2025', 'status' => 'delivered',
-        'street' => '12 Pearl Dr.', 'barangay' => 'Brgy. Addition Hills', 'city' => 'San Juan', 'province' => 'Metro Manila', 'zip_code' => '1500',
-        'notes' => 'Gate code is 4567.',
-        'subtotal' => 950, 'shipping' => 100,
-        'items' => [
-            ['name' => 'Classic Ube Cake', 'qty' => 1, 'price' => 350],
-            ['name' => 'Ube Pandesal', 'qty' => 6, 'price' => 5],
-            ['name' => 'Ube Halo-Halo', 'qty' => 1, 'price' => 180],
-            ['name' => 'Ube Latte', 'qty' => 1, 'price' => 75],
-        ],
-    ],
-    [
-        'id' => 'ORD-004', 'date' => 'August 5, 2025', 'updated_at' => 'August 5, 2025', 'status' => 'cancelled',
-        'street' => '9 Sunflower St.', 'barangay' => 'Brgy. Kabayanan', 'city' => 'Manila', 'province' => 'Metro Manila', 'zip_code' => '1007',
-        'notes' => '',
-        'subtotal' => 420, 'shipping' => 100,
-        'items' => [
-            ['name' => 'Ube Pandesal', 'qty' => 2, 'price' => 5],
-            ['name' => 'Ube Halo-Halo', 'qty' => 1, 'price' => 180],
-        ],
-    ],
-    [
-        'id' => 'ORD-005', 'date' => 'July 28, 2025', 'updated_at' => 'July 30, 2025', 'status' => 'delivered',
-        'street' => '21 Magnolia Ave.', 'barangay' => 'Brgy. Old Zaniga', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1550',
-        'notes' => '',
-        'subtotal' => 1700, 'shipping' => 0,
-        'items' => [
-            ['name' => 'Ube Cheesecake', 'qty' => 2, 'price' => 850],
-        ],
-    ],
-    [
-        'id' => 'ORD-006', 'date' => 'July 20, 2025', 'updated_at' => 'July 22, 2025', 'status' => 'delivered',
-        'street' => '7 Bamboo Ct.', 'barangay' => 'Brgy. Plainview', 'city' => 'Mandaluyong', 'province' => 'Metro Manila', 'zip_code' => '1550',
-        'notes' => 'Text me upon arrival.',
-        'subtotal' => 475, 'shipping' => 100,
-        'items' => [
-            ['name' => 'Ube Latte', 'qty' => 3, 'price' => 75],
-            ['name' => 'Ube Roll', 'qty' => 1, 'price' => 250],
-        ],
-    ],
-];
+$userId = $currentUser['id'];
+$orders = [];
+
+$orderQuery = mysqli_query($connect, "SELECT * FROM orders WHERE user_id = '" . mysqli_real_escape_string($connect, $userId) . "' ORDER BY order_date DESC");
+
+if ($orderQuery) {
+    while ($row = mysqli_fetch_assoc($orderQuery)) {
+        $items = [];
+        $itemQuery = mysqli_query($connect, "SELECT * FROM order_items WHERE order_id = " . intval($row['order_id']));
+        if ($itemQuery) {
+            while ($item = mysqli_fetch_assoc($itemQuery)) {
+                $items[] = [
+                    'name'  => $item['product_name'],
+                    'qty'   => intval($item['quantity']),
+                    'price' => floatval($item['unit_price']),
+                ];
+            }
+        }
+
+        $updatedAt = null;
+        if ($row['updated_at'] !== $row['order_date']) {
+            $updatedAt = date('F j, Y', strtotime($row['updated_at']));
+        }
+
+        $orders[] = [
+            'order_id'   => intval($row['order_id']),
+            'id'         => 'ORD-' . str_pad($row['order_id'], 3, '0', STR_PAD_LEFT),
+            'date'       => date('F j, Y', strtotime($row['order_date'])),
+            'updated_at' => $updatedAt,
+            'status'     => $row['status'],
+            'street'     => $row['street'],
+            'barangay'   => $row['barangay'],
+            'city'       => $row['city'],
+            'province'   => $row['province'],
+            'zip_code'   => $row['zip_code'],
+            'notes'      => $row['notes'] ?? '',
+            'subtotal'   => floatval($row['subtotal']),
+            'shipping'   => floatval($row['shipping_fee']),
+            'items'      => $items,
+        ];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -162,8 +101,9 @@ $mockOrders = [
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($mockOrders as $order): ?>
+                    <?php foreach ($orders as $order): ?>
                     <tr class="order-row" data-status="<?php echo $order['status']; ?>"
+                        data-order-id="<?php echo $order['order_id']; ?>"
                         data-updated="<?php echo htmlspecialchars($order['updated_at'] ?? '', ENT_QUOTES); ?>"
                         data-street="<?php echo htmlspecialchars($order['street'], ENT_QUOTES); ?>"
                         data-barangay="<?php echo htmlspecialchars($order['barangay'], ENT_QUOTES); ?>"

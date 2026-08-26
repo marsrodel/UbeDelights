@@ -1,12 +1,35 @@
 <?php require_once __DIR__ . '/../../server/admin_auth.php';
 
-// Mock stats - in real implementation, these would come from the database
 $stats = [
-    ['label' => 'Total Users', 'value' => '156', 'icon' => 'fa-solid fa-users', 'color' => '#7c3aed'],
-    ['label' => 'Active Users', 'value' => '142', 'icon' => 'fa-solid fa-user-check', 'color' => '#22c55e'],
-    ['label' => 'Pending Approvals', 'value' => '7', 'icon' => 'fa-solid fa-user-clock', 'color' => '#f59e0b'],
-    ['label' => 'Blocked Users', 'value' => '3', 'icon' => 'fa-solid fa-user-slash', 'color' => '#ef4444'],
+    ['label' => 'Total Users', 'value' => '0', 'icon' => 'fa-solid fa-users', 'color' => '#7c3aed'],
+    ['label' => 'Active Users', 'value' => '0', 'icon' => 'fa-solid fa-user-check', 'color' => '#22c55e'],
+    ['label' => 'Pending Approvals', 'value' => '0', 'icon' => 'fa-solid fa-user-clock', 'color' => '#f59e0b'],
+    ['label' => 'Blocked Users', 'value' => '0', 'icon' => 'fa-solid fa-user-slash', 'color' => '#ef4444'],
 ];
+
+if ($connect) {
+    $total = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users"));
+    $stats[0]['value'] = number_format($total['cnt']);
+
+    $active = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'active'"));
+    $stats[1]['value'] = number_format($active['cnt']);
+
+    $pending = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'pending'"));
+    $stats[2]['value'] = number_format($pending['cnt']);
+
+    $blocked = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'blocked'"));
+    $stats[3]['value'] = number_format($blocked['cnt']);
+}
+
+$recentLogs = [];
+if ($connect) {
+    $logResult = mysqli_query($connect, "SELECT l.username, l.action, l.description, l.created_at FROM user_logs l ORDER BY l.created_at DESC LIMIT 5");
+    if ($logResult) {
+        while ($row = mysqli_fetch_assoc($logResult)) {
+            $recentLogs[] = $row;
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -90,36 +113,20 @@ $stats = [
                             </tr>
                         </thead>
                         <tbody>
+                            <?php if (count($recentLogs) > 0): ?>
+                            <?php foreach ($recentLogs as $log): ?>
                             <tr>
-                                <td><strong>windy.sagaad</strong></td>
-                                <td><span class="action-badge action-create">Create User</span></td>
-                                <td>Created new user maria.santos</td>
-                                <td><?php echo date('M j, Y g:i A', strtotime('-2 hours')); ?></td>
+                                <td><strong><?php echo htmlspecialchars($log['username'] ?? 'System'); ?></strong></td>
+                                <td><span class="action-badge action-<?php echo strtolower($log['action']); ?>"><?php echo ucwords(str_replace('_', ' ', $log['action'])); ?></span></td>
+                                <td><?php echo htmlspecialchars($log['description']); ?></td>
+                                <td><?php echo date('M j, Y g:i A', strtotime($log['created_at'])); ?></td>
                             </tr>
+                            <?php endforeach; ?>
+                            <?php else: ?>
                             <tr>
-                                <td><strong>admin_user</strong></td>
-                                <td><span class="action-badge action-block">Block User</span></td>
-                                <td>Blocked user juan.dc</td>
-                                <td><?php echo date('M j, Y g:i A', strtotime('-5 hours')); ?></td>
+                                <td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);">No recent activity</td>
                             </tr>
-                            <tr>
-                                <td><strong>super_admin</strong></td>
-                                <td><span class="action-badge action-approve">Approve User</span></td>
-                                <td>Approved pending user ana.reyes</td>
-                                <td><?php echo date('M j, Y g:i A', strtotime('-1 day')); ?></td>
-                            </tr>
-                            <tr>
-                                <td><strong>windy.sagaad</strong></td>
-                                <td><span class="action-badge action-update">Update User</span></td>
-                                <td>Updated user carlo.mendoza (password updated)</td>
-                                <td><?php echo date('M j, Y g:i A', strtotime('-2 days')); ?></td>
-                            </tr>
-                            <tr>
-                                <td><strong>lynlyn</strong></td>
-                                <td><span class="action-badge action-login">Login</span></td>
-                                <td>User logged in successfully</td>
-                                <td><?php echo date('M j, Y g:i A', strtotime('-3 days')); ?></td>
-                            </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>

@@ -142,6 +142,13 @@
         if (btn) btn.addEventListener('click', closeModal);
     });
 
+    if (modalSubmitBtn) {
+        modalSubmitBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (modalForm) modalForm.requestSubmit();
+        });
+    }
+
     if (modal) {
         modal.addEventListener('click', function(e) {
             if (e.target === modal) closeModal();
@@ -276,8 +283,8 @@
                 '</div>' +
                 '<div class="product-card-actions">' +
                     '<button class="btn-featured" data-id="' + p.id + '" title="Add to featured"><i class="fa-regular fa-star"></i></button>' +
-                    '<button class="btn-outline btn-edit" data-id="' + p.id + '"><i class="fa-solid fa-pen-to-square"></i> Edit</button>' +
-                    '<button class="btn-outline btn-delete" data-id="' + p.id + '"><i class="fa-solid fa-trash-can"></i> Delete</button>' +
+                    '<button class="btn-outline btn-edit" data-id="' + p.id + '" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>' +
+                    '<button class="btn-outline btn-delete" data-id="' + p.id + '" title="Delete"><i class="fa-solid fa-trash-can"></i></button>' +
                 '</div>' +
             '</div>';
     }

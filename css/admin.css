@@ -1240,8 +1240,12 @@ body.admin-body {
 }
 
 .product-card-actions .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 1;
-    text-align: center;
+    padding: 9px 0;
+    font-size: 0.85rem;
 }
 
 .btn-delete {

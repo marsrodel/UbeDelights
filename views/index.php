@@ -63,13 +63,10 @@ if ($connect) {
 
     // Recent orders (max 3)
     $recentOrders = [];
-    $sql = "SELECT o.order_id, o.order_date, o.total_amount, o.status,
-                   GROUP_CONCAT(oi.product_name SEPARATOR ', ') AS items
-            FROM orders o
-            JOIN order_items oi ON o.order_id = oi.order_id
-            WHERE o.user_id = ?
-            GROUP BY o.order_id
-            ORDER BY o.order_date DESC
+    $sql = "SELECT order_id, order_date, updated_at, total_amount, status
+            FROM orders
+            WHERE user_id = ?
+            ORDER BY order_date DESC
             LIMIT 3";
     if ($stmt = mysqli_prepare($connect, $sql)) {
         mysqli_stmt_bind_param($stmt, 's', $userId);
@@ -77,12 +74,14 @@ if ($connect) {
         $res = mysqli_stmt_get_result($stmt);
         if ($res) {
             while ($row = mysqli_fetch_assoc($res)) {
+                $updatedAt = $row['updated_at'];
+                $updatedDisplay = ($updatedAt !== $row['order_date']) ? date('M j, Y', strtotime($updatedAt)) : '—';
                 $recentOrders[] = [
-                    'id'     => 'ORD-' . str_pad($row['order_id'], 3, '0', STR_PAD_LEFT),
-                    'date'   => date('M j, Y', strtotime($row['order_date'])),
-                    'items'  => $row['items'],
-                    'total'  => '₱' . number_format((float)$row['total_amount'], 0),
-                    'status' => $row['status'],
+                    'id'         => 'ORD-' . str_pad($row['order_id'], 3, '0', STR_PAD_LEFT),
+                    'date'       => date('M j, Y', strtotime($row['order_date'])),
+                    'updated_at' => $updatedDisplay,
+                    'total'      => '₱' . number_format((float)$row['total_amount'], 0),
+                    'status'     => $row['status'],
                 ];
             }
         }
@@ -233,7 +232,7 @@ $features = [
                     <div class="product-price">
                         <span class="current"><?php echo $product['price']; ?></span>
                     </div>
-                    <button class="btn-add-cart" data-name="<?php echo htmlspecialchars($product['name']); ?>" data-price="<?php echo $product['price']; ?>" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="btn-add-cart" data-id="<?php echo $product['id']; ?>" data-name="<?php echo htmlspecialchars($product['name']); ?>" data-price="<?php echo $product['price']; ?>" data-image="<?php echo htmlspecialchars($product['image']); ?>" onclick="addToCart(this)">Add to Cart</button>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -259,8 +258,8 @@ $features = [
                 <thead>
                     <tr>
                         <th>Order ID</th>
-                        <th>Date</th>
-                        <th>Items</th>
+                        <th>Order Date</th>
+                        <th>Updated At</th>
                         <th>Total</th>
                         <th>Status</th>
                     </tr>
@@ -270,7 +269,7 @@ $features = [
                     <tr>
                         <td class="order-id"><?php echo $order['id']; ?></td>
                         <td><?php echo $order['date']; ?></td>
-                        <td><?php echo htmlspecialchars($order['items']); ?></td>
+                        <td><?php echo $order['updated_at']; ?></td>
                         <td class="order-total"><?php echo $order['total']; ?></td>
                         <td><span class="status-badge status-<?php echo $order['status']; ?>"><?php echo ucfirst($order['status']); ?></span></td>
                     </tr>

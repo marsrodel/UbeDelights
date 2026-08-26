@@ -11,6 +11,7 @@
     var modalCloseBtn = document.getElementById('modalCloseBtn');
 
     function showToast(message, type) {
+        if (!toast) return;
         toast.textContent = message;
         toast.className = 'toast' + (type ? ' ' + type : '');
         requestAnimationFrame(function() { toast.classList.add('show'); });
@@ -42,15 +43,15 @@
             r.style.display = (i >= start && i < end) ? '' : 'none';
         });
 
+        var emptyState = document.getElementById('ordersEmpty');
         var table = document.getElementById('ordersTable');
-        var emptyEl = document.getElementById('emptyOrders');
         var pagBar = document.getElementById('paginationBar');
         if (rows.length === 0) {
-            emptyEl.style.display = '';
+            emptyState.style.display = '';
             table.style.display = 'none';
             pagBar.style.display = 'none';
         } else {
-            emptyEl.style.display = 'none';
+            emptyState.style.display = 'none';
             table.style.display = '';
             pagBar.style.display = rows.length > ROWS_PER_PAGE ? '' : 'none';
         }
@@ -67,32 +68,27 @@
         links.innerHTML = html;
     }
 
-    // Filter tabs
-    document.querySelectorAll('.filter-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
-            this.classList.add('active');
-            currentFilter = this.dataset.status;
-            currentPage = 1;
-            renderTable();
-        });
-    });
+    function getActionsHtml(status) {
+        var eye = '<button class="btn-icon btn-view" title="View details"><i class="fa-solid fa-eye"></i></button>';
+        if (status === 'pending') {
+            return eye + '<button class="btn-action btn-confirm" data-action="confirm" title="Confirm"><i class="fa-solid fa-check"></i></button><button class="btn-action btn-cancel" data-action="cancel" title="Cancel"><i class="fa-solid fa-xmark"></i></button>';
+        } else if (status === 'confirmed') {
+            return eye + '<button class="btn-action btn-deliver" data-action="deliver" title="Deliver"><i class="fa-solid fa-truck-fast"></i></button><button class="btn-action btn-cancel" data-action="cancel" title="Cancel"><i class="fa-solid fa-xmark"></i></button>';
+        } else if (status === 'delivered') {
+            return eye + '<span class="cell-muted"><i class="fa-solid fa-circle-check" style="color:#15803d;"></i> Done</span>';
+        } else {
+            return eye + '<span class="cell-muted"><i class="fa-solid fa-ban" style="color:#dc2626;"></i> Cancelled</span>';
+        }
+    }
 
-    // Pagination
-    document.getElementById('paginationLinks').addEventListener('click', function(e) {
-        var btn = e.target.closest('.pagination-link');
-        if (!btn || btn.classList.contains('disabled')) return;
-        currentPage = parseInt(btn.dataset.page, 10);
-        renderTable();
-    });
-
-    // Eye icon — open modal
     function openOrderModal(tr) {
         var orderId = tr.querySelector('.order-id').textContent;
         var total = tr.querySelector('.order-total').textContent;
-        var date = tr.querySelector('.order-date').textContent;
+        var date = tr.querySelectorAll('td')[2].textContent;
+        var updatedAt = tr.dataset.updated || '—';
         var status = tr.querySelector('.status-badge').textContent;
         var statusClass = tr.querySelector('.status-badge').className.replace('status-badge ', '');
+        var customer = tr.querySelectorAll('td')[1].textContent.trim();
         var items = JSON.parse(tr.dataset.items || '[]');
         var street = tr.dataset.street;
         var barangay = tr.dataset.barangay;
@@ -102,7 +98,6 @@
         var notes = tr.dataset.notes;
         var subtotal = parseInt(tr.dataset.subtotal, 10);
         var shipping = parseInt(tr.dataset.shipping, 10);
-        var updatedAt = tr.dataset.updated || '—';
 
         var address = street + '<br>' + barangay + ', ' + city + '<br>' + province + ', ' + zip;
 
@@ -124,6 +119,10 @@
             '<div class="order-detail-status">' +
                 '<div><span class="order-detail-id">' + orderId + '</span><br><span class="order-detail-date">Placed: ' + date + ' &middot; Updated: ' + updatedAt + '</span></div>' +
                 '<span class="status-badge ' + statusClass + '">' + status + '</span>' +
+            '</div>' +
+            '<div class="order-detail-section">' +
+                '<h4><i class="fa-solid fa-user"></i> Customer</h4>' +
+                '<div class="order-detail-address">' + customer + '</div>' +
             '</div>' +
             '<div class="order-detail-section">' +
                 '<h4><i class="fa-solid fa-location-dot"></i> Delivery Address</h4>' +
@@ -152,11 +151,76 @@
         document.body.style.overflow = '';
     }
 
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            currentFilter = this.dataset.status;
+            currentPage = 1;
+            renderTable();
+        });
+    });
+
+    document.getElementById('paginationLinks').addEventListener('click', function(e) {
+        var btn = e.target.closest('.pagination-link');
+        if (!btn || btn.classList.contains('disabled')) return;
+        currentPage = parseInt(btn.dataset.page, 10);
+        renderTable();
+    });
+
     document.getElementById('ordersTable').addEventListener('click', function(e) {
-        var btn = e.target.closest('.btn-view');
+        var viewBtn = e.target.closest('.btn-view');
+        if (viewBtn) {
+            var tr = viewBtn.closest('tr');
+            if (tr) openOrderModal(tr);
+            return;
+        }
+
+        var btn = e.target.closest('.btn-action');
         if (!btn) return;
+        var action = btn.dataset.action;
         var tr = btn.closest('tr');
-        if (tr) openOrderModal(tr);
+        var badge = tr.querySelector('.status-badge');
+        var actionsCell = tr.querySelector('.order-actions-cell');
+
+        var orderId = tr.dataset.orderId;
+        var newStatus = action === 'confirm' ? 'confirmed' : action === 'deliver' ? 'delivered' : 'cancelled';
+
+        fetch('../../server/update_order_status.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_id: parseInt(orderId), status: newStatus })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                if (action === 'confirm') {
+                    badge.className = 'status-badge status-confirmed';
+                    badge.textContent = 'Confirmed';
+                    tr.dataset.status = 'confirmed';
+                    actionsCell.innerHTML = getActionsHtml('confirmed');
+                    showToast('Order confirmed!', 'success');
+                } else if (action === 'deliver') {
+                    badge.className = 'status-badge status-delivered';
+                    badge.textContent = 'Delivered';
+                    tr.dataset.status = 'delivered';
+                    actionsCell.innerHTML = getActionsHtml('delivered');
+                    showToast('Order marked as delivered!', 'success');
+                } else if (action === 'cancel') {
+                    badge.className = 'status-badge status-cancelled';
+                    badge.textContent = 'Cancelled';
+                    tr.dataset.status = 'cancelled';
+                    actionsCell.innerHTML = getActionsHtml('cancelled');
+                    showToast('Order cancelled.', 'error');
+                }
+                renderTable();
+            } else {
+                showToast('Failed to update order', 'error');
+            }
+        })
+        .catch(function() {
+            showToast('Network error', 'error');
+        });
     });
 
     if (modalClose) modalClose.addEventListener('click', closeModal);
@@ -168,47 +232,6 @@
     }
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
-    });
-
-    // Reorder
-    document.querySelectorAll('.btn-reorder').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            showToast('Reorder feature coming soon!');
-        });
-    });
-
-    // Cancel order
-    document.getElementById('ordersTable').addEventListener('click', function(e) {
-        var btn = e.target.closest('.btn-cancel-order');
-        if (!btn) return;
-        var tr = btn.closest('tr');
-        if (!confirm('Are you sure you want to cancel this order?')) return;
-
-        var orderId = tr.dataset.orderId;
-
-        fetch('../server/cancel_order.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_id: parseInt(orderId) })
-        })
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            if (data.success) {
-                tr.dataset.status = 'cancelled';
-                var badge = tr.querySelector('.status-badge');
-                badge.className = 'status-badge status-cancelled';
-                badge.textContent = 'Cancelled';
-                var cell = tr.querySelector('.order-actions-cell');
-                cell.innerHTML = '<button class="btn-icon btn-view" title="View details"><i class="fa-solid fa-eye"></i></button>';
-                showToast('Order cancelled.', 'error');
-                renderTable();
-            } else {
-                showToast(data.message || 'Failed to cancel order', 'error');
-            }
-        })
-        .catch(function() {
-            showToast('Network error', 'error');
-        });
     });
 
     renderTable();

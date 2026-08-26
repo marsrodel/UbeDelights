@@ -1,10 +1,20 @@
 <?php require_once __DIR__ . '/../../server/admin_auth.php';
 
-$mockPending = [
-    ['id' => '2025-0012', 'username' => 'ana.ramos', 'fullName' => 'Ana Ramos', 'email' => 'ana.ramos@gmail.com'],
-    ['id' => '2025-0015', 'username' => 'carlos.m', 'fullName' => 'Carlos Mendoza', 'email' => 'carlos.m@yahoo.com'],
-    ['id' => '2025-0018', 'username' => 'liza.santos', 'fullName' => 'Liza Santos', 'email' => 'liza.s@outlook.com'],
-];
+$pendingUsers = [];
+if ($connect) {
+    $sql = "SELECT user_id, username, CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name) AS fullName, email FROM users WHERE status = 'pending' ORDER BY user_id";
+    $result = mysqli_query($connect, $sql);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $pendingUsers[] = [
+                'id'       => $row['user_id'],
+                'username' => $row['username'],
+                'fullName' => trim($row['fullName']),
+                'email'    => $row['email'],
+            ];
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -84,8 +94,8 @@ $mockPending = [
                                     <th>ACTIONS</th>
                                 </tr>
                             </thead>
-                            <tbody id="pendingTableBody">
-                                <?php foreach ($mockPending as $user): ?>
+                                <tbody id="pendingTableBody">
+                                <?php foreach ($pendingUsers as $user): ?>
                                 <tr data-user-id="<?php echo htmlspecialchars($user['id']); ?>">
                                     <td class="cell-id"><?php echo htmlspecialchars($user['id']); ?></td>
                                     <td><?php echo htmlspecialchars($user['username']); ?></td>
@@ -162,7 +172,7 @@ $mockPending = [
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script>
-        var pendingUsers = <?php echo json_encode($mockPending); ?>;
+        var pendingUsers = <?php echo json_encode($pendingUsers); ?>;
     </script>
     <script src="../../javascript/admin_pending_approvals.js"></script>
     <script src="../../javascript/inspect.js"></script>

@@ -10,14 +10,16 @@ function addToCart(btn) {
         }
         return;
     }
+    var id = btn.dataset.id || '';
     var name = btn.dataset.name;
     var price = btn.dataset.price;
+    var image = btn.dataset.image || '';
     var cart = JSON.parse(localStorage.getItem('ube_cart') || '[]');
     var existing = cart.find(function(item) { return item.name === name; });
     if (existing) {
         existing.qty += 1;
     } else {
-        cart.push({ name: name, price: price, qty: 1 });
+        cart.push({ id: id, name: name, price: price, qty: 1, image: image });
     }
     localStorage.setItem('ube_cart', JSON.stringify(cart));
 

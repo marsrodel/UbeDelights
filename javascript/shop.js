@@ -44,17 +44,30 @@
                 showToast('This product is not available.', 'error');
                 return;
             }
+            var id = this.dataset.id || '';
             var name = this.dataset.name;
             var price = this.dataset.price;
+            var image = this.dataset.image || '';
             var cart = JSON.parse(localStorage.getItem('ube_cart') || '[]');
             var existing = cart.find(function(item) { return item.name === name; });
             if (existing) {
                 existing.qty += 1;
             } else {
-                cart.push({ name: name, price: price, qty: 1 });
+                cart.push({ id: id, name: name, price: price, qty: 1, image: image });
             }
             localStorage.setItem('ube_cart', JSON.stringify(cart));
+
+            var original = this.textContent;
+            this.textContent = 'Added! \u2713';
+            this.classList.add('added');
+            var self = this;
+            setTimeout(function() {
+                self.textContent = original;
+                self.classList.remove('added');
+            }, 1500);
+
             showToast(name + ' added to cart!', 'success');
+            updateCartBadge();
         });
     });
 })();

@@ -9,6 +9,7 @@ if ($connect) {
         if ($res) {
             while ($row = mysqli_fetch_assoc($res)) {
                 $products[] = [
+                    'id'          => (int)$row['product_id'],
                     'name'        => $row['name'],
                     'price'       => '₱' . number_format((float)$row['price'], 0),
                     'category'    => $row['category'],
@@ -92,7 +93,7 @@ $categories = [
                         <span class="current"><?php echo $product['price']; ?></span>
                     </div>
                     <p class="description"><?php echo htmlspecialchars($product['description']); ?></p>
-                    <button class="btn-add-cart" data-name="<?php echo htmlspecialchars($product['name']); ?>" data-price="<?php echo $product['price']; ?>" onclick="addToCart(this)">Add to Cart</button>
+                    <button class="btn-add-cart" data-id="<?php echo $product['id']; ?>" data-name="<?php echo htmlspecialchars($product['name']); ?>" data-price="<?php echo $product['price']; ?>" data-image="<?php echo htmlspecialchars($product['image']); ?>">Add to Cart</button>
                 </div>
             </div>
             <?php endforeach; ?>

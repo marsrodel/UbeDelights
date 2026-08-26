@@ -28,19 +28,8 @@
         return '\u20B1' + num.toLocaleString();
     }
 
-    function getItemImage(itemName) {
-        var imageMap = {
-            'Ube Cheesecake': '../images/items/cheesecake.jpg',
-            'Ube Roll': '../images/items/uberoll.jpg',
-            'Ube Crinkles': '../images/items/crinkles.jpg',
-            'Ube Halo-Halo': '../images/items/halohalo.jpg',
-            'Classic Ube Cake': '../images/items/classic.jpg',
-            'Ube Pandesal': '../images/items/pandesal.jpg',
-            'Ube Latte': '../images/items/latte.jpg',
-            'Ube Macapuno Cake': '../images/items/macapuno.jpg'
-        };
-
-        return imageMap[itemName] || '../images/cake.png';
+    function getItemImage(item) {
+        return item.image || '../images/cake.png';
     }
 
     function renderCheckoutItems() {
@@ -61,7 +50,7 @@
             var div = document.createElement('div');
             div.className = 'checkout-item';
             div.innerHTML =
-                '<img src="' + getItemImage(item.name) + '" alt="">' +
+                '<img src="' + getItemImage(item) + '" alt="">' +
                 '<div class="checkout-item-info">' +
                     '<div class="checkout-item-name">' + item.name + '</div>' +
                     '<div class="checkout-item-qty">Qty: ' + item.qty + '</div>' +
@@ -78,17 +67,6 @@
         document.getElementById('coTotal').textContent = formatPrice(total);
     }
 
-    // Payment option selection
-    var paymentOptions = document.querySelectorAll('.payment-option');
-    paymentOptions.forEach(function(option) {
-        option.addEventListener('click', function() {
-            paymentOptions.forEach(function(o) { o.classList.remove('selected'); });
-            this.classList.add('selected');
-            this.querySelector('input[type="radio"]').checked = true;
-        });
-    });
-
-    // Place order
     if (btnPlaceOrder) {
         btnPlaceOrder.addEventListener('click', function() {
             var firstName = document.getElementById('coFirstName').value.trim();
@@ -122,54 +100,55 @@
                 return;
             }
 
-            var paymentInput = document.querySelector('input[name="payment"]:checked');
-            var paymentLabels = { cod: 'Cash on Delivery', gcash: 'GCash', maya: 'Maya (PayMaya)' };
-            var payment = paymentInput ? (paymentLabels[paymentInput.value] || paymentInput.value) : 'Order Placed';
             var notes = document.getElementById('coNotes') ? document.getElementById('coNotes').value.trim() : '';
 
-            // Generate order ID
-            var orderId = 'UBD-' + Date.now().toString(36).toUpperCase();
-
-            // Build order object
-            var subtotal = 0;
-            cart.forEach(function(item) {
-                subtotal += parsePrice(item.price) * item.qty;
-            });
-            var shipping = subtotal >= 500 ? 0 : 99;
-
-            var order = {
-                id: orderId,
-                items: cart,
-                subtotal: subtotal,
-                shipping: shipping,
-                total: subtotal + shipping,
-                payment: payment,
-                notes: notes,
+            var orderData = {
                 address: {
                     firstName: firstName,
                     lastName: lastName,
+                    email: email,
+                    phone: phone,
                     street: street,
                     barangay: barangay,
                     city: city,
                     province: province,
-                    zip: zip,
-                    email: email,
-                    phone: phone
+                    zip: zip
                 },
-                status: 'Pending',
-                date: new Date().toISOString()
+                items: cart.map(function(item) {
+                    return {
+                        id: item.id || null,
+                        name: item.name,
+                        price: item.price,
+                        qty: item.qty
+                    };
+                }),
+                notes: notes
             };
 
-            // Save order to localStorage
-            var orders = JSON.parse(localStorage.getItem('ube_orders') || '[]');
-            orders.unshift(order);
-            localStorage.setItem('ube_orders', JSON.stringify(orders));
+            btnPlaceOrder.disabled = true;
+            btnPlaceOrder.textContent = 'Placing Order...';
 
-            // Clear cart
-            saveCart([]);
-
-            // Show confirmation
-            showConfirmation(orderId);
+            fetch('../server/place_order.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    saveCart([]);
+                    showConfirmation('ORD-' + data.order_id);
+                } else {
+                    showToast(data.message || 'Failed to place order', 'error');
+                    btnPlaceOrder.disabled = false;
+                    btnPlaceOrder.textContent = 'Place Order';
+                }
+            })
+            .catch(function() {
+                showToast('Network error. Please try again.', 'error');
+                btnPlaceOrder.disabled = false;
+                btnPlaceOrder.textContent = 'Place Order';
+            });
         });
     }
 

@@ -1,32 +1,22 @@
 <?php require_once __DIR__ . '/../../server/admin_auth.php';
 
-$mockUsers = [
-    ['id' => '2011-1000', 'username' => 'winwin', 'fullName' => 'Win Sagaad', 'email' => 'sagaadwindelyn.csucc@gmail.com', 'role' => 'super_admin', 'status' => 'active'],
-    ['id' => '2020-1153', 'username' => 'windy.sagaad', 'fullName' => 'Windelyn Sagaad', 'email' => 'windelyn.sagaad@csucc.edu.ph', 'role' => 'super_admin', 'status' => 'blocked'],
-    ['id' => '2023-0123', 'username' => 'usertest', 'fullName' => 'Rodel Dam Bitch', 'email' => 'user@gmail.com', 'role' => 'admin', 'status' => 'active'],
-    ['id' => '2020-1111', 'username' => 'lynlyn', 'fullName' => 'Lynlyn Sgaad', 'email' => 'windelynsagaad26@gmail.com', 'role' => 'admin', 'status' => 'blocked'],
-    ['id' => '2020-6000', 'username' => 'aljun', 'fullName' => 'Aljun Sagaad', 'email' => 'aljunsagaad@gmail.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0001', 'username' => 'maria.santos', 'fullName' => 'Maria Santos', 'email' => 'maria.santos@gmail.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0002', 'username' => 'juan.dc', 'fullName' => 'Juan Dela Cruz', 'email' => 'juandc@yahoo.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0003', 'username' => 'ana.reyes', 'fullName' => 'Ana Reyes', 'email' => 'ana.reyes@outlook.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0004', 'username' => 'carlo.mendoza', 'fullName' => 'Carlo Mendoza', 'email' => 'carlo.mendoza@gmail.com', 'role' => 'customer', 'status' => 'blocked'],
-    ['id' => '2025-0005', 'username' => 'lisa.garcia', 'fullName' => 'Lisa Garcia', 'email' => 'lisagarcia@gmail.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0006', 'username' => 'paolo.b', 'fullName' => 'Paolo Bautista', 'email' => 'paolo.b@gmail.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0007', 'username' => 'grace.lim', 'fullName' => 'Grace Lim', 'email' => 'grace.lim@yahoo.com', 'role' => 'customer', 'status' => 'blocked'],
-    ['id' => '2025-0008', 'username' => 'miguel.t', 'fullName' => 'Miguel Torres', 'email' => 'miguel.torres@gmail.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0009', 'username' => 'ana.ramos', 'fullName' => 'Ana Ramos', 'email' => 'ana.ramos@gmail.com', 'role' => 'customer', 'status' => 'pending'],
-    ['id' => '2025-0010', 'username' => 'carlos.m', 'fullName' => 'Carlos Mendoza', 'email' => 'carlos.m@yahoo.com', 'role' => 'customer', 'status' => 'pending'],
-    ['id' => '2025-0011', 'username' => 'liza.santos', 'fullName' => 'Liza Santos', 'email' => 'liza.s@outlook.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0012', 'username' => 'mark.dela', 'fullName' => 'Mark Dela Peña', 'email' => 'mark.delapena@gmail.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0013', 'username' => 'jenny.cruz', 'fullName' => 'Jenny Cruz', 'email' => 'jenny.cruz@yahoo.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0014', 'username' => 'paul.v', 'fullName' => 'Paul Villanueva', 'email' => 'paul.v@gmail.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0015', 'username' => 'sara.g', 'fullName' => 'Sara Garcia', 'email' => 'sara.g@outlook.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0016', 'username' => 'danny.r', 'fullName' => 'Danny Reyes', 'email' => 'danny.r@gmail.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0017', 'username' => 'kate.m', 'fullName' => 'Kate Morales', 'email' => 'kate.m@yahoo.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0018', 'username' => 'brian.s', 'fullName' => 'Brian Santos', 'email' => 'brian.s@gmail.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0019', 'username' => 'rosie.l', 'fullName' => 'Rosie Lim', 'email' => 'rosie.l@outlook.com', 'role' => 'customer', 'status' => 'active'],
-    ['id' => '2025-0020', 'username' => 'tom.n', 'fullName' => 'Tom Navarro', 'email' => 'tom.n@gmail.com', 'role' => 'customer', 'status' => 'active'],
-];
+$users = [];
+if ($connect) {
+    $sql = "SELECT user_id, username, CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name, IF(IFNULL(extension_name, '') != '', CONCAT(' ', extension_name), '')) AS fullName, email, role, status FROM users ORDER BY user_id";
+    $result = mysqli_query($connect, $sql);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $users[] = [
+                'id'       => $row['user_id'],
+                'username' => $row['username'],
+                'fullName' => trim($row['fullName']),
+                'email'    => $row['email'],
+                'role'     => $row['role'],
+                'status'   => $row['status'] ?? 'pending',
+            ];
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -348,7 +338,7 @@ $mockUsers = [
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/register.js"></script>
-    <script>var allUsers = <?php echo json_encode($mockUsers); ?>; var currentUserRole = <?php echo json_encode($_SESSION['role'] ?? 'admin'); ?>;</script>
+    <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>;</script>
     <script src="../../javascript/user_management.js"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
