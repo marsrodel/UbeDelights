@@ -270,6 +270,7 @@ body.admin-body {
     display: flex;
     flex-direction: column;
     gap: 28px;
+    flex: 1;
 }
 
 .page-intro p {
@@ -709,6 +710,7 @@ body.admin-body {
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
     overflow: hidden;
+    flex: 1;
 }
 
 .orders-table {
