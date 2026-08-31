@@ -8,13 +8,15 @@ $orderQuery = mysqli_query($connect, "SELECT * FROM orders WHERE user_id = '" . 
 if ($orderQuery) {
     while ($row = mysqli_fetch_assoc($orderQuery)) {
         $items = [];
-        $itemQuery = mysqli_query($connect, "SELECT * FROM order_items WHERE order_id = " . intval($row['order_id']));
+        $itemQuery = mysqli_query($connect, "SELECT oi.*, p.image FROM order_items oi LEFT JOIN products p ON oi.product_id = p.product_id WHERE oi.order_id = " . intval($row['order_id']));
         if ($itemQuery) {
             while ($item = mysqli_fetch_assoc($itemQuery)) {
                 $items[] = [
+                    'id'    => intval($item['product_id']),
                     'name'  => $item['product_name'],
                     'qty'   => intval($item['quantity']),
-                    'price' => floatval($item['unit_price']),
+                    'price' => '₱' . number_format(floatval($item['unit_price']), 0),
+                    'image' => $item['image'] ? '../' . ltrim($item['image'], '/') : '',
                 ];
             }
         }

@@ -173,7 +173,14 @@
     // Reorder
     document.querySelectorAll('.btn-reorder').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            showToast('Reorder feature coming soon!');
+            var tr = btn.closest('tr');
+            var items = JSON.parse(tr.dataset.items || '[]');
+            var cart = items.map(function(item) {
+                return { id: item.id || null, name: item.name, price: item.price, qty: item.qty, image: item.image || '' };
+            });
+            localStorage.setItem('ube_cart', JSON.stringify(cart));
+            if (typeof updateCartBadge === 'function') updateCartBadge();
+            window.location.href = './cart.php';
         });
     });
 
