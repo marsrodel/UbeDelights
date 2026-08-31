@@ -113,11 +113,41 @@
 
     if (btnAddUser && addUserModal) {
         btnAddUser.addEventListener('click', function() {
-            addUserForm.reset();
-            document.getElementById('addUserModalTitle').textContent = 'Add New User';
-            addUserSubmitBtn.textContent = 'Add User';
-            document.getElementById('addUserModal').classList.add('active');
+            console.log('Add User clicked via JS handler');
+            if (addUserForm) {
+                addUserForm.reset();
+                var errs = addUserForm.querySelectorAll('[id$="-error"]');
+                for (var i = 0; i < errs.length; i++) errs[i].parentNode.removeChild(errs[i]);
+            }
+            var titleEl = document.getElementById('addUserModalTitle');
+            if (titleEl) titleEl.textContent = 'Add New User';
+            if (addUserSubmitBtn) addUserSubmitBtn.textContent = 'Add User';
+            addUserModal.classList.add('active');
             document.body.style.overflow = 'hidden';
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '../../server/generate_id.php', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    try {
+                        var resp = JSON.parse(xhr.responseText);
+                        var idInput = document.getElementById('id');
+                        if (idInput && resp.id) {
+                            idInput.value = resp.id;
+                        }
+                    } catch(e) {}
+                }
+            };
+            xhr.send();
+        });
+    } else {
+        console.warn('Add User modal elements not found:', { btnAddUser: !!btnAddUser, addUserModal: !!addUserModal });
+    }
+
+    if (addUserSubmitBtn && addUserForm) {
+        addUserSubmitBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            addUserForm.requestSubmit();
         });
     }
 
@@ -336,3 +366,4 @@
 
     // Also expose closeModal globally for inline onclick handlers
     window.closeModal = closeModal;
+})();

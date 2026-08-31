@@ -25,8 +25,8 @@ if ($connect) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
-    <link rel="stylesheet" href="../../css/user_management.css?v=1.0">
+    <link rel="stylesheet" href="../../css/admin_security.css?v=2.0">
+    <link rel="stylesheet" href="../../css/user_management.css?v=2.0">
 </head>
 <body class="admin-body">
     <aside class="admin-sidebar" id="adminSidebar">
@@ -69,7 +69,7 @@ if ($connect) {
                 <p style="margin:2px 0 0; font-size:0.85rem; color:var(--text-muted);">Manage system users and their permissions.</p>
             </div>
             <div class="topbar-right">
-                <button class="btn-primary" id="btnAddUser" style="padding:10px 12px; font-size:0.95rem; border-radius:10px;" title="Add User"><i class="fa-solid fa-user-plus"></i></button>
+                <button class="btn-primary" id="btnAddUser" style="padding:10px 12px; font-size:0.95rem; border-radius:10px;" title="Add User" onclick="document.getElementById('addUserModal').classList.add('active'); document.body.style.overflow='hidden';"><i class="fa-solid fa-user-plus"></i></button>
             </div>
         </header>
 
@@ -213,9 +213,10 @@ if ($connect) {
             <div class="modal-body">
                 <div class="register-container">
                     <div class="form-header">
-                        <h2><i class="fa-solid fa-user-plus" style="color:var(--accent);"></i> Add New User</h2>
+                        <h2 id="addUserModalTitle"><i class="fa-solid fa-user-plus" style="color:var(--accent);"></i> Add New User</h2>
                         <button class="modal-close" onclick="closeModal('addUserModal')"><i class="fa-solid fa-xmark"></i></button>
                     </div>
+                    <form id="addUserForm">
                     <div class="form-sections">
                         <div class="section">
                             <h1>Personal Information</h1>
@@ -323,10 +324,11 @@ if ($connect) {
                             </div>
                         </div>
                     </div>
+                    </form>
 
                     <div class="form-actions">
                         <button type="button" class="btn-cancel" onclick="closeModal('addUserModal')">Cancel</button>
-                        <button type="button" class="add-btn" id="addUserSubmit">Add User</button>
+                        <button type="button" class="add-btn" id="addUserSubmitBtn">Add User</button>
                     </div>
                 </div>
             </div>
@@ -335,11 +337,10 @@ if ($connect) {
 
     <div class="toast" id="toast"></div>
 
-    <script src="../../javascript/admin-routing.js"></script>
-    <script src="../../javascript/admin_security.js"></script>
-    <script src="../../javascript/register.js"></script>
+    <script src="../../javascript/admin-routing.js?v=2.0"></script>
+    <script src="../../javascript/admin_security.js?v=3.0"></script>
     <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>;</script>
-    <script src="../../javascript/user_management.js"></script>
-    <script src="../../javascript/inspect.js"></script>
+    <script src="../../javascript/user_management.js?v=3.0"></script>
+    <script src="../../javascript/inspect.js?v=2.0"></script>
 </body>
 </html>

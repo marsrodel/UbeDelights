@@ -1007,7 +1007,7 @@ function checkEmailExists(emailValue) {
     emailInput.setAttribute('data-validating', 'true');
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '../server/check_email.php', true);
+    xhr.open('POST', '../../server/check_email.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     xhr.onreadystatechange = function() {
@@ -1475,7 +1475,7 @@ function checkIdExists(idValue) {
     }
     
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '../server/check_id.php', true);
+    xhr.open('POST', '../../server/check_id.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     
     xhr.onreadystatechange = function() {
@@ -1507,7 +1507,7 @@ function checkUsernameExists(usernameValue) {
     usernameInput.setAttribute('data-validating', 'true');
     
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '../server/check_username.php', true);
+    xhr.open('POST', '../../server/check_username.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     
     xhr.onreadystatechange = function() {
@@ -1833,7 +1833,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Prevent form submission if fields are empty (step-by-step) and preserve existing error logic
-        var form = document.querySelector('form');
+        var form = document.getElementById('addUserForm');
         if (form) {
             form.setAttribute('novalidate', 'novalidate');
             // Helper: clear all generic required-only errors immediately
@@ -1889,11 +1889,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }, true);
 
             form.addEventListener('submit', function(e) {
+                e.preventDefault();
                 // Clear previous required-only errors to avoid stale messages elsewhere
                 var prevRequired = form.querySelectorAll('[id$="-error"]');
                 for (var ci2 = 0; ci2 < prevRequired.length; ci2++) {
                     var errEl = prevRequired[ci2];
-                    // Remove any error attached to currently empty fields to allow ordered progression
                     var fidFromErr = errEl.id.replace('-error','');
                     var fld = document.getElementById(fidFromErr);
                     var emptyNow = false;
@@ -1906,9 +1906,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         errEl.parentNode && errEl.parentNode.removeChild(errEl);
                     }
                 }
-                // Enforce a strict progression order regardless of DOM layout
-                // Show required message on ALL empty fields; focus first empty
-                var requiredOrder = ['id','fname','lname','bday','age','sex','email','street','brgy','city','province','country','zipcode','user','pass','repass'];
+                var requiredOrder = ['id','fname','lname','bday','age','sex','email','street','brgy','city','province','country','zipcode','user','role','pass','repass'];
                 var firstEmpty = null;
                 var anyEmpty = false;
                 for (var i = 0; i < requiredOrder.length; i++) {
@@ -1924,7 +1922,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 if (anyEmpty) {
-                    e.preventDefault();
                     return;
                 }
 
@@ -1933,18 +1930,51 @@ document.addEventListener('DOMContentLoaded', function() {
                 var emailErr = document.getElementById('email-error');
                 var passErr = document.getElementById('pass-error');
                 if (userErr || ageErr || emailErr) {
-                    e.preventDefault();
+                    return;
                 }
                 var pVal = (passEl && passEl.value) || '';
                 var rVal = (repassEl && repassEl.value) || '';
                 if (pVal !== rVal) {
-                    e.preventDefault();
-                    showErrorMessage('repass', '');
+                    showErrorMessage('repass', 'Passwords do not match');
                     return;
                 }
                 if (hasSpace(pVal) || hasSpace(rVal) || passErr) {
-                    e.preventDefault();
+                    return;
                 }
+
+                var fieldMap = {
+                    'id': 'idNo', 'fname': 'firstName', 'mname': 'middleName',
+                    'lname': 'lastName', 'ename': 'extension', 'bday': 'birthday',
+                    'sex': 'sex', 'email': 'email', 'street': 'purok',
+                    'brgy': 'barangay', 'city': 'municipality', 'province': 'province',
+                    'country': 'country', 'zipcode': 'zipCode', 'user': 'username',
+                    'role': 'role', 'pass': 'password', 'repass': 'confirmPassword'
+                };
+                var params = 'action=create_user';
+                for (var key in fieldMap) {
+                    var el = document.getElementById(key);
+                    if (el) params += '&' + encodeURIComponent(fieldMap[key]) + '=' + encodeURIComponent((el.value || '').trim());
+                }
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../server/user_management.php', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        try {
+                            var resp = JSON.parse(xhr.responseText);
+                            if (resp.success) {
+                                closeModal('addUserModal');
+                                window.location.reload();
+                            } else {
+                                window.adminToast(resp.message || 'Failed to create user', 'error');
+                            }
+                        } catch(ex) {
+                            window.adminToast('An error occurred while creating user', 'error');
+                        }
+                    }
+                };
+                xhr.send(params);
             });
         }
     }
@@ -2110,7 +2140,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var passDupTimeoutId;
     function checkPasswordExists(password) {
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', '../server/check_password.php', true);
+        xhr.open('POST', '../../server/check_password.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
@@ -2270,9 +2300,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Trim fields before form submission
-    var form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
+    var addUserFormRef = document.getElementById('addUserForm');
+    if (addUserFormRef) {
+        addUserFormRef.addEventListener('submit', function(e) {
             trimNameFields();
             // Final address validations
             var ok = true;
