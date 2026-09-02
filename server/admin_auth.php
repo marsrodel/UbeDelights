@@ -4,7 +4,7 @@ include __DIR__ . '/db.php';
 
 // Must be logged in
 if (!isset($_SESSION['auth_user_id'])) {
-    header('Location: ../views/login.php');
+    header('Location: ../login.php');
     exit();
 }
 
@@ -18,7 +18,7 @@ if (!isset($_SESSION['auth_role']) || !in_array($_SESSION['auth_role'], ['admin'
 if (isset($_SESSION['auth_status']) && $_SESSION['auth_status'] !== 'active') {
     session_unset();
     session_destroy();
-    header('Location: ../views/login.php?error=inactive');
+    header('Location: ../login.php?error=inactive');
     exit();
 }
 

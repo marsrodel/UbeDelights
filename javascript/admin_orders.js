@@ -60,11 +60,11 @@
         info.innerHTML = 'Showing <strong>' + (start + 1) + '&ndash;' + Math.min(end, rows.length) + '</strong> of <strong>' + rows.length + '</strong> orders';
 
         var links = document.getElementById('paginationLinks');
-        var html = '<button class="pagination-link' + (currentPage === 1 ? ' disabled' : '') + '" data-page="' + (currentPage - 1) + '">&laquo;</button>';
+        var html = '<button class="pagination-link' + (currentPage === 1 ? ' disabled' : '') + '" data-page="' + (currentPage - 1) + '">&laquo; Prev</button>';
         for (var p = 1; p <= totalPages; p++) {
             html += '<button class="pagination-link' + (p === currentPage ? ' current' : '') + '" data-page="' + p + '">' + p + '</button>';
         }
-        html += '<button class="pagination-link' + (currentPage === totalPages ? ' disabled' : '') + '" data-page="' + (currentPage + 1) + '">&raquo;</button>';
+        html += '<button class="pagination-link' + (currentPage === totalPages ? ' disabled' : '') + '" data-page="' + (currentPage + 1) + '">Next &raquo;</button>';
         links.innerHTML = html;
     }
 

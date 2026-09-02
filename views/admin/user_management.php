@@ -2,7 +2,7 @@
 
 $users = [];
 if ($connect) {
-    $sql = "SELECT user_id, username, CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name, IF(IFNULL(extension_name, '') != '', CONCAT(' ', extension_name), '')) AS fullName, email, role, status FROM users ORDER BY user_id";
+    $sql = "SELECT user_id, username, CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name, IF(IFNULL(extension_name, '') != '', CONCAT(' ', extension_name), '')) AS fullName, email, role, status FROM users WHERE status != 'pending' ORDER BY FIELD(role, 'super_admin', 'admin', 'customer'), user_id";
     $result = mysqli_query($connect, $sql);
     if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
@@ -96,6 +96,7 @@ if ($connect) {
                             <option value="active">Active</option>
                             <option value="blocked">Blocked</option>
                             <option value="pending">Pending</option>
+                            <option value="incomplete">Incomplete</option>
                         </select>
                     </div>
                 </div>
@@ -112,11 +113,12 @@ if ($connect) {
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="usersTableBody">
-                        </tbody>
+                        <tbody id="usersTableBody"></tbody>
                     </table>
                 </div>
                 <div class="pagination-bar" id="paginationContainer">
+                    <div class="pagination-info" id="paginationInfo"></div>
+                    <div class="pagination" id="paginationLinks"></div>
                 </div>
             </div>
 

@@ -2321,3 +2321,178 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ============================================================
+//  USER MANAGEMENT TABLE — RENDERING, FILTERING & PAGINATION
+// ============================================================
+(function() {
+    'use strict';
+
+    var state = { page: 1, perPage: 10, filters: { search: '', role: '', status: '' } };
+
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    function roleBadge(r) { return '<span class="role-pill role-'+esc(r)+'">'+esc(r==='super_admin'?'Super Admin':r==='admin'?'Admin':'Customer')+'</span>'; }
+
+    function statusBadge(s) { return '<span class="status-pill status-'+esc(s)+'">'+esc(s.charAt(0).toUpperCase()+s.slice(1))+'</span>'; }
+
+    function actionButtons(user) {
+        var h = '';
+        h += '<button class="um-action-btn btn-view" data-id="'+esc(user.id)+'" title="View"><i class="fa-solid fa-eye"></i></button> ';
+        h += '<button class="um-action-btn btn-edit" data-id="'+esc(user.id)+'" title="Edit"><i class="fa-solid fa-pen"></i></button> ';
+        if (user.status === 'blocked') {
+            h += '<button class="um-action-btn btn-unblock" data-id="'+esc(user.id)+'" title="Unblock"><i class="fa-solid fa-unlock"></i></button>';
+        } else {
+            h += '<button class="um-action-btn btn-block" data-id="'+esc(user.id)+'" title="Block"><i class="fa-solid fa-ban"></i></button>';
+        }
+        h += ' <button class="um-action-btn btn-delete" data-id="'+esc(user.id)+'" title="Delete"><i class="fa-solid fa-trash"></i></button>';
+        return h;
+    }
+
+    function filterUsers(users) {
+        var f = state.filters;
+        return users.filter(function(u) {
+            if (f.search) {
+                var s = f.search.toLowerCase();
+                if ((u.username||'').toLowerCase().indexOf(s)===-1 && (u.fullName||'').toLowerCase().indexOf(s)===-1 && (u.email||'').toLowerCase().indexOf(s)===-1 && (u.id||'').toLowerCase().indexOf(s)===-1) return false;
+            }
+            if (f.role && u.role !== f.role) return false;
+            if (f.status && u.status !== f.status) return false;
+            return true;
+        });
+    }
+
+    function renderTable(rows) {
+        var tbody = document.getElementById('usersTableBody');
+        var emptyState = document.getElementById('emptyUsers');
+        var table = document.getElementById('usersTable');
+        if (!tbody) return;
+        if (rows.length === 0) {
+            tbody.innerHTML = '';
+            if (table) table.style.display = 'none';
+            if (emptyState) emptyState.style.display = '';
+            return;
+        }
+        if (table) table.style.display = '';
+        if (emptyState) emptyState.style.display = 'none';
+        var html = '';
+        rows.forEach(function(u) {
+            html += '<tr data-user-id="'+esc(u.id)+'">';
+            html += '<td class="cell-id">'+esc(u.id)+'</td>';
+            html += '<td>'+esc(u.username)+'</td>';
+            html += '<td class="cell-strong">'+esc(u.fullName)+'</td>';
+            html += '<td class="cell-muted">'+esc(u.email)+'</td>';
+            html += '<td>'+roleBadge(u.role)+'</td>';
+            html += '<td>'+statusBadge(u.status)+'</td>';
+            html += '<td class="actions-cell">'+actionButtons(u)+'</td>';
+            html += '</tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function renderPagination(total) {
+        var container = document.getElementById('paginationContainer');
+        if (!container) return;
+        var totalPages = Math.max(1, Math.ceil(total / state.perPage));
+        if (state.page > totalPages) state.page = totalPages;
+        var start = (state.page - 1) * state.perPage + 1;
+        var end = Math.min(state.page * state.perPage, total);
+
+        var html = '<div class="pagination-info">Showing <strong>' + (total > 0 ? start : 0) + '</strong> to <strong>' + end + '</strong> of <strong>' + total + '</strong> entries</div>';
+
+        html += '<div class="per-page-group"><span>Show</span><select id="umPerPageSelect">';
+        [10, 25, 50].forEach(function(opt) {
+            html += '<option value="' + opt + '"' + (state.perPage === opt ? ' selected' : '') + '>' + opt + '</option>';
+        });
+        html += '</select><span>per page</span></div>';
+
+        html += '<div class="pagination">';
+        if (state.page > 1) {
+            html += '<a class="pagination-link" data-page="' + (state.page - 1) + '">&laquo; Prev</a>';
+        } else {
+            html += '<span class="pagination-link disabled">&laquo; Prev</span>';
+        }
+
+        var startPage = Math.max(1, state.page - 2);
+        var endPage = Math.min(totalPages, state.page + 2);
+
+        if (startPage > 1) {
+            html += '<a class="pagination-link" data-page="1">1</a>';
+            if (startPage > 2) html += '<span class="pagination-link disabled">...</span>';
+        }
+
+        for (var i = startPage; i <= endPage; i++) {
+            if (i === state.page) {
+                html += '<span class="pagination-link current">' + i + '</span>';
+            } else {
+                html += '<a class="pagination-link" data-page="' + i + '">' + i + '</a>';
+            }
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += '<span class="pagination-link disabled">...</span>';
+            html += '<a class="pagination-link" data-page="' + totalPages + '">' + totalPages + '</a>';
+        }
+
+        if (state.page < totalPages) {
+            html += '<a class="pagination-link" data-page="' + (state.page + 1) + '">Next &raquo;</a>';
+        } else {
+            html += '<span class="pagination-link disabled">Next &raquo;</span>';
+        }
+        html += '</div>';
+
+        container.innerHTML = html;
+
+        var perPageEl = document.getElementById('umPerPageSelect');
+        if (perPageEl) {
+            perPageEl.addEventListener('change', function() {
+                state.perPage = parseInt(this.value) || 10;
+                state.page = 1;
+                render();
+            });
+        }
+        container.querySelectorAll('.pagination-link[data-page]').forEach(function(link) {
+            link.addEventListener('click', function() {
+                state.page = parseInt(this.getAttribute('data-page')) || 1;
+                render();
+            });
+        });
+    }
+
+    function render() {
+        var filtered = filterUsers(typeof allUsers !== 'undefined' ? allUsers : []);
+        var paged = filtered.slice((state.page-1)*state.perPage, state.page*state.perPage);
+        renderTable(paged);
+        renderPagination(filtered.length);
+        var countEl = document.querySelector('.card-header-left h2');
+        if (countEl) countEl.textContent = 'User Management (' + filtered.length + ')';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchInput = document.getElementById('userSearch');
+        var roleFilter = document.getElementById('roleFilter');
+        var statusFilter = document.getElementById('statusFilter');
+
+        function updateFilters() {
+            state.filters = {
+                search: searchInput ? searchInput.value.trim() : '',
+                role: roleFilter ? roleFilter.value : '',
+                status: statusFilter ? statusFilter.value : ''
+            };
+            state.page = 1;
+            render();
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() { updateFilters(); });
+        }
+        if (roleFilter) {
+            roleFilter.addEventListener('change', function() { updateFilters(); });
+        }
+        if (statusFilter) {
+            statusFilter.addEventListener('change', function() { updateFilters(); });
+        }
+
+        render();
+    });
+})();

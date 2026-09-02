@@ -601,6 +601,9 @@ body.admin-body {
 /* Action Buttons */
 .actions-cell {
     white-space: nowrap;
+    display: flex;
+    gap: 5px;
+    align-items: center;
 }
 
 .action-btn {

@@ -1,3 +1,159 @@
+// ============================================================
+//  PENDING APPROVALS — TABLE RENDERING, PAGINATION, SEARCH
+// ============================================================
+(function() {
+    'use strict';
+
+    var state = { page: 1, perPage: 10, search: '' };
+
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    function filterUsers(users) {
+        if (!state.search) return users;
+        var s = state.search.toLowerCase();
+        return users.filter(function(u) {
+            return (u.username||'').toLowerCase().indexOf(s) !== -1 ||
+                   (u.fullName||'').toLowerCase().indexOf(s) !== -1 ||
+                   (u.email||'').toLowerCase().indexOf(s) !== -1 ||
+                   (u.id||'').toLowerCase().indexOf(s) !== -1;
+        });
+    }
+
+    function renderTable(rows) {
+        var tbody = document.getElementById('pendingTableBody');
+        var emptyState = document.getElementById('emptyPending');
+        var table = document.getElementById('pendingTable');
+        if (!tbody) return;
+        if (rows.length === 0) {
+            tbody.innerHTML = '';
+            if (table) table.style.display = 'none';
+            if (emptyState) emptyState.style.display = '';
+            return;
+        }
+        if (table) table.style.display = '';
+        if (emptyState) emptyState.style.display = 'none';
+        var html = '';
+        rows.forEach(function(u) {
+            html += '<tr data-user-id="' + esc(u.id) + '">';
+            html += '<td class="cell-id">' + esc(u.id) + '</td>';
+            html += '<td>' + esc(u.username) + '</td>';
+            html += '<td class="cell-strong">' + esc(u.fullName) + '</td>';
+            html += '<td class="cell-muted">' + esc(u.email) + '</td>';
+            html += '<td class="actions-cell">';
+            html += '<button class="pending-action-btn btn-view" onclick="viewPendingUser(\'' + esc(u.id) + '\')" title="View Details"><i class="fa-solid fa-eye"></i></button>';
+            html += '<button class="pending-action-btn btn-approve" onclick="approvePendingUser(\'' + esc(u.id) + '\')" title="Approve"><i class="fa-solid fa-check"></i></button>';
+            html += '<button class="pending-action-btn btn-reject" onclick="rejectPendingUser(\'' + esc(u.id) + '\')" title="Reject"><i class="fa-solid fa-xmark"></i></button>';
+            html += '</td></tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function renderPagination(total) {
+        var container = document.getElementById('pendingPagination');
+        if (!container) return;
+        var totalPages = Math.max(1, Math.ceil(total / state.perPage));
+        if (state.page > totalPages) state.page = totalPages;
+        var start = (state.page - 1) * state.perPage + 1;
+        var end = Math.min(state.page * state.perPage, total);
+
+        var html = '<div class="pagination-info">Showing <strong>' + (total > 0 ? start : 0) + '</strong> to <strong>' + end + '</strong> of <strong>' + total + '</strong> entries</div>';
+
+        html += '<div class="per-page-group"><span>Show</span><select id="pendingPerPageSelect">';
+        [10, 25, 50].forEach(function(opt) {
+            html += '<option value="' + opt + '"' + (state.perPage === opt ? ' selected' : '') + '>' + opt + '</option>';
+        });
+        html += '</select><span>per page</span></div>';
+
+        html += '<div class="pagination">';
+        if (state.page > 1) {
+            html += '<a class="pagination-link" data-page="' + (state.page - 1) + '">&laquo; Prev</a>';
+        } else {
+            html += '<span class="pagination-link disabled">&laquo; Prev</span>';
+        }
+
+        var startPage = Math.max(1, state.page - 2);
+        var endPage = Math.min(totalPages, state.page + 2);
+
+        if (startPage > 1) {
+            html += '<a class="pagination-link" data-page="1">1</a>';
+            if (startPage > 2) html += '<span class="pagination-link disabled">...</span>';
+        }
+
+        for (var i = startPage; i <= endPage; i++) {
+            if (i === state.page) {
+                html += '<span class="pagination-link current">' + i + '</span>';
+            } else {
+                html += '<a class="pagination-link" data-page="' + i + '">' + i + '</a>';
+            }
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += '<span class="pagination-link disabled">...</span>';
+            html += '<a class="pagination-link" data-page="' + totalPages + '">' + totalPages + '</a>';
+        }
+
+        if (state.page < totalPages) {
+            html += '<a class="pagination-link" data-page="' + (state.page + 1) + '">Next &raquo;</a>';
+        } else {
+            html += '<span class="pagination-link disabled">Next &raquo;</span>';
+        }
+        html += '</div>';
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.pagination-link[data-page]').forEach(function(link) {
+            link.addEventListener('click', function() {
+                state.page = parseInt(this.getAttribute('data-page')) || 1;
+                render();
+            });
+        });
+
+        var perPageEl = document.getElementById('pendingPerPageSelect');
+        if (perPageEl) {
+            perPageEl.addEventListener('change', function() {
+                state.perPage = parseInt(this.value) || 10;
+                state.page = 1;
+                render();
+            });
+        }
+    }
+
+    function render() {
+        var filtered = filterUsers(typeof pendingUsers !== 'undefined' ? pendingUsers : []);
+        var paged = filtered.slice((state.page - 1) * state.perPage, state.page * state.perPage);
+        renderTable(paged);
+        renderPagination(filtered.length);
+    }
+
+    function setupSearch() {
+        var searchInput = document.querySelector('.search-box input');
+        var searchBtn = document.getElementById('btnSearchUsers');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                state.search = this.value.trim();
+                state.page = 1;
+                render();
+            });
+        }
+        if (searchBtn) {
+            searchBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                state.search = searchInput ? searchInput.value.trim() : '';
+                state.page = 1;
+                render();
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setupSearch();
+        render();
+    });
+})();
+
+// ============================================================
+//  MODALS & ACTION HANDLERS
+// ============================================================
 function viewPendingUser(userId) {
     var user = pendingUsers.find(function(u) { return u.id === userId; });
     if (!user) return;

@@ -95,27 +95,12 @@ if ($connect) {
                                 </tr>
                             </thead>
                                 <tbody id="pendingTableBody">
-                                <?php foreach ($pendingUsers as $user): ?>
-                                <tr data-user-id="<?php echo htmlspecialchars($user['id']); ?>">
-                                    <td class="cell-id"><?php echo htmlspecialchars($user['id']); ?></td>
-                                    <td><?php echo htmlspecialchars($user['username']); ?></td>
-                                    <td class="cell-strong"><?php echo htmlspecialchars($user['fullName']); ?></td>
-                                    <td class="cell-muted"><?php echo htmlspecialchars($user['email']); ?></td>
-                                    <td class="actions-cell">
-                                        <button class="pending-action-btn btn-view" onclick="viewPendingUser('<?php echo htmlspecialchars($user['id']); ?>')" title="View Details">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        <button class="pending-action-btn btn-approve" onclick="approvePendingUser('<?php echo htmlspecialchars($user['id']); ?>')" title="Approve">
-                                            <i class="fa-solid fa-check"></i>
-                                        </button>
-                                        <button class="pending-action-btn btn-reject" onclick="rejectPendingUser('<?php echo htmlspecialchars($user['id']); ?>')" title="Reject">
-                                            <i class="fa-solid fa-xmark"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
+                                </tbody>
                         </table>
+                    </div>
+                    <div class="pagination-bar" id="pendingPagination">
+                        <div class="pagination-info" id="pendingPaginationInfo"></div>
+                        <div class="pagination" id="pendingPaginationLinks"></div>
                     </div>
                 </div>
             </div>
@@ -171,9 +156,7 @@ if ($connect) {
 
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
-    <script>
-        var pendingUsers = <?php echo json_encode($pendingUsers); ?>;
-    </script>
+    <script>var pendingUsers = <?php echo json_encode($pendingUsers); ?>;</script>
     <script src="../../javascript/admin_pending_approvals.js"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
