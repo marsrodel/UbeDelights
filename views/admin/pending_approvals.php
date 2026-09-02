@@ -15,6 +15,13 @@ if ($connect) {
         }
     }
 }
+
+$orderCount = 0;
+$pendingCount = count($pendingUsers);
+if ($connect) {
+    $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'pending'");
+    if ($r) $orderCount = mysqli_fetch_assoc($r)['cnt'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,9 +55,9 @@ if ($connect) {
         <nav class="sidebar-nav">
             <a onclick="getAdminDashboard()" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
             <a onclick="getAdminProducts()" class="sidebar-link"><i class="fa-solid fa-box"></i><span>Products</span></a>
-            <a onclick="getAdminOrders()" class="sidebar-link"><i class="fa-solid fa-bag-shopping"></i><span>Orders</span></a>
+            <a onclick="getAdminOrders()" class="sidebar-link"><i class="fa-solid fa-bag-shopping"></i><span>Orders</span><?php if ($orderCount > 0): ?><span class="sidebar-badge"><?php echo $orderCount; ?></span><?php endif; ?></a>
             <a onclick="getAdminUserManagement()" class="sidebar-link"><i class="fa-solid fa-users-cog"></i><span>User Management</span></a>
-            <a onclick="getAdminPendingApprovals()" class="sidebar-link active"><i class="fa-solid fa-user-clock"></i><span>Pending Approvals</span></a>
+            <a onclick="getAdminPendingApprovals()" class="sidebar-link active"><i class="fa-solid fa-user-clock"></i><span>Pending Approvals</span><?php if ($pendingCount > 0): ?><span class="sidebar-badge"><?php echo $pendingCount; ?></span><?php endif; ?></a>
             <a onclick="getAdminSystemLogs()" class="sidebar-link"><i class="fa-solid fa-list-alt"></i><span>System Logs</span></a>
         </nav>
 

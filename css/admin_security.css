@@ -129,6 +129,26 @@ body.admin-body {
     cursor: pointer;
     transition: var(--transition);
     white-space: nowrap;
+    position: relative;
+}
+
+.sidebar-badge {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #e17055;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .sidebar-link i {
