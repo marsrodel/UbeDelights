@@ -148,10 +148,11 @@ body::after {
 
 .hero-image {
     max-width: 100%;
-    max-height: 500px;
+    max-height: 520px;
     width: auto;
     height: auto;
     object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
 }
 
 /* Footer pinned */
@@ -170,23 +171,32 @@ body::after {
 
 .footer p {
     color: #ffffff;
-    font-size: 0.9rem;
-    opacity: 0.8;
+    font-size: 0.85rem;
+    opacity: 0.7;
 }
 
 header {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 4px;
     z-index: 1;
+}
+
+header h1 {
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    letter-spacing: -0.02em;
 }
 
 /* Container without background */
 .register-container {
-    background: rgb(214, 212, 212);
-    backdrop-filter: blur(600px);
-    border-radius: 10px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    border: 3px solid rgba(102, 126, 234, 0.6);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     max-width: 960px;
     width: 100%;
     margin: 0 auto;
@@ -213,7 +223,7 @@ header {
 }
 
 /* Section titles: white, no gap to inputs */
-h1 { font-size: 0.95rem; margin: 0; padding: 0; border-bottom: none; color: #340146c2; font-weight: 600;}
+h1 { font-size: 0.95rem; margin: 0; padding: 0; border-bottom: none; color: #2d1b4e; font-weight: 600;}
 
 
 /* Three-column grid with minimal spacing */
@@ -229,7 +239,7 @@ label {
     top: 2px;
     left: 12px;
     font-weight: 600;
-    color: #340146c2;
+    color: #2d1b4e;
     font-size: .9rem;
     line-height: 1.3;
     pointer-events: none;
@@ -283,10 +293,10 @@ label {
 input, select {
     width: 100%;
     padding: 18px 12px 2px;
-    border: 1px solid #cda7e6;
+    border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 0.875rem;
-    background-color: #f9fafb;
+    background-color: #ffffff;
     transition: border-color 0.2s ease;
     height: 40px;
     box-sizing: border-box;
@@ -382,7 +392,7 @@ button {
 }
 
 .login-prompt a {
-    color:#340146c2;
+    color: #2d1b4e;
     text-decoration: none;
     font-weight: 600;
     cursor: pointer;

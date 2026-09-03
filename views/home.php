@@ -50,7 +50,7 @@ $vs = isset($_GET['viewsource']) ? '?viewsource=1' : '';
     </main>
 
     <footer class="footer">
-        <p>&copy; 2025 Ube Delights. All rights reserved.</p>
+        <p>&copy; 2026 Ube Delights. All rights reserved.</p>
     </footer>
     <script src="../javascript/routing.js"></script>
     <script src="../javascript/inspect.js"></script>

@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
 
     <footer class="footer">
-        <p>&copy; 2025 Ube Delights. All rights reserved.</p>
+        <p>&copy; 2026 Ube Delights. All rights reserved.</p>
     </footer>
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/login.js"></script>

@@ -122,6 +122,9 @@ if(isset($_POST['submit'])){
     <main class="main-content">
         <div class="content-wrapper">
             <div class="form-section">
+                <header>
+                    <h1>Create an Account</h1>
+                </header>
                 <div class="register-container">
                     <form action="" method="POST">
 
@@ -237,7 +240,7 @@ if(isset($_POST['submit'])){
     </main>
 
     <footer class="footer">
-        <p>&copy; 2025 Ube Delights. All rights reserved.</p>
+        <p>&copy; 2026 Ube Delights. All rights reserved.</p>
     </footer>
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/noauto.js"></script>

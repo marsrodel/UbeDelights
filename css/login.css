@@ -156,7 +156,7 @@ body::after {
     display: flex;
     width: 100%;
     max-width: 1200px;
-    height: calc(100vh - 200px);
+    height: calc(100vh - 180px);
     align-items: center;
 }
 
@@ -180,10 +180,11 @@ body::after {
 
 .hero-image {
     max-width: 100%;
-    max-height: 500px;
+    max-height: 520px;
     width: auto;
     height: auto;
     object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
 }
 
 /* Footer pinned */
@@ -204,8 +205,8 @@ body::after {
 
 .footer p {
     color: #ffffff;
-    font-size: 0.9rem;
-    opacity: 0.8;
+    font-size: 0.85rem;
+    opacity: 0.7;
 }
 
 .lockout-timer {
@@ -220,18 +221,19 @@ header {
 
 header h1 {
     color: #ffffff;
-    font-size: 2.2rem; /* slightly reduced */
+    font-size: 2.2rem;
     font-weight: 600;
     margin-bottom: 4px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    letter-spacing: -0.02em;
 }
 
 .login-container {
-    background: rgb(214, 212, 212);
-    backdrop-filter: blur(600px);
-    border-radius: 10px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    border: 3px solid rgba(102, 126, 234, 0.6);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     max-width: 380px;
     width: 100%;
     margin: 0 auto;
@@ -254,14 +256,14 @@ form {
 
 label {
     font-weight: 600;
-    color: #340146c2;
+    color: #2d1b4e;
     font-size: 0.9rem;
     margin-bottom: 2px;
 }
 
 input {
     padding: 11px;
-    border: 2px solid #cda7e6;
+    border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 1rem;
     font-family: 'Inter', sans-serif;
@@ -349,8 +351,8 @@ input::placeholder {
 .below { 
     padding-top: 2px;
     text-align: center;
-    margin-top: 4px; /* tighter gap below Forgot Password */
-    color: #340146c2;
+    margin-top: 4px;
+    color: #2d1b4e;
     font-size: 13px;
     font-weight: 500;
 }
@@ -393,10 +395,10 @@ input::placeholder {
 
 .forgot {
     text-align: center;
-    color: #340146c2;
+    color: #2d1b4e;
     font-size: 13px;
     font-weight: 500;
-    margin: 4px 0 2px; /* reduce default P margins for tighter spacing */
+    margin: 4px 0 2px;
 }
 
 .forgot a {
