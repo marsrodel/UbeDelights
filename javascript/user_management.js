@@ -1964,7 +1964,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         try {
                             var resp = JSON.parse(xhr.responseText);
                             if (resp.success) {
-                                closeModal('addUserModal');
+                                var m = document.getElementById('addUserModal');
+                                if (m) { m.classList.remove('active'); document.body.style.overflow = ''; }
                                 window.location.reload();
                             } else {
                                 window.adminToast(resp.message || 'Failed to create user', 'error');

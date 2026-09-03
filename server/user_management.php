@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'super_admin'])) {
+if (!isset($_SESSION['auth_user_id']) || !in_array($_SESSION['auth_role'], ['admin', 'super_admin'])) {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Access denied']);
     exit();
@@ -17,8 +17,8 @@ $response = ['success' => false, 'message' => ''];
 try {
     $action = $_POST['action'] ?? '';
     $userId = $_POST['user_id'] ?? '';
-    $currentUserId = $_SESSION['user_id'] ?? '';
-    $currentRole = $_SESSION['role'] ?? '';
+    $currentUserId = $_SESSION['auth_user_id'] ?? '';
+    $currentRole = $_SESSION['auth_role'] ?? '';
 
     if (empty($action)) {
         throw new Exception('Invalid action');
@@ -48,7 +48,7 @@ try {
             $types = "";
 
             if (!empty($search)) {
-                $where_clauses[] = "(idNo LIKE ? OR username LIKE ? OR firstName LIKE ? OR lastName LIKE ? OR emailAddress LIKE ?)";
+                $where_clauses[] = "(user_id LIKE ? OR username LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR email LIKE ?)";
                 $search_param = "%$search%";
                 $params = array_merge($params, [$search_param, $search_param, $search_param, $search_param, $search_param]);
                 $types .= "sssss";
@@ -79,7 +79,7 @@ try {
             $total_pages = ceil($total_users / $limit);
 
             // Fetch results
-            $users_query = "SELECT idNo, username, firstName, middleName, lastName, extension, emailAddress, role, status, date_created FROM users $where_sql ORDER BY role DESC, lastName, firstName LIMIT ? OFFSET ?";
+            $users_query = "SELECT user_id, username, first_name, middle_name, last_name, extension_name, email, role, status, created_at FROM users $where_sql ORDER BY FIELD(role, 'super_admin', 'admin', 'customer'), user_id LIMIT ? OFFSET ?";
             $users_stmt = $connect->prepare($users_query);
             $pagination_params = array_merge($params, [$limit, $offset]);
             $pagination_types = $types . "ii";
@@ -109,7 +109,7 @@ try {
                 throw new Exception('User ID is required');
             }
             
-            $stmt = $conn->prepare("SELECT idNo, username, firstName, middleName, lastName, extension, birthday, age, sex, emailAddress, purok, barangay, municipality, province, country, zipCode, role, status, date_created FROM users WHERE idNo = ?");
+            $stmt = $connect->prepare("SELECT user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, street, barangay, city_municipality, province, country, zip_code, role, status, created_at FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -172,19 +172,22 @@ try {
             }
 
             if (!empty($username)) {
-                $c = $conn->prepare("SELECT idNo FROM users WHERE username = ?");
+                $c = $connect->prepare("SELECT user_id FROM users WHERE username = ?");
                 $c->bind_param("s", $username); $c->execute();
                 if ($c->get_result()->num_rows > 0) $errors[] = 'Username already exists';
+                $c->close();
             }
             if (!empty($email)) {
-                $c = $conn->prepare("SELECT idNo FROM users WHERE emailAddress = ?");
+                $c = $connect->prepare("SELECT user_id FROM users WHERE email = ?");
                 $c->bind_param("s", $email); $c->execute();
                 if ($c->get_result()->num_rows > 0) $errors[] = 'Email already exists';
+                $c->close();
             }
             if (!empty($idNo)) {
-                $c = $conn->prepare("SELECT idNo FROM users WHERE idNo = ?");
+                $c = $connect->prepare("SELECT user_id FROM users WHERE user_id = ?");
                 $c->bind_param("s", $idNo); $c->execute();
                 if ($c->get_result()->num_rows > 0) $errors[] = 'ID Number already exists';
+                $c->close();
             }
 
             if (!empty($errors)) {
@@ -204,8 +207,8 @@ try {
             // Generate next ID if not provided
             if (empty($idNo)) {
                 $year = date('Y');
-                $last_id_result = $conn->query("SELECT idNo FROM users WHERE idNo LIKE '$year-%' ORDER BY id DESC LIMIT 1");
-                $last_id = $last_id_result && $last_id_result->num_rows > 0 ? $last_id_result->fetch_assoc()['idNo'] : '';
+                $last_id_result = $connect->query("SELECT user_id FROM users WHERE user_id LIKE '$year-%' ORDER BY user_id DESC LIMIT 1");
+                $last_id = $last_id_result && $last_id_result->num_rows > 0 ? $last_id_result->fetch_assoc()['user_id'] : '';
                 if ($last_id) {
                     $parts = explode('-', $last_id);
                     $next_num = (int)$parts[1] + 1;
@@ -215,14 +218,14 @@ try {
                 }
             }
 
-            $ins = $conn->prepare("INSERT INTO users (idNo, username, firstName, middleName, lastName, extension, birthday, age, sex, emailAddress, password_hash, role, status, purok, barangay, municipality, province, country, zipCode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?)");
-            $ins->bind_param("ssssssssisssssssss",
+            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'incomplete', 0, ?, ?, ?, ?, ?, ?)");
+            $ins->bind_param("sssssssissssssssss",
                 $idNo, $username, $firstName, $middleName, $lastName, $extension,
                 $birthday, $age, $sex, $email, $hashed, $role,
                 $purok, $barangay, $municipality, $province, $country, $zipCode
             );
             if ($ins->execute()) {
-                logAction('CREATE_USER', "User {$_SESSION['username']} created new user $username (ID: $idNo)");
+                logAction('CREATE_USER', "User {$_SESSION['auth_username']} created new user $username (ID: $idNo)");
                 $response = ['success' => true, 'message' => 'User created successfully', 'user_id' => $idNo];
             } else {
                 throw new Exception('Failed to create user');
@@ -268,7 +271,7 @@ try {
             }
             
             // Check target user's current role
-            $stmt_check = $conn->prepare("SELECT role FROM users WHERE idNo = ?");
+            $stmt_check = $connect->prepare("SELECT role FROM users WHERE user_id = ?");
             $stmt_check->bind_param("s", $userId);
             $stmt_check->execute();
             $target_user_role = $stmt_check->get_result()->fetch_assoc()['role'] ?? '';
@@ -286,16 +289,16 @@ try {
                     throw new Exception('Password must be at least 8 characters');
                 }
                 $hashed_pw = password_hash($new_password, PASSWORD_DEFAULT);
-                $stmt = $conn->prepare("UPDATE users SET username = ?, firstName = ?, middleName = ?, lastName = ?, extension = ?, sex = ?, birthday = ?, age = ?, emailAddress = ?, role = ?, purok = ?, barangay = ?, municipality = ?, province = ?, country = ?, zipCode = ?, password_hash = ? WHERE idNo = ?");
+                $stmt = $connect->prepare("UPDATE users SET username = ?, first_name = ?, middle_name = ?, last_name = ?, extension_name = ?, sex = ?, date_of_birth = ?, age = ?, email = ?, role = ?, street = ?, barangay = ?, city_municipality = ?, province = ?, country = ?, zip_code = ?, password_hash = ? WHERE user_id = ?");
                 $stmt->bind_param("sssssssissssssssss", $username, $firstName, $middleName, $lastName, $extension, $sex, $birthday, $age, $email, $role, $purok, $barangay, $municipality, $province, $country, $zipCode, $hashed_pw, $userId);
             } else {
-                $stmt = $conn->prepare("UPDATE users SET username = ?, firstName = ?, middleName = ?, lastName = ?, extension = ?, sex = ?, birthday = ?, age = ?, emailAddress = ?, role = ?, purok = ?, barangay = ?, municipality = ?, province = ?, country = ?, zipCode = ? WHERE idNo = ?");
+                $stmt = $connect->prepare("UPDATE users SET username = ?, first_name = ?, middle_name = ?, last_name = ?, extension_name = ?, sex = ?, date_of_birth = ?, age = ?, email = ?, role = ?, street = ?, barangay = ?, city_municipality = ?, province = ?, country = ?, zip_code = ? WHERE user_id = ?");
                 $stmt->bind_param("sssssssisssssssss", $username, $firstName, $middleName, $lastName, $extension, $sex, $birthday, $age, $email, $role, $purok, $barangay, $municipality, $province, $country, $zipCode, $userId);
             }
 
             if ($stmt->execute()) {
                 $pw_msg = !empty($new_password) ? ' (password updated)' : '';
-                logAction('UPDATE_USER', "User {$_SESSION['username']} updated user $username$pw_msg");
+                logAction('UPDATE_USER', "User {$_SESSION['auth_username']} updated user $username$pw_msg");
                 $response = ['success' => true, 'message' => 'User updated successfully' . $pw_msg];
             } else {
                 throw new Exception('Failed to update user');
@@ -309,7 +312,7 @@ try {
             }
 
             // Get user details
-            $stmt = $conn->prepare("SELECT username, role FROM users WHERE idNo = ?");
+            $stmt = $connect->prepare("SELECT username, role FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -325,10 +328,10 @@ try {
             }
 
             // Delete the user
-            $del_stmt = $conn->prepare("DELETE FROM users WHERE idNo = ?");
+            $del_stmt = $connect->prepare("DELETE FROM users WHERE user_id = ?");
             $del_stmt->bind_param("s", $userId);
             if ($del_stmt->execute()) {
-                logAction('DELETE_USER', "User {$_SESSION['username']} deleted user {$target_user['username']} (ID: $userId)");
+                logAction('DELETE_USER', "User {$_SESSION['auth_username']} deleted user {$target_user['username']} (ID: $userId)");
                 $response = ['success' => true, 'message' => "User {$target_user['username']} has been deleted successfully"];
             } else {
                 throw new Exception('Failed to delete user');

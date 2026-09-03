@@ -18,8 +18,8 @@ function logAction($action, $description, $user_name = null) {
     }
     
     // Get user name from session if not provided
-    if ($user_name === null && isset($_SESSION['username'])) {
-        $user_name = $_SESSION['username'];
+    if ($user_name === null && isset($_SESSION['auth_username'])) {
+        $user_name = $_SESSION['auth_username'];
     }
     
     // Get IP address
@@ -30,7 +30,7 @@ function logAction($action, $description, $user_name = null) {
     $device_info = getDeviceAndBrowser($user_agent);
     
     // Prepare and execute the insert statement
-    $stmt = $connect->prepare("INSERT INTO user_logs (user_name, action, description, ip_address, device, browser) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $connect->prepare("INSERT INTO user_logs (username, action, description, ip_address, device, browser) VALUES (?, ?, ?, ?, ?, ?)");
     
     if ($stmt === false) {
         error_log("Failed to prepare log statement: " . $connect->error);
@@ -130,7 +130,7 @@ function getOS($user_agent) {
  * @return string|null
  */
 function getCurrentUserId() {
-    return $_SESSION['user_id'] ?? null;
+    return $_SESSION['auth_user_id'] ?? null;
 }
 
 /**
@@ -138,7 +138,7 @@ function getCurrentUserId() {
  * @return string|null
  */
 function getCurrentUserRole() {
-    return $_SESSION['role'] ?? null;
+    return $_SESSION['auth_role'] ?? null;
 }
 
 /**
