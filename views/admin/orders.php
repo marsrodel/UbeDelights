@@ -102,7 +102,10 @@ if ($connect) {
 
     <div class="admin-main">
         <header class="admin-topbar">
-            <h1>Orders</h1>
+            <div>
+                <h1>Orders</h1>
+                <p class="topbar-subtitle">View and manage customer orders.</p>
+            </div>
             <div class="topbar-right">
                 <span class="topbar-date"><i class="fa-solid fa-calendar-days"></i><?php echo date('F j, Y'); ?></span>
             </div>

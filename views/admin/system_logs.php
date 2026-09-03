@@ -78,7 +78,10 @@ if ($connect) {
 
     <div class="admin-main">
         <header class="admin-topbar">
-            <h1>System Logs</h1>
+            <div>
+                <h1>System Logs</h1>
+                <p class="topbar-subtitle">Track user activity and system events.</p>
+            </div>
             <div class="topbar-right">
                 <span class="topbar-date"><i class="fa-solid fa-calendar-days"></i><?php echo date('F j, Y'); ?></span>
             </div>

@@ -99,7 +99,10 @@ if ($connect) {
 
     <div class="admin-main">
         <header class="admin-topbar">
-            <h1>Products</h1>
+            <div>
+                <h1>Products</h1>
+                <p class="topbar-subtitle">Manage your bakery products and inventory.</p>
+            </div>
             <div class="topbar-right">
                 <span class="topbar-date"><i class="fa-solid fa-calendar-days"></i><?php echo date('F j, Y'); ?></span>
             </div>

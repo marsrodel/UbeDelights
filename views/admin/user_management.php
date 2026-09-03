@@ -75,7 +75,7 @@ if ($connect) {
         <header class="admin-topbar">
             <div>
                 <h1>User Management</h1>
-                <p style="margin:2px 0 0; font-size:0.85rem; color:var(--text-muted);">Manage system users and their permissions.</p>
+                <p class="topbar-subtitle">Manage system users and their permissions.</p>
             </div>
             <div class="topbar-right">
                 <button class="btn-primary" id="btnAddUser" style="padding:10px 12px; font-size:0.95rem; border-radius:10px;" title="Add User" onclick="document.getElementById('addUserModal').classList.add('active'); document.body.style.overflow='hidden';"><i class="fa-solid fa-user-plus"></i></button>
@@ -104,7 +104,6 @@ if ($connect) {
                             <option value="">All Status</option>
                             <option value="active">Active</option>
                             <option value="blocked">Blocked</option>
-                            <option value="pending">Pending</option>
                             <option value="incomplete">Incomplete</option>
                         </select>
                     </div>

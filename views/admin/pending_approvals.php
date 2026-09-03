@@ -68,7 +68,10 @@ if ($connect) {
 
     <div class="admin-main">
         <header class="admin-topbar">
-            <h1>Pending Approvals</h1>
+            <div>
+                <h1>Pending Approvals</h1>
+                <p class="topbar-subtitle">Review and approve new user registrations.</p>
+            </div>
             <div class="topbar-right">
                 <span class="topbar-date"><i class="fa-solid fa-calendar-days"></i><?php echo date('F j, Y'); ?></span>
             </div>

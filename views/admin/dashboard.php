@@ -85,7 +85,10 @@ if ($connect) {
 
     <div class="admin-main">
         <header class="admin-topbar">
-            <h1>Dashboard</h1>
+            <div>
+                <h1>Dashboard</h1>
+                <p class="topbar-subtitle">Overview of your store's performance and recent activity.</p>
+            </div>
             <div class="topbar-right">
                 <span class="topbar-date"><i class="fa-solid fa-calendar-days"></i><?php echo date('F j, Y'); ?></span>
             </div>
