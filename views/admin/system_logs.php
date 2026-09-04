@@ -2,9 +2,8 @@
 
 $logs = [];
 if ($connect) {
-    $sql = "SELECT l.username AS user_name, u.user_id AS idNo, IFNULL(u.role, 'system') AS user_role, l.action, l.description, IFNULL(l.device, 'Unknown') AS device, IFNULL(l.browser, 'Unknown') AS browser, l.ip_address, l.created_at
-            FROM user_logs l
-            LEFT JOIN users u ON l.username = u.username
+    $sql = "SELECT l.username AS user_name, IFNULL(l.idNumber, 'N/A') AS idNo, IFNULL(l.role, 'system') AS user_role, l.action, l.details, IFNULL(l.device, 'Unknown') AS device, IFNULL(l.browser, 'Unknown') AS browser, l.ip_address, l.created_at
+            FROM activity_logs l
             ORDER BY l.created_at DESC";
     $result = mysqli_query($connect, $sql);
     if ($result) {
@@ -14,7 +13,7 @@ if ($connect) {
                 'idNo'       => $row['idNo'] ?? 'N/A',
                 'user_role'  => $row['user_role'],
                 'action'     => $row['action'],
-                'description'=> $row['description'],
+                'description'=> $row['details'],
                 'device'     => $row['device'],
                 'browser'    => $row['browser'],
                 'ip_address' => $row['ip_address'] ?? 'N/A',

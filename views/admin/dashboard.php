@@ -1,41 +1,47 @@
 <?php require_once __DIR__ . '/../../server/admin_auth.php';
 
-$stats = [
-    ['label' => 'Total Users', 'value' => '0', 'icon' => 'fa-solid fa-users', 'color' => '#7c3aed'],
-    ['label' => 'Active Users', 'value' => '0', 'icon' => 'fa-solid fa-user-check', 'color' => '#22c55e'],
-    ['label' => 'Pending Approvals', 'value' => '0', 'icon' => 'fa-solid fa-user-clock', 'color' => '#f59e0b'],
-    ['label' => 'Blocked Users', 'value' => '0', 'icon' => 'fa-solid fa-user-slash', 'color' => '#ef4444'],
-];
+$totalOrders = 0;
+$pendingOrders = 0;
+$deliveredOrders = 0;
+$cancelledOrders = 0;
 
 if ($connect) {
-    $total = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users"));
-    $stats[0]['value'] = number_format($total['cnt']);
+    $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders");
+    if ($r) $totalOrders = mysqli_fetch_assoc($r)['cnt'];
 
-    $active = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'active'"));
-    $stats[1]['value'] = number_format($active['cnt']);
+    $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'pending'");
+    if ($r) $pendingOrders = mysqli_fetch_assoc($r)['cnt'];
 
-    $pending = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'pending'"));
-    $stats[2]['value'] = number_format($pending['cnt']);
+    $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'delivered'");
+    if ($r) $deliveredOrders = mysqli_fetch_assoc($r)['cnt'];
 
-    $blocked = mysqli_fetch_assoc(mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'blocked'"));
-    $stats[3]['value'] = number_format($blocked['cnt']);
+    $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'cancelled'");
+    if ($r) $cancelledOrders = mysqli_fetch_assoc($r)['cnt'];
 }
 
-$recentLogs = [];
+$stats = [
+    ['label' => 'Total Orders', 'value' => number_format($totalOrders), 'icon' => 'fa-solid fa-bag-shopping', 'color' => '#7c3aed'],
+    ['label' => 'Pending',      'value' => number_format($pendingOrders), 'icon' => 'fa-solid fa-clock',        'color' => '#f59e0b'],
+    ['label' => 'Delivered',    'value' => number_format($deliveredOrders), 'icon' => 'fa-solid fa-circle-check', 'color' => '#22c55e'],
+    ['label' => 'Cancelled',    'value' => number_format($cancelledOrders), 'icon' => 'fa-solid fa-circle-xmark', 'color' => '#ef4444'],
+];
+
+$recentOrders = [];
 if ($connect) {
-    $logResult = mysqli_query($connect, "SELECT l.username, l.action, l.description, l.created_at FROM user_logs l ORDER BY l.created_at DESC LIMIT 5");
-    if ($logResult) {
-        while ($row = mysqli_fetch_assoc($logResult)) {
-            $recentLogs[] = $row;
+    $sql = "SELECT order_id, customer_name, total_amount, status, order_date
+            FROM orders
+            ORDER BY order_date DESC
+            LIMIT 5";
+    $result = mysqli_query($connect, $sql);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $recentOrders[] = $row;
         }
     }
 }
 
-$orderCount = 0;
 $pendingCount = 0;
 if ($connect) {
-    $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'pending'");
-    if ($r) $orderCount = mysqli_fetch_assoc($r)['cnt'];
     $r2 = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'pending'");
     if ($r2) $pendingCount = mysqli_fetch_assoc($r2)['cnt'];
 }
@@ -72,7 +78,7 @@ if ($connect) {
         <nav class="sidebar-nav">
             <a onclick="getAdminDashboard()" class="sidebar-link active"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
             <a onclick="getAdminProducts()" class="sidebar-link"><i class="fa-solid fa-box"></i><span>Products</span></a>
-            <a onclick="getAdminOrders()" class="sidebar-link"><i class="fa-solid fa-bag-shopping"></i><span>Orders</span><?php if ($orderCount > 0): ?><span class="sidebar-badge"><?php echo $orderCount; ?></span><?php endif; ?></a>
+            <a onclick="getAdminOrders()" class="sidebar-link"><i class="fa-solid fa-bag-shopping"></i><span>Orders</span><?php if ($pendingOrders > 0): ?><span class="sidebar-badge"><?php echo $pendingOrders; ?></span><?php endif; ?></a>
             <a onclick="getAdminUserManagement()" class="sidebar-link"><i class="fa-solid fa-users-cog"></i><span>User Management</span></a>
             <a onclick="getAdminPendingApprovals()" class="sidebar-link"><i class="fa-solid fa-user-clock"></i><span>Pending Approvals</span><?php if ($pendingCount > 0): ?><span class="sidebar-badge"><?php echo $pendingCount; ?></span><?php endif; ?></a>
             <a onclick="getAdminSystemLogs()" class="sidebar-link"><i class="fa-solid fa-list-alt"></i><span>System Logs</span></a>
@@ -111,32 +117,34 @@ if ($connect) {
 
             <div class="card">
                 <div class="card-header">
-                    <h2>Recent Activity</h2>
-                    <a onclick="getAdminSystemLogs()" class="view-all">View All →</a>
+                    <h2>Recent Orders</h2>
+                    <a onclick="getAdminOrders()" class="view-all">View All →</a>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Description</th>
-                                <th>Date / Time</th>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (count($recentLogs) > 0): ?>
-                            <?php foreach ($recentLogs as $log): ?>
+                            <?php if (count($recentOrders) > 0): ?>
+                            <?php foreach ($recentOrders as $order): ?>
                             <tr>
-                                <td><strong><?php echo htmlspecialchars($log['username'] ?? 'System'); ?></strong></td>
-                                <td><span class="action-badge action-<?php echo strtolower($log['action']); ?>"><?php echo ucwords(str_replace('_', ' ', $log['action'])); ?></span></td>
-                                <td><?php echo htmlspecialchars($log['description']); ?></td>
-                                <td><?php echo date('M j, Y g:i A', strtotime($log['created_at'])); ?></td>
+                                <td><strong>ORD-<?php echo str_pad($order['order_id'], 3, '0', STR_PAD_LEFT); ?></strong></td>
+                                <td><?php echo htmlspecialchars($order['customer_name']); ?></td>
+                                <td><strong>₱<?php echo number_format($order['total_amount'], 2); ?></strong></td>
+                                <td><span class="status-badge status-<?php echo strtolower($order['status']); ?>"><?php echo ucfirst($order['status']); ?></span></td>
+                                <td><?php echo date('M j, Y', strtotime($order['order_date'])); ?></td>
                             </tr>
                             <?php endforeach; ?>
                             <?php else: ?>
                             <tr>
-                                <td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);">No recent activity</td>
+                                <td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">No recent orders</td>
                             </tr>
                             <?php endif; ?>
                         </tbody>
