@@ -120,122 +120,115 @@ if(isset($_POST['submit'])){
     </nav>
 
     <main class="main-content">
-        <div class="content-wrapper">
-            <div class="form-section">
-                <header>
-                    <h1>Create an Account</h1>
-                </header>
-                <div class="register-container">
-                    <form action="" method="POST">
+        <div class="register-container">
+            <form action="" method="POST">
 
-                        <div class="form-sections">
-                            <div class="section">
-                                <h1>Personal Information</h1>
-                                <div class="form-group">
-                                    <div class="form-box">
-                                        <label for="id">ID Number <span class="required">*</span></label>
-                                        <input type="text" id="id" name="id" placeholder="xxxx-xxxx" value="<?php echo htmlspecialchars($generated_user_id, ENT_QUOTES, 'UTF-8'); ?>" readonly required>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="fname">First Name <span class="required">*</span></label>
-                                        <input type="text" id="fname" name="fname" required>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="mname">Middle Name <span class="optional">(optional)</span></label>
-                                        <input type="text" id="mname" name="mname">
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="lname">Last Name <span class="required">*</span></label>
-                                        <input type="text" id="lname" name="lname" required>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="ename">Extension Name <span class="optional">(optional)</span></label>
-                                        <input type="text" id="ename" name="ename">
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="bday">Date of Birth <span class="required">*</span></label>
-                                        <input type="date" id="bday" name="bday" onchange="calculateAge()">
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="age">Age <span class="required" placeholder="Please set your birthdate">*</span></label>
-                                        <input type="text" id="age" name="age" readonly>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="sex">Sex <span class="required">*</span></label>
-                                        <select name="sex" id="sex" required>
-                                            <option value="">-Select Sex-</option>
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="email">Email Address <span class="required">*</span></label>
-                                        <input type="text" id="email" name="email" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="section">
-                                <h1>Address Information</h1>
-                                <div class="form-group">
-                                    <div class="form-box">
-                                        <label for="street">Purok/Street <span class="required">*</span></label>
-                                        <input type="text" name="street" id="street" required>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="brgy">Barangay <span class="required">*</span></label>
-                                        <input type="text" name="brgy" id="brgy" required>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="city">City/Municipality <span class="required">*</span></label>
-                                        <input type="text" name="city" id="city" required>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="province">Province <span class="required">*</span></label>
-                                        <input type="text" name="province" id="province" required>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="country">Country <span class="required">*</span></label>
-                                        <input type="text" name="country" id="country" required>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="zipcode">Zip Code <span class="required">*</span></label>
-                                        <input type="number" name="zipcode" id="zipcode" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="section">
-                                <h1>Account Information</h1>
-                                <div class="form-group">
-                                    <div class="form-box">
-                                        <label for="user">Username <span class="required">*</span></label>
-                                        <input type="text" id="user" name="uname" required>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="pass">Password <span class="required">*</span> <span id="pass-strength" class="field-hint"></span></label>
-                                        <div class="password-wrapper">
-                                            <input type="password" id="pass" name="pass" required>
-                                            <i class="fa-solid fa-eye-slash" id="eyeicon-register"></i>
-                                        </div>
-                                    </div>
-                                    <div class="form-box">
-                                        <label for="repass">Re-Enter Password <span class="required">*</span> <span id="repass-match" class="field-hint"></span></label>
-                                        <input type="password" id="repass" name="repass" required>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="section-block">
+                    <div class="section-title">Personal Information</div>
+                    <div class="fields-row cols-4">
+                        <div class="form-group">
+                            <label for="id">ID Number <span class="required">*</span></label>
+                            <input type="text" id="id" name="id" value="<?php echo htmlspecialchars($generated_user_id, ENT_QUOTES, 'UTF-8'); ?>" readonly required>
                         </div>
-
-                        <div class="form-actions">
-                            <button type="submit" name="submit">Next</button>
-                            <div class="login-prompt">
-                                Already have an account? <a onclick="getLogin()">Log In</a>
-                            </div>
+                        <div class="form-group">
+                            <label for="fname">First Name <span class="required">*</span></label>
+                            <input type="text" id="fname" name="fname" placeholder="First Name" required>
                         </div>
-                    </form>
+                        <div class="form-group">
+                            <label for="mname">Middle Name <span class="optional">(Optional)</span></label>
+                            <input type="text" id="mname" name="mname" placeholder="Middle Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="lname">Last Name <span class="required">*</span></label>
+                            <input type="text" id="lname" name="lname" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                    <div class="fields-row cols-4">
+                        <div class="form-group">
+                            <label for="ename">Extension Name <span class="optional">(Optional)</span></label>
+                            <input type="text" id="ename" name="ename" placeholder="ex. Jr, Sr, III">
+                        </div>
+                        <div class="form-group">
+                            <label for="bday">Date of Birth <span class="required">*</span></label>
+                            <input type="date" id="bday" name="bday" onchange="calculateAge()">
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age <span class="required">*</span></label>
+                            <input type="text" id="age" name="age" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="sex">Sex <span class="required">*</span></label>
+                            <select name="sex" id="sex" required>
+                                <option value="">Select Sex</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <div class="section-block">
+                    <div class="section-title">Account Information</div>
+                    <div class="fields-row cols-4">
+                        <div class="form-group">
+                            <label for="email">Email <span class="required">*</span></label>
+                            <input type="text" id="email" name="email" placeholder="ex. user@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user">Username <span class="required">*</span></label>
+                            <input type="text" id="user" name="uname" placeholder="ex. John123" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pass">Password <span class="required">*</span> <span id="pass-strength" class="field-hint"></span></label>
+                            <div class="password-wrapper">
+                                <input type="password" id="pass" name="pass" placeholder="Password" required>
+                                <i class="fa-solid fa-eye-slash" id="eyeicon-register"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="repass">Confirm Password <span class="required">*</span> <span id="repass-match" class="field-hint"></span></label>
+                            <input type="password" id="repass" name="repass" placeholder="Confirm Password" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-block">
+                    <div class="section-title">Address Information</div>
+                    <div class="fields-row cols-3">
+                        <div class="form-group">
+                            <label for="street">Purok/Street <span class="required">*</span></label>
+                            <input type="text" name="street" id="street" placeholder="Purok-9, P9, P-9" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="brgy">Barangay <span class="required">*</span></label>
+                            <input type="text" name="brgy" id="brgy" placeholder="Barangay" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City/Municipality <span class="required">*</span></label>
+                            <input type="text" name="city" id="city" placeholder="City/Municipality" required>
+                        </div>
+                    </div>
+                    <div class="fields-row cols-3">
+                        <div class="form-group">
+                            <label for="province">Province <span class="required">*</span></label>
+                            <input type="text" name="province" id="province" placeholder="Province" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="country">Country <span class="required">*</span></label>
+                            <input type="text" name="country" id="country" placeholder="Country" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="zipcode">Zip Code <span class="required">*</span></label>
+                            <input type="number" name="zipcode" id="zipcode" placeholder="Zipcode" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <div class="login-prompt">Already have an account? <a onclick="getLogin()">Log In</a></div>
+                    <button type="submit" name="submit">Next</button>
+                </div>
+            </form>
         </div>
     </main>
 
