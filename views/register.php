@@ -92,6 +92,9 @@ if(isset($_POST['submit'])){
     header('Location: ./set_security_questions.php');
     exit();
 }
+
+// Restore form values from session if returning from security questions
+$pending = isset($_SESSION['pending_registration']) ? $_SESSION['pending_registration'] : null;
 ?>
 
 <!DOCTYPE html>
@@ -128,40 +131,40 @@ if(isset($_POST['submit'])){
                     <div class="fields-row cols-4">
                         <div class="form-group">
                             <label for="id">ID Number <span class="required">*</span></label>
-                            <input type="text" id="id" name="id" value="<?php echo htmlspecialchars($generated_user_id, ENT_QUOTES, 'UTF-8'); ?>" readonly required>
+                            <input type="text" id="id" name="id" value="<?php echo htmlspecialchars($pending ? $pending['user_id'] : $generated_user_id, ENT_QUOTES, 'UTF-8'); ?>" readonly required>
                         </div>
                         <div class="form-group">
                             <label for="fname">First Name <span class="required">*</span></label>
-                            <input type="text" id="fname" name="fname" placeholder="First Name" required>
+                            <input type="text" id="fname" name="fname" value="<?php echo htmlspecialchars($pending['first_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="mname">Middle Name <span class="optional">(Optional)</span></label>
-                            <input type="text" id="mname" name="mname" placeholder="Middle Name">
+                            <input type="text" id="mname" name="mname" value="<?php echo htmlspecialchars($pending['middle_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                         <div class="form-group">
                             <label for="lname">Last Name <span class="required">*</span></label>
-                            <input type="text" id="lname" name="lname" placeholder="Last Name" required>
+                            <input type="text" id="lname" name="lname" value="<?php echo htmlspecialchars($pending['last_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                     </div>
                     <div class="fields-row cols-4">
                         <div class="form-group">
                             <label for="ename">Extension Name <span class="optional">(Optional)</span></label>
-                            <input type="text" id="ename" name="ename" placeholder="ex. Jr, Sr, III">
+                            <input type="text" id="ename" name="ename" value="<?php echo htmlspecialchars($pending['extension_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                         </div>
                         <div class="form-group">
                             <label for="bday">Date of Birth <span class="required">*</span></label>
-                            <input type="date" id="bday" name="bday" onchange="calculateAge()">
+                            <input type="date" id="bday" name="bday" value="<?php echo htmlspecialchars($pending['date_of_birth'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" onchange="calculateAge()">
                         </div>
                         <div class="form-group">
                             <label for="age">Age <span class="required">*</span></label>
-                            <input type="text" id="age" name="age" readonly>
+                            <input type="text" id="age" name="age" value="<?php echo htmlspecialchars($pending['age'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" readonly>
                         </div>
                         <div class="form-group">
                             <label for="sex">Sex <span class="required">*</span></label>
                             <select name="sex" id="sex" required>
                                 <option value="">Select Sex</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
+                                <option value="Male" <?php if (($pending['sex'] ?? '') === 'Male') echo 'selected'; ?>>Male</option>
+                                <option value="Female" <?php if (($pending['sex'] ?? '') === 'Female') echo 'selected'; ?>>Female</option>
                             </select>
                         </div>
                     </div>
@@ -172,22 +175,23 @@ if(isset($_POST['submit'])){
                     <div class="fields-row cols-4">
                         <div class="form-group">
                             <label for="email">Email <span class="required">*</span></label>
-                            <input type="text" id="email" name="email" placeholder="ex. user@example.com" required>
+                            <input type="text" id="email" name="email" value="<?php echo htmlspecialchars($pending['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="user">Username <span class="required">*</span></label>
-                            <input type="text" id="user" name="uname" placeholder="ex. John123" required>
+                            <input type="text" id="user" name="uname" value="<?php echo htmlspecialchars($pending['username'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="pass">Password <span class="required">*</span> <span id="pass-strength" class="field-hint"></span></label>
                             <div class="password-wrapper">
-                                <input type="password" id="pass" name="pass" placeholder="Password" required>
+                                <input type="password" id="pass" name="pass" required>
                                 <i class="fa-solid fa-eye-slash" id="eyeicon-register"></i>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="repass">Confirm Password <span class="required">*</span> <span id="repass-match" class="field-hint"></span></label>
-                            <input type="password" id="repass" name="repass" placeholder="Confirm Password" required>
+                            <label for="repass">Confirm Password <span class="required">*</span></label>
+                            <input type="password" id="repass" name="repass" required>
+                            <span id="repass-match"></span>
                         </div>
                     </div>
                 </div>
@@ -197,29 +201,29 @@ if(isset($_POST['submit'])){
                     <div class="fields-row cols-3">
                         <div class="form-group">
                             <label for="street">Purok/Street <span class="required">*</span></label>
-                            <input type="text" name="street" id="street" placeholder="Purok-9, P9, P-9" required>
+                            <input type="text" name="street" id="street" value="<?php echo htmlspecialchars($pending['street'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="brgy">Barangay <span class="required">*</span></label>
-                            <input type="text" name="brgy" id="brgy" placeholder="Barangay" required>
+                            <input type="text" name="brgy" id="brgy" value="<?php echo htmlspecialchars($pending['barangay'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="city">City/Municipality <span class="required">*</span></label>
-                            <input type="text" name="city" id="city" placeholder="City/Municipality" required>
+                            <input type="text" name="city" id="city" value="<?php echo htmlspecialchars($pending['city'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                     </div>
                     <div class="fields-row cols-3">
                         <div class="form-group">
                             <label for="province">Province <span class="required">*</span></label>
-                            <input type="text" name="province" id="province" placeholder="Province" required>
+                            <input type="text" name="province" id="province" value="<?php echo htmlspecialchars($pending['province'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="country">Country <span class="required">*</span></label>
-                            <input type="text" name="country" id="country" placeholder="Country" required>
+                            <input type="text" name="country" id="country" value="<?php echo htmlspecialchars($pending['country'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                         <div class="form-group">
                             <label for="zipcode">Zip Code <span class="required">*</span></label>
-                            <input type="number" name="zipcode" id="zipcode" placeholder="Zipcode" required>
+                            <input type="number" name="zipcode" id="zipcode" value="<?php echo htmlspecialchars($pending['zip_code'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
                         </div>
                     </div>
                 </div>

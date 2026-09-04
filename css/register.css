@@ -381,6 +381,10 @@ button:active {
     font-size: 0.75rem !important;
 }
 
+#repass-match {
+    font-size: 0.75rem !important;
+}
+
 /* ── HIDE NUMBER SPINNERS ── */
 #zipcode::-webkit-outer-spin-button,
 #zipcode::-webkit-inner-spin-button {

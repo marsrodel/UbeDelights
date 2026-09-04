@@ -96,8 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     if ($ok_user) {
         mysqli_commit($connect);
         unset($_SESSION['pending_registration']);
-        header('Location: ./login.php?registered=success');
-        exit();
+        $registration_success = true;
     } else {
         mysqli_rollback($connect);
         header('Location: ./set_security_questions.php?error=save');
@@ -113,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Set Security Questions</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="../css/security_questions.css?v=1.0" />
+  <link rel="stylesheet" href="../css/security_questions.css?v=2.0" />
 </head>
 <body>
   <nav class="navbar">
@@ -132,79 +131,88 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   </nav>
 
   <main class="main-content">
-    <div class="content-wrapper">
-      <div class="form-section">
-        <div class="sq-container">
-          <form action="" method="POST" autocomplete="off" novalidate>
-            <div class="form-header">
-              <h1>Set Your Authentication Questions</h1>
-              <p class="subtitle">These will help you recover your account if you forget your password.</p>
-            </div>
-
-            <div class="form-group">
-              <div class="form-box">
-                <label for="q1">Question 1 <span class="required">*</span></label>
-                <select id="q1" name="q1" required>
-                  <option value="" selected disabled>-Select a question-</option>
-                </select>
-              </div>
-              <div class="form-box">
-                <label for="a1">Answer <span class="required">*</span></label>
-                <div class="password-wrapper">
-                  <input type="password" id="a1" name="a1" required />
-                  <i class="fa-solid fa-eye-slash" id="eyeicon-a1"></i>
-                </div>
-              </div>
-
-              <div class="form-box">
-                <label for="q2">Question 2 <span class="required">*</span></label>
-                <select id="q2" name="q2" required>
-                  <option value="" selected disabled>-Select a question-</option>
-                </select>
-              </div>
-              <div class="form-box">
-                <label for="a2">Answer <span class="required">*</span></label>
-                <div class="password-wrapper">
-                  <input type="password" id="a2" name="a2" required />
-                  <i class="fa-solid fa-eye-slash" id="eyeicon-a2"></i>
-                </div>
-              </div>
-
-              <div class="form-box">
-                <label for="q3">Question 3 <span class="required">*</span></label>
-                <select id="q3" name="q3" required>
-                  <option value="" selected disabled>-Select a question-</option>
-                </select>
-              </div>
-              <div class="form-box">
-                <label for="a3">Answer <span class="required">*</span></label>
-                <div class="password-wrapper">
-                  <input type="password" id="a3" name="a3" required />
-                  <i class="fa-solid fa-eye-slash" id="eyeicon-a3"></i>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="button" onclick="history.back()">Previous</button>
-              <button type="submit" name="submit">Register</button>
-            </div>
-          </form>
+    <div class="sq-container">
+      <form action="" method="POST" autocomplete="off" novalidate>
+        <div class="form-header">
+          <h1>Set Up Your Security Questions</h1>
+          <p class="subtitle">These will help you recover your account if you forgot your password.</p>
         </div>
-      </div>
 
-      <div class="image-section">
-        <img src="../images/cake.png" alt="Delicious Ube Cake" class="hero-image" />
-      </div>
+        <div class="section-block">
+          <div class="section-title">Security Questions</div>
+          <div class="fields-row cols-3">
+            <div class="form-group">
+              <label for="q1">Question 1 <span class="required">*</span></label>
+              <select id="q1" name="q1" required>
+                <option value="" selected disabled>-Select a question-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="q2">Question 2 <span class="required">*</span></label>
+              <select id="q2" name="q2" required>
+                <option value="" selected disabled>-Select a question-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="q3">Question 3 <span class="required">*</span></label>
+              <select id="q3" name="q3" required>
+                <option value="" selected disabled>-Select a question-</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-title">Answers</div>
+          <div class="fields-row cols-3">
+            <div class="form-group">
+              <label for="a1">Answer <span class="required">*</span></label>
+              <div class="password-wrapper">
+                <input type="password" id="a1" name="a1" required />
+                <i class="fa-solid fa-eye-slash" id="eyeicon-a1"></i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="a2">Answer <span class="required">*</span></label>
+              <div class="password-wrapper">
+                <input type="password" id="a2" name="a2" required />
+                <i class="fa-solid fa-eye-slash" id="eyeicon-a2"></i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="a3">Answer <span class="required">*</span></label>
+              <div class="password-wrapper">
+                <input type="password" id="a3" name="a3" required />
+                <i class="fa-solid fa-eye-slash" id="eyeicon-a3"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" onclick="history.back()">Previous</button>
+          <button type="submit" name="submit">Register</button>
+        </div>
+      </form>
     </div>
   </main>
 
   <footer class="footer">
-    <p>&copy; 2025 Ube Delights. All rights reserved.</p>
+    <p>&copy; 2026 Ube Delights. All rights reserved.</p>
   </footer>
+  <div class="reg-success-overlay" id="regSuccessOverlay">
+    <div class="reg-success-card">
+      <h3>Registration Submitted</h3>
+      <p>Registration submitted. Your account is pending approval.</p>
+      <button class="reg-success-btn" onclick="window.location.href='./login.php'">OK</button>
+    </div>
+  </div>
   <script src="../javascript/disable_back.js"></script>
   <script src="../javascript/sq.js"></script>
   <script src="../javascript/routing.js"></script>
   <script src="../javascript/inspect.js"></script>
+  <?php if (!empty($registration_success)): ?>
+  <script>document.getElementById('regSuccessOverlay').classList.add('show');</script>
+  <?php endif; ?>
 </body>
 </html>

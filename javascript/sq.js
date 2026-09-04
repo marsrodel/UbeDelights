@@ -1,21 +1,30 @@
 (function(){
-      var QUESTIONS = [
-        'Who is your best friend in Elementary?',
-        'What is the name of your favorite pet?',
-        'Who is your favorite teacher in high school?',
-        'What city were you born in?',
-        'What is your mother\'s maiden name?',
-        'What was the name of your first school?'
+      var QUESTIONS_1 = [
+        'What was the name of your first pet?',
+        'What was the make of your first vehicle?',
+        'What is your favorite travel destination?'
       ];
-      function populate(sel){
-        sel.innerHTML = '<option value="" disabled selected>-Select a question-</option>' + QUESTIONS.map(function(q){
+      var QUESTIONS_2 = [
+        'What is your favorite flower?',
+        'What is your favorite subject in school?',
+        'What is your favorite color?'
+      ];
+      var QUESTIONS_3 = [
+        'What is your oldest sibling\'s first name?',
+        'What is your best friend\'s name?',
+        'What is your favorite childhood nickname?'
+      ];
+      function populate(sel, questions){
+        sel.innerHTML = '<option value="" disabled selected>-Select a question-</option>' + questions.map(function(q){
           return '<option value="'+q.replace(/"/g,'&quot;')+'">'+q+'</option>';
         }).join('');
       }
       var s1 = document.getElementById('q1');
       var s2 = document.getElementById('q2');
       var s3 = document.getElementById('q3');
-      [s1,s2,s3].forEach(function(s){ if (s) populate(s); });
+      if (s1) populate(s1, QUESTIONS_1);
+      if (s2) populate(s2, QUESTIONS_2);
+      if (s3) populate(s3, QUESTIONS_3);
 
       function refreshDisables(){
         // If this page doesn't have the select elements, skip safely
