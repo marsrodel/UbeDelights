@@ -111,35 +111,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <main class="main-content">
-        <div class="content-wrapper">
-            <div class="form-section">
-                <header>
+        <div class="intro-section">
+            <h2>Welcome to<br><span>Ube Delights</span></h2>
+            <p>Indulge in the rich, vibrant flavors of our signature ube cakes made with authentic purple yam from the Philippines.</p>
+            <ul class="intro-points">
+                <li><i class="fa-solid fa-star"></i> Freshly baked daily with authentic ube</li>
+                <li><i class="fa-solid fa-truck-fast"></i> Free delivery on orders above ₱500</li>
+                <li><i class="fa-solid fa-gift"></i> Custom cake orders accepted</li>
+            </ul>
+        </div>
+        <div class="login-form">
+            <div class="login-container">
+                <form action="" method="POST" novalidate>
                     <h1>Login</h1>
-                </header>
-                <div class="login-container">
-                    <form action="" method="POST" novalidate>
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" name="username" placeholder="Username" required value="<?php echo isset($_GET['u']) ? htmlspecialchars($_GET['u']) : '';?>">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Enter Username" required value="<?php echo isset($_GET['u']) ? htmlspecialchars($_GET['u']) : '';?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" name="password" placeholder="Enter Password" required>
+                            <i class="fa-solid fa-eye-slash" id="eyeicon"></i>
                         </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <div class="password-wrapper">
-                                <input type="password" id="password" name="password" placeholder="Password" required>
-                                <i class="fa-solid fa-eye-slash" id="eyeicon"></i>
-                            </div>
-                        </div>
-                        <div class="auth-alt">
-                            <p id="forgot-section" class="forgot" >Forgot Password? <a onclick="getRecover()">Reset Here</a></p>
-                        </div>
-                        <div id="lockout-timer" class="lockout-timer"></div>
-                        <button class="btn" type="submit">Login</button>
-                    </form>
+                    </div>
+                    <div class="auth-alt">
+                        <p id="forgot-section" class="forgot">Forgot Password? <a onclick="getRecover()">Reset Here</a></p>
+                    </div>
+                    <div id="lockout-timer" class="lockout-timer"></div>
+                    <button class="btn" type="submit">Login</button>
                     <p class="below">Don't have an account? <a onclick="getRegister()">Register</a></p>
-                </div>
-            </div>
-            <div class="image-section">
-                <img src="../images/cake.png" alt="Delicious Ube Cake" class="hero-image">
+                </form>
             </div>
         </div>
     </main>
