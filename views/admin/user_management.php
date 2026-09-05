@@ -2,17 +2,40 @@
 
 $users = [];
 if ($connect) {
-    $sql = "SELECT user_id, username, CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name, IF(IFNULL(extension_name, '') != '', CONCAT(' ', extension_name), '')) AS fullName, email, role, status FROM users WHERE status != 'pending' ORDER BY FIELD(role, 'super_admin', 'admin', 'customer'), user_id";
+    $sql = "SELECT user_id, username, first_name, middle_name, last_name, extension_name,
+                   email, role, status, date_of_birth, age, sex,
+                   street, barangay, city_municipality, province, country, zip_code
+            FROM users WHERE status != 'pending'
+            ORDER BY FIELD(role, 'super_admin', 'admin', 'customer'), user_id";
     $result = mysqli_query($connect, $sql);
     if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
+            $fullName = trim(implode(' ', array_filter([
+                $row['first_name'],
+                $row['middle_name'],
+                $row['last_name'],
+                $row['extension_name']
+            ])));
             $users[] = [
                 'id'       => $row['user_id'],
                 'username' => $row['username'],
-                'fullName' => trim($row['fullName']),
+                'fullName' => $fullName,
+                'firstName' => $row['first_name'],
+                'middleName' => $row['middle_name'] ?? '',
+                'lastName' => $row['last_name'],
+                'extensionName' => $row['extension_name'] ?? '',
                 'email'    => $row['email'],
                 'role'     => $row['role'],
                 'status'   => $row['status'] ?? 'pending',
+                'dob'      => $row['date_of_birth'],
+                'age'      => $row['age'],
+                'sex'      => $row['sex'],
+                'street'   => $row['street'],
+                'barangay' => $row['barangay'],
+                'city'     => $row['city_municipality'],
+                'province' => $row['province'],
+                'country'  => $row['country'],
+                'zipCode'  => $row['zip_code'],
             ];
         }
     }
@@ -78,7 +101,6 @@ if ($connect) {
                 <p class="topbar-subtitle">Manage system users and their permissions.</p>
             </div>
             <div class="topbar-right">
-                <button class="btn-primary" id="btnAddUser" style="padding:10px 12px; font-size:0.95rem; border-radius:10px;" title="Add User" onclick="document.getElementById('addUserModal').classList.add('active'); document.body.style.overflow='hidden';"><i class="fa-solid fa-user-plus"></i></button>
             </div>
         </header>
 
@@ -140,7 +162,7 @@ if ($connect) {
 
     <!-- View User Modal -->
     <div class="modal-overlay" id="viewUserModal" role="dialog" aria-modal="true">
-        <div class="modal" style="max-width:650px;">
+        <div class="modal">
             <div class="modal-header">
                 <h2>User Details</h2>
                 <button class="modal-close" onclick="closeModal('viewUserModal')"><i class="fa-solid fa-xmark"></i></button>

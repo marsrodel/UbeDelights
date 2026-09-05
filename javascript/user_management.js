@@ -2340,13 +2340,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function actionButtons(user) {
         var h = '';
         h += '<button class="um-action-btn btn-view" data-id="'+esc(user.id)+'" title="View"><i class="fa-solid fa-eye"></i></button> ';
-        h += '<button class="um-action-btn btn-edit" data-id="'+esc(user.id)+'" title="Edit"><i class="fa-solid fa-pen"></i></button> ';
+        h += '<div class="um-dropdown-wrap">';
+        h += '<button class="um-action-btn btn-more" title="More Actions"><i class="fa-solid fa-ellipsis-vertical"></i></button>';
+        h += '<div class="um-dropdown">';
+        h += '<button class="um-dropdown-item" data-action="edit" data-id="'+esc(user.id)+'"><i class="fa-solid fa-pen"></i> Edit</button>';
         if (user.status === 'blocked') {
-            h += '<button class="um-action-btn btn-unblock" data-id="'+esc(user.id)+'" title="Unblock"><i class="fa-solid fa-unlock"></i></button>';
+            h += '<button class="um-dropdown-item" data-action="unblock" data-id="'+esc(user.id)+'"><i class="fa-solid fa-unlock"></i> Unblock</button>';
         } else {
-            h += '<button class="um-action-btn btn-block" data-id="'+esc(user.id)+'" title="Block"><i class="fa-solid fa-ban"></i></button>';
+            h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
         }
-        h += ' <button class="um-action-btn btn-delete" data-id="'+esc(user.id)+'" title="Delete"><i class="fa-solid fa-trash"></i></button>';
+        h += '<button class="um-dropdown-item danger" data-action="delete" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Delete</button>';
+        h += '</div></div>';
         return h;
     }
 
@@ -2495,5 +2499,63 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render();
+
+        var usersTableBody = document.getElementById('usersTableBody');
+        if (usersTableBody) {
+            usersTableBody.addEventListener('click', function(e) {
+                var viewBtn = e.target.closest('.btn-view');
+                if (!viewBtn) return;
+                var userId = viewBtn.getAttribute('data-id');
+                var allData = typeof allUsers !== 'undefined' ? allUsers : [];
+                var user = allData.find(function(u) { return u.id === userId; });
+                if (!user) return;
+                var body = document.getElementById('viewUserBody');
+                if (!body) return;
+                var roleLabel = user.role === 'super_admin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : 'Customer';
+                var dob = user.dob ? new Date(user.dob).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+                var statusLabel = user.status.charAt(0).toUpperCase() + user.status.slice(1);
+                body.innerHTML =
+                    '<div class="um-view-form">' +
+                        '<div class="section-block">' +
+                            '<div class="section-title">Personal Information</div>' +
+                            '<div class="fields-row cols-4">' +
+                                '<div class="form-group"><label>ID Number</label><input type="text" value="' + esc(user.id) + '" readonly></div>' +
+                                '<div class="form-group"><label>First Name</label><input type="text" value="' + esc(user.firstName) + '" readonly></div>' +
+                                '<div class="form-group"><label>Middle Name</label><input type="text" value="' + esc(user.middleName || '') + '" readonly></div>' +
+                                '<div class="form-group"><label>Last Name</label><input type="text" value="' + esc(user.lastName) + '" readonly></div>' +
+                            '</div>' +
+                            '<div class="fields-row cols-4">' +
+                                '<div class="form-group"><label>Extension Name</label><input type="text" value="' + esc(user.extensionName || '') + '" readonly></div>' +
+                                '<div class="form-group"><label>Date of Birth</label><input type="text" value="' + esc(dob) + '" readonly></div>' +
+                                '<div class="form-group"><label>Age</label><input type="text" value="' + esc(String(user.age)) + '" readonly></div>' +
+                                '<div class="form-group"><label>Sex</label><input type="text" value="' + esc(user.sex) + '" readonly></div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="section-block">' +
+                            '<div class="section-title">Account Information</div>' +
+                            '<div class="fields-row cols-4">' +
+                                '<div class="form-group"><label>Email</label><input type="text" value="' + esc(user.email) + '" readonly></div>' +
+                                '<div class="form-group"><label>Username</label><input type="text" value="' + esc(user.username) + '" readonly></div>' +
+                                '<div class="form-group"><label>Role</label><input type="text" value="' + esc(roleLabel) + '" readonly></div>' +
+                                '<div class="form-group"><label>Status</label><input type="text" value="' + esc(statusLabel) + '" readonly></div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="section-block">' +
+                            '<div class="section-title">Address Information</div>' +
+                            '<div class="fields-row cols-3">' +
+                                '<div class="form-group"><label>Purok/Street</label><input type="text" value="' + esc(user.street || '') + '" readonly></div>' +
+                                '<div class="form-group"><label>Barangay</label><input type="text" value="' + esc(user.barangay || '') + '" readonly></div>' +
+                                '<div class="form-group"><label>City/Municipality</label><input type="text" value="' + esc(user.city || '') + '" readonly></div>' +
+                            '</div>' +
+                            '<div class="fields-row cols-3">' +
+                                '<div class="form-group"><label>Province</label><input type="text" value="' + esc(user.province || '') + '" readonly></div>' +
+                                '<div class="form-group"><label>Country</label><input type="text" value="' + esc(user.country || '') + '" readonly></div>' +
+                                '<div class="form-group"><label>Zip Code</label><input type="text" value="' + esc(user.zipCode || '') + '" readonly></div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                document.getElementById('viewUserModal').classList.add('active');
+            });
+        }
     });
 })();
