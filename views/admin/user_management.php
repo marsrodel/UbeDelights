@@ -182,37 +182,98 @@ if ($connect) {
                 <h2>Edit User</h2>
                 <button class="modal-close" onclick="closeModal('editUserModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <form class="modal-form" id="editUserForm">
-                <input type="hidden" id="editUserId">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="editFullName" required>
+            <div class="modal-body" id="editUserBody">
+                <div class="um-view-form">
+                    <input type="hidden" id="editUserId">
+                    <div class="section-block">
+                        <div class="section-title">Personal Information</div>
+                        <div class="fields-row cols-4">
+                            <div class="form-group">
+                                <label>ID Number <span class="required">*</span></label>
+                                <input type="text" id="editIdNumber" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>First Name <span class="required">*</span></label>
+                                <input type="text" id="editFirstName">
+                            </div>
+                            <div class="form-group">
+                                <label>Middle Name <span class="optional" style="color:var(--danger);">(Optional)</span></label>
+                                <input type="text" id="editMiddleName">
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name <span class="required">*</span></label>
+                                <input type="text" id="editLastName">
+                            </div>
+                        </div>
+                        <div class="fields-row cols-4">
+                            <div class="form-group">
+                                <label>Extension Name <span class="optional" style="color:var(--danger);">(Optional)</span></label>
+                                <input type="text" id="editExtensionName" placeholder="Jr, Sr, III">
+                            </div>
+                            <div class="form-group">
+                                <label>Date of Birth <span class="required">*</span></label>
+                                <input type="date" id="editDob">
+                            </div>
+                            <div class="form-group">
+                                <label>Age <span class="required">*</span></label>
+                                <input type="text" id="editAge" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Sex <span class="required">*</span></label>
+                                <select id="editSex">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="editEmail" required>
+                    <div class="section-block">
+                        <div class="section-title">Address Information</div>
+                        <div class="fields-row cols-3">
+                            <div class="form-group">
+                                <label>Purok/Street <span class="required">*</span></label>
+                                <input type="text" id="editStreet">
+                            </div>
+                            <div class="form-group">
+                                <label>Barangay <span class="required">*</span></label>
+                                <input type="text" id="editBarangay">
+                            </div>
+                            <div class="form-group">
+                                <label>City/Municipality <span class="required">*</span></label>
+                                <input type="text" id="editCity">
+                            </div>
+                        </div>
+                        <div class="fields-row cols-3">
+                            <div class="form-group">
+                                <label>Province <span class="required">*</span></label>
+                                <input type="text" id="editProvince">
+                            </div>
+                            <div class="form-group">
+                                <label>Country <span class="required">*</span></label>
+                                <input type="text" id="editCountry">
+                            </div>
+                            <div class="form-group">
+                                <label>Zip Code <span class="required">*</span></label>
+                                <input type="text" id="editZipcode">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-block">
+                        <div class="section-title">Account Information</div>
+                        <div class="fields-row cols-3">
+                            <div class="form-group">
+                                <label>Email <span class="required">*</span></label>
+                                <input type="email" id="editEmail">
+                            </div>
+                            <div class="form-group">
+                                <label>Username <span class="required">*</span></label>
+                                <input type="text" id="editUsername">
+                            </div>
+                            <div class="form-group"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Role</label>
-                        <select id="editRole">
-                            <option value="customer">Customer</option>
-                            <option value="admin">Admin</option>
-                            <option value="super_admin">Super Admin</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="editStatus">
-                            <option value="active">Active</option>
-                            <option value="blocked">Blocked</option>
-                            <option value="pending">Pending</option>
-                        </select>
-                    </div>
-                </div>
-            </form>
+            </div>
             <div class="modal-footer">
                 <button class="btn-outline" onclick="closeModal('editUserModal')">Cancel</button>
                 <button class="btn-primary" id="editUserSave"><i class="fa-solid fa-check"></i> Save Changes</button>

@@ -1,6 +1,11 @@
 /* ==========================================
    USER MANAGEMENT — CARD HEADER
    ========================================== */
+
+:root {
+    --red-not-allowed-cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="%23ff2d55" stroke-width="2"/><line x1="4" y1="12" x2="12" y2="4" stroke="%23ff2d55" stroke-width="2"/></svg>') 8 8, not-allowed;
+}
+
 .card { overflow: visible !important; }
 .table-container { overflow: visible !important; }
 .card-header-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); gap: 16px; flex-wrap: wrap; }
@@ -96,6 +101,38 @@
 #viewUserModal .modal-body { padding: 12px 20px 8px; overflow: visible; }
 #viewUserModal .modal-footer { padding: 10px 20px; }
 #viewUserModal .modal-close { width: 30px; height: 30px; font-size: 0.9rem; }
+#editUserModal .modal { max-width: 950px; max-height: none; }
+#editUserModal .modal-header { padding: 12px 20px; }
+#editUserModal .modal-header h2 { font-size: 1rem; }
+#editUserModal .modal-body { padding: 12px 20px 8px; overflow: visible; }
+#editUserModal .modal-footer { padding: 10px 20px; }
+#editUserModal .modal-close { width: 30px; height: 30px; font-size: 0.9rem; }
+.um-view-form .form-group input:not([readonly]),
+.um-view-form .form-group select {
+    cursor: text;
+    background: var(--bg-main);
+    color: var(--text-primary);
+}
+.um-view-form .form-group input:not([readonly]):focus,
+.um-view-form .form-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+}
+.um-view-form .form-group input[readonly] {
+    cursor: var(--red-not-allowed-cursor) !important;
+}
+.um-view-form .form-group select {
+    width: 100%; padding: 8px 30px 8px 12px; border: 1px solid #d6dfe4; border-radius: 8px;
+    font-size: 0.88rem; font-family: 'Inter', sans-serif; background-color: var(--bg-main);
+    color: var(--text-primary); outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 10px center;
+    background-repeat: no-repeat;
+    background-size: 14px;
+    cursor: pointer;
+}
 #viewPendingModal .modal { max-width: 950px; max-height: none; }
 #viewPendingModal .modal-header { padding: 12px 20px; }
 #viewPendingModal .modal-header h2 { font-size: 1rem; }

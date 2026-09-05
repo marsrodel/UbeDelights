@@ -2594,6 +2594,35 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             usersTableBody.addEventListener('click', function(e) {
+                var item = e.target.closest('[data-action="edit"]');
+                if (!item) return;
+                e.stopPropagation();
+                var userId = item.getAttribute('data-id');
+                var allData = typeof allUsers !== 'undefined' ? allUsers : [];
+                var user = allData.find(function(u) { return u.id === userId; });
+                if (!user) return;
+                var dob = user.dob ? new Date(user.dob).toISOString().split('T')[0] : '';
+                document.getElementById('editUserId').value = user.id;
+                document.getElementById('editIdNumber').value = user.id;
+                document.getElementById('editFirstName').value = user.firstName || '';
+                document.getElementById('editMiddleName').value = user.middleName || '';
+                document.getElementById('editLastName').value = user.lastName || '';
+                document.getElementById('editExtensionName').value = user.extensionName || '';
+                document.getElementById('editDob').value = dob;
+                document.getElementById('editAge').value = user.age || '';
+                document.getElementById('editSex').value = user.sex || 'Male';
+                document.getElementById('editEmail').value = user.email || '';
+                document.getElementById('editUsername').value = user.username || '';
+                document.getElementById('editStreet').value = user.street || '';
+                document.getElementById('editBarangay').value = user.barangay || '';
+                document.getElementById('editCity').value = user.city || '';
+                document.getElementById('editProvince').value = user.province || '';
+                document.getElementById('editCountry').value = user.country || '';
+                document.getElementById('editZipcode').value = user.zipCode || '';
+                document.getElementById('editUserModal').classList.add('active');
+            });
+
+            usersTableBody.addEventListener('click', function(e) {
                 var item = e.target.closest('[data-action="block"]');
                 if (!item) return;
                 e.stopPropagation();
