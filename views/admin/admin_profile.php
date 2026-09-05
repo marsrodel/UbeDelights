@@ -116,37 +116,37 @@ if ($connect) {
                     <h3 class="profile-section-title">Personal Information</h3>
                     <div class="form-grid cols-4">
                         <div class="form-field">
-                            <label for="profileId">ID Number</label>
+                            <label for="profileId">ID Number <span class="required">*</span></label>
                             <input type="text" id="profileId" value="<?php echo htmlspecialchars($profile['id'] ?? ''); ?>" readonly>
                         </div>
                         <div class="form-field">
-                            <label for="profileFirstName">First Name</label>
+                            <label for="profileFirstName">First Name <span class="required">*</span></label>
                             <input type="text" id="profileFirstName" name="first_name">
                         </div>
                         <div class="form-field">
-                            <label for="profileMiddleName">Middle Name</label>
+                            <label for="profileMiddleName">Middle Name <span class="optional">(Optional)</span></label>
                             <input type="text" id="profileMiddleName" name="middle_name">
                         </div>
                         <div class="form-field">
-                            <label for="profileLastName">Last Name</label>
+                            <label for="profileLastName">Last Name <span class="required">*</span></label>
                             <input type="text" id="profileLastName" name="last_name">
                         </div>
                     </div>
                     <div class="form-grid cols-4">
                         <div class="form-field">
-                            <label for="profileExtensionName">Extension Name</label>
+                            <label for="profileExtensionName">Extension Name <span class="optional">(Optional)</span></label>
                             <input type="text" id="profileExtensionName" name="extension_name" placeholder="Jr, Sr, III">
                         </div>
                         <div class="form-field">
-                            <label for="profileBirthdate">Date of Birth</label>
+                            <label for="profileBirthdate">Date of Birth <span class="required">*</span></label>
                             <input type="date" id="profileBirthdate" name="date_of_birth">
                         </div>
                         <div class="form-field">
-                            <label for="profileAge">Age</label>
+                            <label for="profileAge">Age <span class="required">*</span></label>
                             <input type="number" id="profileAge" readonly>
                         </div>
                         <div class="form-field">
-                            <label for="profileSex">Sex</label>
+                            <label for="profileSex">Sex <span class="required">*</span></label>
                             <select id="profileSex" name="sex">
                                 <option value="">Select Sex</option>
                                 <option value="Male">Male</option>
@@ -158,11 +158,11 @@ if ($connect) {
                     <h3 class="profile-section-title">Account Information</h3>
                     <div class="form-grid cols-4">
                         <div class="form-field">
-                            <label for="profileEmail">Email</label>
+                            <label for="profileEmail">Email <span class="required">*</span></label>
                             <input type="email" id="profileEmail" name="email">
                         </div>
                         <div class="form-field">
-                            <label for="profileUsername">Username</label>
+                            <label for="profileUsername">Username <span class="required">*</span></label>
                             <input type="text" id="profileUsername" name="username">
                         </div>
                         <div class="form-field">
@@ -178,29 +178,29 @@ if ($connect) {
                     <h3 class="profile-section-title">Address Information</h3>
                     <div class="form-grid cols-3">
                         <div class="form-field">
-                            <label for="profileStreet">Purok/Street</label>
+                            <label for="profileStreet">Purok/Street <span class="required">*</span></label>
                             <input type="text" id="profileStreet" name="street">
                         </div>
                         <div class="form-field">
-                            <label for="profileBarangay">Barangay</label>
+                            <label for="profileBarangay">Barangay <span class="required">*</span></label>
                             <input type="text" id="profileBarangay" name="barangay">
                         </div>
                         <div class="form-field">
-                            <label for="profileCity">City/Municipality</label>
+                            <label for="profileCity">City/Municipality <span class="required">*</span></label>
                             <input type="text" id="profileCity" name="city_municipality">
                         </div>
                     </div>
                     <div class="form-grid cols-3">
                         <div class="form-field">
-                            <label for="profileProvince">Province</label>
+                            <label for="profileProvince">Province <span class="required">*</span></label>
                             <input type="text" id="profileProvince" name="province">
                         </div>
                         <div class="form-field">
-                            <label for="profileCountry">Country</label>
+                            <label for="profileCountry">Country <span class="required">*</span></label>
                             <input type="text" id="profileCountry" name="country">
                         </div>
                         <div class="form-field">
-                            <label for="profileZipcode">Zip Code</label>
+                            <label for="profileZipcode">Zip Code <span class="required">*</span></label>
                             <input type="text" id="profileZipcode" name="zip_code">
                         </div>
                     </div>
@@ -237,6 +237,8 @@ if ($connect) {
 
     <script>var adminProfile = <?php echo json_encode($profile); ?>;</script>
     <script src="../../javascript/admin-routing.js?v=2.0"></script>
-    <script src="../../javascript/admin_profile.js?v=2.0"></script>
+    <script src="../../javascript/register.js?v=2.0"></script>
+    <script src="../../javascript/inspect.js?v=2.0"></script>
+    <script src="../../javascript/admin_profile.js?v=3.0"></script>
 </body>
 </html>

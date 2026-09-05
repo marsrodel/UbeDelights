@@ -2570,6 +2570,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             usersTableBody.addEventListener('click', function(e) {
+                var editBtn = e.target.closest('.btn-edit');
+                if (!editBtn) return;
+                window.location.href = './admin_profile.php';
+            });
+
+            usersTableBody.addEventListener('click', function(e) {
                 var btn = e.target.closest('.btn-more');
                 if (btn) {
                     e.stopPropagation();
