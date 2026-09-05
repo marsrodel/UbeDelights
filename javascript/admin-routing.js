@@ -22,6 +22,10 @@ const getAdminSystemLogs = () => {
     window.location.href = "./system_logs.php";
 };
 
+const getAdminProfile = () => {
+    window.location.href = "./admin_profile.php";
+};
+
 const getAdminLogout = () => {
     window.location.href = "../../server/logout.php";
 };

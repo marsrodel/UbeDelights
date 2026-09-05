@@ -1,0 +1,228 @@
+/* ==========================================
+   ADMIN PROFILE — MY ACCOUNT
+   ========================================== */
+
+/* Card wrapper */
+.profile-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.profile-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.profile-card .card-header h2 {
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.profile-card .card-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+
+.profile-form {
+    padding: 20px 24px 24px;
+}
+
+/* ==========================================
+   SECTION TITLES
+   ========================================== */
+.profile-section-title {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 8px 0;
+    padding-bottom: 0;
+}
+
+.profile-form .profile-section-title:first-child {
+    margin-top: 0;
+}
+
+/* ==========================================
+   FORM GRID — 4 COLUMNS / 3 COLUMNS
+   ========================================== */
+.form-grid {
+    display: grid;
+    gap: 10px 14px;
+    margin-bottom: 18px;
+}
+
+.form-grid.cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.form-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.form-field label {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+    margin-bottom: 0;
+}
+
+.form-field input,
+.form-field select {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-family: var(--font-body);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text-primary);
+    outline: none;
+    transition: var(--transition);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+}
+
+.form-field input[readonly] {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    cursor: default;
+}
+
+.form-field input::placeholder {
+    color: var(--text-muted);
+}
+
+/* ==========================================
+   PASSWORD SECTION
+   ========================================== */
+.password-section {
+    margin-top: 4px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+}
+
+.password-section h3 {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 8px 0;
+}
+
+.form-hint {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    margin: 0 0 10px 0;
+}
+
+/* ==========================================
+   ACTION BUTTONS
+   ========================================== */
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+}
+
+.profile-actions .btn-outline {
+    padding: 8px 22px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.profile-actions .btn-outline:hover {
+    background: var(--bg-main);
+    border-color: var(--accent);
+}
+
+.profile-actions .btn-primary {
+    padding: 8px 22px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--primary-gradient);
+    color: #fff;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.profile-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4), 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================
+   TOAST NOTIFICATION
+   ========================================== */
+.profile-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.profile-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.profile-toast.success { background: var(--success); }
+.profile-toast.error { background: var(--danger); }
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 1024px) {
+    .form-grid.cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .form-grid.cols-4,
+    .form-grid.cols-3 {
+        grid-template-columns: 1fr;
+    }
+}

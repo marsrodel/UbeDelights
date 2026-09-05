@@ -2,15 +2,37 @@
 
 $pendingUsers = [];
 if ($connect) {
-    $sql = "SELECT user_id, username, CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name) AS fullName, email FROM users WHERE status = 'pending' ORDER BY user_id";
+    $sql = "SELECT user_id, username, first_name, middle_name, last_name, extension_name,
+                   email, date_of_birth, age, sex,
+                   street, barangay, city_municipality, province, country, zip_code
+            FROM users WHERE status = 'pending' ORDER BY user_id";
     $result = mysqli_query($connect, $sql);
     if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
+            $fullName = trim(implode(' ', array_filter([
+                $row['first_name'],
+                $row['middle_name'],
+                $row['last_name'],
+                $row['extension_name']
+            ])));
             $pendingUsers[] = [
                 'id'       => $row['user_id'],
                 'username' => $row['username'],
-                'fullName' => trim($row['fullName']),
+                'fullName' => $fullName,
+                'firstName' => $row['first_name'],
+                'middleName' => $row['middle_name'] ?? '',
+                'lastName' => $row['last_name'],
+                'extensionName' => $row['extension_name'] ?? '',
                 'email'    => $row['email'],
+                'dob'      => $row['date_of_birth'],
+                'age'      => $row['age'],
+                'sex'      => $row['sex'],
+                'street'   => $row['street'],
+                'barangay' => $row['barangay'],
+                'city'     => $row['city_municipality'],
+                'province' => $row['province'],
+                'country'  => $row['country'],
+                'zipCode'  => $row['zip_code'],
             ];
         }
     }
@@ -31,6 +53,7 @@ if ($connect) {
     <title>Pending Approvals - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
+    <link rel="stylesheet" href="../../css/user_management.css?v=2.0">
 </head>
 <body class="admin-body">
     <aside class="admin-sidebar" id="adminSidebar">
@@ -59,6 +82,7 @@ if ($connect) {
             <a onclick="getAdminUserManagement()" class="sidebar-link"><i class="fa-solid fa-users-cog"></i><span>User Management</span></a>
             <a onclick="getAdminPendingApprovals()" class="sidebar-link active"><i class="fa-solid fa-user-clock"></i><span>Pending Approvals</span><?php if ($pendingCount > 0): ?><span class="sidebar-badge"><?php echo $pendingCount; ?></span><?php endif; ?></a>
             <a onclick="getAdminSystemLogs()" class="sidebar-link"><i class="fa-solid fa-list-alt"></i><span>System Logs</span></a>
+            <a onclick="getAdminProfile()" class="sidebar-link"><i class="fa-solid fa-user"></i><span>My Account</span></a>
         </nav>
 
         <div class="sidebar-footer">
@@ -125,7 +149,7 @@ if ($connect) {
 
     <!-- View Pending User Modal -->
     <div class="modal-overlay" id="viewPendingModal" role="dialog" aria-modal="true" aria-labelledby="viewPendingModalTitle">
-        <div class="modal" style="max-width: 650px;">
+        <div class="modal">
             <div class="modal-header">
                 <h2 id="viewPendingModalTitle">Registration Details</h2>
                 <button class="modal-close" id="viewPendingModalClose" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>

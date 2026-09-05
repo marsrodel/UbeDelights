@@ -1,6 +1,8 @@
 /* ==========================================
    USER MANAGEMENT — CARD HEADER
    ========================================== */
+.card { overflow: visible !important; }
+.table-container { overflow: visible !important; }
 .card-header-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); gap: 16px; flex-wrap: wrap; }
 .card-header-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .card-header-left h2 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
@@ -55,15 +57,15 @@
 .um-dropdown-wrap { position: relative; display: inline-block; }
 .um-dropdown-wrap .um-dropdown {
     display: none; position: absolute; right: 0; top: 100%;
-    min-width: 140px; background: #fff; border: 1px solid var(--border);
+    min-width: 170px; background: #fff; border: 1px solid var(--border);
     border-radius: 10px; box-shadow: var(--shadow-md); z-index: 50;
-    padding: 6px 0; margin-top: 4px;
+    padding: 6px 0; margin-top: 4px; font-family: var(--font-body);
 }
 .um-dropdown-wrap.open .um-dropdown { display: block; }
 .um-dropdown-item {
     display: flex; align-items: center; gap: 8px; width: 100%;
     padding: 8px 14px; border: none; background: none; cursor: pointer;
-    font-size: 13px; color: var(--text-secondary); text-align: left;
+    font-size: 13px; font-family: var(--font-body); color: var(--text-secondary); text-align: left;
     transition: background 0.15s;
 }
 .um-dropdown-item:hover { background: var(--bg-main); color: var(--text-primary); }
@@ -94,6 +96,12 @@
 #viewUserModal .modal-body { padding: 12px 20px 8px; overflow: visible; }
 #viewUserModal .modal-footer { padding: 10px 20px; }
 #viewUserModal .modal-close { width: 30px; height: 30px; font-size: 0.9rem; }
+#viewPendingModal .modal { max-width: 950px; max-height: none; }
+#viewPendingModal .modal-header { padding: 12px 20px; }
+#viewPendingModal .modal-header h2 { font-size: 1rem; }
+#viewPendingModal .modal-body { padding: 12px 20px 8px; overflow: visible; }
+#viewPendingModal .modal-footer { padding: 10px 20px; }
+#viewPendingModal .modal-close { width: 30px; height: 30px; font-size: 0.9rem; }
 .um-view-form .section-block { margin-bottom: 10px; }
 .um-view-form .section-title {
     font-size: 0.75rem; font-weight: 700; color: var(--accent);

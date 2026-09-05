@@ -154,16 +154,54 @@
 // ============================================================
 //  MODALS & ACTION HANDLERS
 // ============================================================
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function viewPendingUser(userId) {
     var user = pendingUsers.find(function(u) { return u.id === userId; });
     if (!user) return;
     var body = document.getElementById('viewPendingBody');
+    if (!body) return;
+    var dob = user.dob ? new Date(user.dob).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+    var sex = user.sex || '';
+    var age = user.age != null ? String(user.age) : '';
     body.innerHTML =
-        '<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">' +
-            '<div class="info-item"><div class="info-label">ID Number</div><div class="info-value">' + user.id + '</div></div>' +
-            '<div class="info-item"><div class="info-label">Username</div><div class="info-value">' + user.username + '</div></div>' +
-            '<div class="info-item"><div class="info-label">Full Name</div><div class="info-value">' + user.fullName + '</div></div>' +
-            '<div class="info-item"><div class="info-label">Email</div><div class="info-value">' + user.email + '</div></div>' +
+        '<div class="um-view-form">' +
+            '<div class="section-block">' +
+                '<div class="section-title">Personal Information</div>' +
+                '<div class="fields-row cols-4">' +
+                    '<div class="form-group"><label>ID Number</label><input type="text" value="' + esc(user.id) + '" readonly></div>' +
+                    '<div class="form-group"><label>First Name</label><input type="text" value="' + esc(user.firstName || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Middle Name</label><input type="text" value="' + esc(user.middleName || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Last Name</label><input type="text" value="' + esc(user.lastName || '') + '" readonly></div>' +
+                '</div>' +
+                '<div class="fields-row cols-4">' +
+                    '<div class="form-group"><label>Extension Name</label><input type="text" value="' + esc(user.extensionName || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Date of Birth</label><input type="text" value="' + esc(dob) + '" readonly></div>' +
+                    '<div class="form-group"><label>Age</label><input type="text" value="' + esc(age) + '" readonly></div>' +
+                    '<div class="form-group"><label>Sex</label><input type="text" value="' + esc(sex) + '" readonly></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="section-block">' +
+                '<div class="section-title">Account Information</div>' +
+                '<div class="fields-row cols-4">' +
+                    '<div class="form-group"><label>Email</label><input type="text" value="' + esc(user.email || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Username</label><input type="text" value="' + esc(user.username || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Role</label><input type="text" value="Customer" readonly></div>' +
+                    '<div class="form-group"><label>Status</label><input type="text" value="Pending" readonly></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="section-block">' +
+                '<div class="section-title">Address Information</div>' +
+                '<div class="fields-row cols-3">' +
+                    '<div class="form-group"><label>Purok/Street</label><input type="text" value="' + esc(user.street || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Barangay</label><input type="text" value="' + esc(user.barangay || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>City/Municipality</label><input type="text" value="' + esc(user.city || '') + '" readonly></div>' +
+                '</div>' +
+                '<div class="fields-row cols-3">' +
+                    '<div class="form-group"><label>Province</label><input type="text" value="' + esc(user.province || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Country</label><input type="text" value="' + esc(user.country || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Zip Code</label><input type="text" value="' + esc(user.zipCode || '') + '" readonly></div>' +
+                '</div>' +
+            '</div>' +
         '</div>';
     document.getElementById('viewPendingModal').classList.add('active');
 }

@@ -87,6 +87,7 @@ if ($connect) {
             <a onclick="getAdminUserManagement()" class="sidebar-link active"><i class="fa-solid fa-users-cog"></i><span>User Management</span></a>
             <a onclick="getAdminPendingApprovals()" class="sidebar-link"><i class="fa-solid fa-user-clock"></i><span>Pending Approvals</span><?php if ($pendingCount > 0): ?><span class="sidebar-badge"><?php echo $pendingCount; ?></span><?php endif; ?></a>
             <a onclick="getAdminSystemLogs()" class="sidebar-link"><i class="fa-solid fa-list-alt"></i><span>System Logs</span></a>
+            <a onclick="getAdminProfile()" class="sidebar-link"><i class="fa-solid fa-user"></i><span>My Account</span></a>
         </nav>
 
         <div class="sidebar-footer">
@@ -371,7 +372,7 @@ if ($connect) {
 
     <script src="../../javascript/admin-routing.js?v=2.0"></script>
     <script src="../../javascript/admin_security.js?v=3.0"></script>
-    <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>;</script>
+    <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>;</script>
     <script src="../../javascript/user_management.js?v=3.0"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
 </body>

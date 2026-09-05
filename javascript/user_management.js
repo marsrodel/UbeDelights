@@ -2340,17 +2340,29 @@ document.addEventListener('DOMContentLoaded', function() {
     function actionButtons(user) {
         var h = '';
         h += '<button class="um-action-btn btn-view" data-id="'+esc(user.id)+'" title="View"><i class="fa-solid fa-eye"></i></button> ';
-        h += '<div class="um-dropdown-wrap">';
-        h += '<button class="um-action-btn btn-more" title="More Actions"><i class="fa-solid fa-ellipsis-vertical"></i></button>';
-        h += '<div class="um-dropdown">';
-        h += '<button class="um-dropdown-item" data-action="edit" data-id="'+esc(user.id)+'"><i class="fa-solid fa-pen"></i> Edit</button>';
-        if (user.status === 'blocked') {
-            h += '<button class="um-dropdown-item" data-action="unblock" data-id="'+esc(user.id)+'"><i class="fa-solid fa-unlock"></i> Unblock</button>';
+
+        var isOwn = (user.id === currentUserId);
+        var isCustomer = (user.role === 'customer');
+
+        if (isOwn) {
+            h += '<button class="um-action-btn btn-edit" data-action="edit" data-id="'+esc(user.id)+'" title="Edit"><i class="fa-solid fa-pen"></i></button>';
         } else {
-            h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
+            h += '<div class="um-dropdown-wrap">';
+            h += '<button class="um-action-btn btn-more" title="More Actions"><i class="fa-solid fa-ellipsis-vertical"></i></button>';
+            h += '<div class="um-dropdown">';
+            h += '<button class="um-dropdown-item" data-action="edit" data-id="'+esc(user.id)+'"><i class="fa-solid fa-pen"></i> Edit</button>';
+            if (isCustomer) {
+                h += '<button class="um-dropdown-item" data-action="reset-password" data-id="'+esc(user.id)+'"><i class="fa-solid fa-key"></i> Reset Password</button>';
+            }
+            if (user.status === 'blocked') {
+                h += '<button class="um-dropdown-item" data-action="unblock" data-id="'+esc(user.id)+'"><i class="fa-solid fa-unlock"></i> Unblock</button>';
+            } else {
+                h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
+            }
+            h += '<button class="um-dropdown-item danger" data-action="request-deletion" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Request Deletion</button>';
+            h += '</div></div>';
         }
-        h += '<button class="um-dropdown-item danger" data-action="delete" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Delete</button>';
-        h += '</div></div>';
+
         return h;
     }
 
@@ -2556,6 +2568,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     '</div>';
                 document.getElementById('viewUserModal').classList.add('active');
             });
+
+            usersTableBody.addEventListener('click', function(e) {
+                var btn = e.target.closest('.btn-more');
+                if (btn) {
+                    e.stopPropagation();
+                    var wrap = btn.closest('.um-dropdown-wrap');
+                    var wasOpen = wrap.classList.contains('open');
+                    document.querySelectorAll('.um-dropdown-wrap.open').forEach(function(el) { el.classList.remove('open'); });
+                    if (!wasOpen) wrap.classList.add('open');
+                }
+            });
         }
+
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.um-dropdown-wrap.open').forEach(function(el) { el.classList.remove('open'); });
+        });
     });
 })();
