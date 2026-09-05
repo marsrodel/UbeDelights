@@ -223,19 +223,89 @@ if ($connect) {
     <!-- Block/Unblock Confirmation Modal -->
     <div class="modal-overlay" id="blockModal" role="dialog" aria-modal="true">
         <div class="modal" style="max-width:450px;">
-            <div class="modal-header">
-                <h2 id="blockModalTitle">Block User</h2>
+            <div class="modal-header" style="border-bottom:none;">
+                <h2 id="blockModalTitle">Confirm Status Change</h2>
                 <button class="modal-close" onclick="closeModal('blockModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="modal-body">
-                <p id="blockModalMessage">Are you sure you want to block this user?</p>
-                <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:8px;">User: <strong id="blockModalUserName"></strong></p>
+            <div class="modal-body" style="padding:0 24px 24px;">
+                <p id="blockModalMessage" style="color:var(--text-secondary); font-size:0.95rem;">Block this user? They will not be able to log in.</p>
                 <input type="hidden" id="blockUserId">
                 <input type="hidden" id="blockAction">
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="border-top:none;">
                 <button class="btn-outline" onclick="closeModal('blockModal')">Cancel</button>
-                <button class="btn-primary" id="blockConfirmBtn"><i class="fa-solid fa-check"></i> <span id="blockConfirmText">Confirm</span></button>
+                <button class="btn-primary" id="blockConfirmBtn">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Block Password Confirmation Modal -->
+    <div class="modal-overlay" id="blockPasswordModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header">
+                <h2 id="blockPasswordTitle">Enter your password to block this user.</h2>
+                <button class="modal-close" onclick="closeModal('blockPasswordModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form class="modal-form">
+                <p style="color:var(--text-secondary); font-size:0.82rem;">Enter your account password to confirm this action.</p>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="blockPasswordInput" placeholder="Enter password">
+                </div>
+                <input type="hidden" id="blockPasswordUserId">
+                <input type="hidden" id="blockPasswordAction">
+            </form>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeModal('blockPasswordModal')">Cancel</button>
+                <button class="btn-primary" id="blockPasswordConfirmBtn"><i class="fa-solid fa-check"></i> Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal-overlay" id="resetPasswordModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header">
+                <h2>Reset Customer Password</h2>
+                <button class="modal-close" onclick="closeModal('resetPasswordModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form class="modal-form">
+                <p style="color:var(--text-secondary); font-size:0.82rem;">Set a new password for this user. They will use it the next time they log in.</p>
+                <div class="form-group">
+                    <label>New password</label>
+                    <input type="password" id="resetNewPassword" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm password</label>
+                    <input type="password" id="resetConfirmPassword" placeholder="Confirm new password">
+                </div>
+                <input type="hidden" id="resetPasswordUserId">
+            </form>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeModal('resetPasswordModal')">Cancel</button>
+                <button class="btn-primary" id="resetPasswordConfirmBtn"><i class="fa-solid fa-key"></i> Reset Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Deletion Modal -->
+    <div class="modal-overlay" id="requestDeletionModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header">
+                <h2>Request Account Deletion</h2>
+                <button class="modal-close" onclick="closeModal('requestDeletionModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form class="modal-form">
+                <p style="color:var(--text-secondary); font-size:0.82rem;">A deletion request will be sent to the super admin for approval. The account will not be removed until it is approved.</p>
+                <div class="form-group">
+                    <label>Reason <span class="required">*</span></label>
+                    <textarea id="deletionReason" placeholder="Explain why this account should be deleted" rows="4"></textarea>
+                </div>
+                <input type="hidden" id="deletionUserId">
+            </form>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeModal('requestDeletionModal')">Cancel</button>
+                <button class="btn-primary" id="deletionConfirmBtn"><i class="fa-solid fa-paper-plane"></i> Submit Request</button>
             </div>
         </div>
     </div>

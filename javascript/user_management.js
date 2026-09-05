@@ -2576,6 +2576,62 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             usersTableBody.addEventListener('click', function(e) {
+                var item = e.target.closest('[data-action="reset-password"]');
+                if (!item) return;
+                e.stopPropagation();
+                var userId = item.getAttribute('data-id');
+                document.getElementById('resetPasswordUserId').value = userId;
+                document.getElementById('resetPasswordModal').classList.add('active');
+            });
+
+            usersTableBody.addEventListener('click', function(e) {
+                var item = e.target.closest('[data-action="request-deletion"]');
+                if (!item) return;
+                e.stopPropagation();
+                var userId = item.getAttribute('data-id');
+                document.getElementById('deletionUserId').value = userId;
+                document.getElementById('requestDeletionModal').classList.add('active');
+            });
+
+            usersTableBody.addEventListener('click', function(e) {
+                var item = e.target.closest('[data-action="block"]');
+                if (!item) return;
+                e.stopPropagation();
+                var userId = item.getAttribute('data-id');
+                document.getElementById('blockUserId').value = userId;
+                document.getElementById('blockAction').value = 'block';
+                document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
+                document.getElementById('blockModalMessage').textContent = 'Block this user? They will not be able to log in.';
+                document.getElementById('blockConfirmBtn').textContent = 'Yes';
+                document.getElementById('blockModal').classList.add('active');
+            });
+
+            usersTableBody.addEventListener('click', function(e) {
+                var item = e.target.closest('[data-action="unblock"]');
+                if (!item) return;
+                e.stopPropagation();
+                var userId = item.getAttribute('data-id');
+                document.getElementById('blockUserId').value = userId;
+                document.getElementById('blockAction').value = 'unblock';
+                document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
+                document.getElementById('blockModalMessage').textContent = 'Unblock this user? They will be able to log in again.';
+                document.getElementById('blockConfirmBtn').textContent = 'Yes';
+                document.getElementById('blockModal').classList.add('active');
+            });
+
+            document.getElementById('blockConfirmBtn').addEventListener('click', function() {
+                var userId = document.getElementById('blockUserId').value;
+                var action = document.getElementById('blockAction').value;
+                closeModal('blockModal');
+                document.getElementById('blockPasswordUserId').value = userId;
+                document.getElementById('blockPasswordAction').value = action;
+                document.getElementById('blockPasswordTitle').textContent = action === 'block'
+                    ? 'Enter your password to block this user.'
+                    : 'Enter your password to unblock this user.';
+                document.getElementById('blockPasswordModal').classList.add('active');
+            });
+
+            usersTableBody.addEventListener('click', function(e) {
                 var btn = e.target.closest('.btn-more');
                 if (btn) {
                     e.stopPropagation();
