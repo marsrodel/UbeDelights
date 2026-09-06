@@ -125,7 +125,6 @@ if ($connect) {
                         </div>
                         <select class="filter-select" id="roleFilter">
                             <option value="">All Roles</option>
-                            <option value="super_admin">Super Admin</option>
                             <option value="admin">Admin</option>
                             <option value="customer">Customer</option>
                         </select>
