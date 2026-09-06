@@ -88,9 +88,8 @@ if ($connect) {
         </header>
 
         <main class="admin-content">
-            <div class="filters-card">
-                <div class="filters-title"><i class="fa-solid fa-filter"></i> Filters</div>
-                <div class="filters-grid">
+            <div class="card logs-card">
+                <div class="filters-grid" style="padding:18px 18px 14px; border-bottom:1px solid var(--border);">
                     <div class="filter-field">
                         <label>User Name</label>
                         <input type="text" id="logsSearch" placeholder="Username...">
@@ -117,15 +116,6 @@ if ($connect) {
                         <button class="btn-outline" id="btnClearLogsFilter" style="padding:10px 18px; font-size:0.85rem;"><i class="fa-solid fa-xmark"></i> Clear</button>
                     </div>
                 </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="section-header">
-                        <h2><i class="fa-solid fa-clipboard-list" style="color:var(--accent);"></i> Activity Records</h2>
-                        <span class="count" id="logsTotalCount">(<?php echo count($logs); ?> total)</span>
-                    </div>
-                </div>
                 <div class="table-container">
                     <table class="data-table" id="logsTable">
                         <thead>
@@ -145,6 +135,12 @@ if ($connect) {
                 </div>
                 <div class="pagination-bar" id="logsPaginationContainer">
                 </div>
+            </div>
+
+            <div class="empty-state" id="emptyLogs" style="display:none;">
+                <div class="empty-icon">📋</div>
+                <h3>No system logs</h3>
+                <p>Activity records will appear here once users start logging in.</p>
             </div>
 
         </main>

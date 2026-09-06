@@ -83,14 +83,20 @@
     function renderTable(logs) {
         var tbody = document.getElementById('logsTableBody');
         var emptyEl = document.getElementById('emptyLogs');
+        var tableEl = document.getElementById('logsTable');
+        var paginationEl = document.getElementById('logsPaginationContainer');
         if (!tbody) return;
 
         if (logs.length === 0) {
             tbody.innerHTML = '';
-            if (emptyEl) emptyEl.style.display = 'none';
+            if (tableEl) tableEl.style.display = 'none';
+            if (paginationEl) paginationEl.style.display = '';
+            if (emptyEl) emptyEl.style.display = '';
             renderPagination(0);
             return;
         }
+        if (tableEl) tableEl.style.display = '';
+        if (paginationEl) paginationEl.style.display = '';
         if (emptyEl) emptyEl.style.display = 'none';
 
         var html = '';
