@@ -30,7 +30,7 @@
         var ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12 || 12;
         var mins = d.getMinutes().toString().padStart(2, '0');
-        return month + ' ' + day + ', ' + year + ', ' + hours + ':' + mins + ' ' + ampm;
+        return month + ' ' + day + ', ' + year + '<br><span style="font-size:0.75rem;color:var(--text-muted);">' + hours + ':' + mins + ' ' + ampm + '</span>';
     }
 
     function cleanLogDetails(details) {
@@ -149,10 +149,12 @@
         for (var i = 0; i < logs.length; i++) {
             var log = logs[i];
             var ip = log.ip_address === '::1' ? '127.0.0.1' : (log.ip_address || '—');
-            var timeIn = formatLogTimestamp(log.time_in || log.created_at);
+            var timeIn = log.time_in ? formatLogTimestamp(log.time_in) : '—';
             var timeOut = '—';
-            if (log.action === 'login') {
-                timeOut = log.time_out ? formatLogTimestamp(log.time_out) : '<span style="color:var(--success);font-weight:600;">Active</span>';
+            if (log.time_out === 'active') {
+                timeOut = '<span style="color:var(--success);font-weight:600;">Active</span>';
+            } else if (log.time_out) {
+                timeOut = formatLogTimestamp(log.time_out);
             }
             var browser = (log.browser || 'Unknown').replace(/\s+\S+$/, '').trim();
 
@@ -161,9 +163,7 @@
                 '<td>' + escapeHtml(log.fullName || log.username || '—') + '</td>' +
                 '<td><span class="role-pill ' + getRoleClass(log.role) + '">' + getRoleLabel(log.role) + '</span></td>' +
                 '<td><span class="activity-badge ' + getActionClass(log.action) + '">' + escapeHtml(getActionLabel(log.action)) + '</span></td>' +
-                '<td>' + escapeHtml(log.device || 'Desktop') + '</td>' +
-                '<td>' + escapeHtml(browser) + '</td>' +
-                '<td>' + escapeHtml(log.os || 'Unknown') + '</td>' +
+                '<td>' + escapeHtml(browser + '/' + (log.os || 'Unknown')) + '</td>' +
                 '<td>' + timeIn + '</td>' +
                 '<td>' + timeOut + '</td>' +
                 '<td><code class="ip-badge">' + escapeHtml(ip) + '</code></td>' +

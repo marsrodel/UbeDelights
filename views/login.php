@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 1) Find user by username (case-sensitive) or email
     // Use BINARY for username to enforce case sensitivity. Email remains as-is.
-    $sqlUser = "SELECT user_id, username, email, password_hash, is_active, role, status FROM users WHERE (BINARY username = ? OR email = ?) LIMIT 1";
+    $sqlUser = "SELECT user_id, username, first_name, last_name, email, password_hash, is_active, role, status FROM users WHERE (BINARY username = ? OR email = ?) LIMIT 1";
     $stmtUser = mysqli_prepare($connect, $sqlUser);
     mysqli_stmt_bind_param($stmtUser, 'ss', $login, $login);
     mysqli_stmt_execute($stmtUser);
@@ -60,6 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['auth_username'] = $user['username'];
     $_SESSION['auth_role'] = $user['role'];
     $_SESSION['auth_status'] = $user['status'];
+    $_SESSION['auth_first_name'] = $user['first_name'] ?? '';
+    $_SESSION['auth_last_name'] = $user['last_name'] ?? '';
 
     // Check if user already has security questions set
     // In new schema, questions are stored on users

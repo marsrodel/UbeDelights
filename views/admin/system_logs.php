@@ -30,7 +30,7 @@ if ($connect) {
 
         <div class="sidebar-profile">
             <div class="admin-chip">
-                <div class="admin-avatar">AU</div>
+                <div class="admin-avatar"><?php echo strtoupper(substr($_SESSION['auth_first_name'] ?? 'A', 0, 1) . substr($_SESSION['auth_last_name'] ?? 'U', 0, 1)); ?></div>
                 <div class="admin-chip-info">
                     <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
                     <small>ADMIN</small>
@@ -75,7 +75,6 @@ if ($connect) {
                         <label>Role</label>
                         <select id="logsRoleFilter">
                             <option value="">All Roles</option>
-                            <option value="super_admin">Super Admin</option>
                             <option value="admin">Admin</option>
                             <option value="customer">Customer</option>
                         </select>
@@ -101,9 +100,7 @@ if ($connect) {
                                 <th>Name</th>
                                 <th>Role</th>
                                 <th>Action</th>
-                                <th>Device</th>
-                                <th>Browser</th>
-                                <th>Software</th>
+                                <th>Browser / OS</th>
                                 <th>Time In</th>
                                 <th>Time Out</th>
                                 <th>IP Address</th>

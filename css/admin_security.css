@@ -623,9 +623,10 @@ body.admin-body {
     text-transform: lowercase;
 }
 
+.role-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: capitalize; letter-spacing: 0.03em; }
 .role-super_admin { background: #ede9fe; color: #5a3a80; }
 .role-admin { background: #dbeafe; color: #1d4ed8; }
-.role-customer { background: #dcfce7; color: #15803d; }
+.role-customer { background: #f3f4f6; color: #374151; }
 
 .status-active { background: #dcfce7; color: #15803d; }
 .status-blocked { background: #fee2e2; color: #dc2626; }

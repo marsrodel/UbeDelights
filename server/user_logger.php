@@ -115,33 +115,22 @@ function logs_attach_time_out($db, $rows) {
         $row['time_in'] = $row['created_at'] ?? null;
         $row['time_out'] = null;
 
-        if (($row['action'] ?? '') !== 'login' || empty($row['idNumber']) || empty($row['created_at'])) {
-            continue;
+        if (($row['action'] ?? '') === 'logout' || ($row['action'] ?? '') === 'session_timeout') {
+            $row['time_in'] = null;
+            $row['time_out'] = $row['created_at'] ?? null;
         }
 
-        $nextStmt = mysqli_prepare($db, "SELECT created_at FROM activity_logs WHERE idNumber = ? AND action = 'login' AND created_at > ? ORDER BY created_at ASC LIMIT 1");
-        mysqli_stmt_bind_param($nextStmt, 'ss', $row['idNumber'], $row['created_at']);
-        mysqli_stmt_execute($nextStmt);
-        $nextResult = mysqli_stmt_get_result($nextStmt);
-        $nextLogin = $nextResult ? mysqli_fetch_assoc($nextResult) : null;
-        mysqli_stmt_close($nextStmt);
-
-        if ($nextLogin) {
-            $sql = "SELECT created_at FROM activity_logs WHERE idNumber = ? AND action IN ('logout', 'session_timeout') AND created_at > ? AND created_at < ? ORDER BY created_at ASC LIMIT 1";
-            $stmt = mysqli_prepare($db, $sql);
-            mysqli_stmt_bind_param($stmt, 'sss', $row['idNumber'], $row['created_at'], $nextLogin['created_at']);
-        } else {
-            $sql = "SELECT created_at FROM activity_logs WHERE idNumber = ? AND action IN ('logout', 'session_timeout') AND created_at > ? ORDER BY created_at ASC LIMIT 1";
-            $stmt = mysqli_prepare($db, $sql);
+        if (($row['action'] ?? '') === 'login' && !empty($row['idNumber']) && !empty($row['created_at'])) {
+            $stmt = mysqli_prepare($db, "SELECT 1 FROM activity_logs WHERE idNumber = ? AND action IN ('logout', 'session_timeout') AND created_at > ? LIMIT 1");
             mysqli_stmt_bind_param($stmt, 'ss', $row['idNumber'], $row['created_at']);
-        }
-        mysqli_stmt_execute($stmt);
-        $logoutResult = mysqli_stmt_get_result($stmt);
-        $logout = $logoutResult ? mysqli_fetch_assoc($logoutResult) : null;
-        mysqli_stmt_close($stmt);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            $hasLogout = $result && mysqli_num_rows($result) > 0;
+            mysqli_stmt_close($stmt);
 
-        if ($logout) {
-            $row['time_out'] = $logout['created_at'];
+            if (!$hasLogout) {
+                $row['time_out'] = 'active';
+            }
         }
     }
     unset($row);

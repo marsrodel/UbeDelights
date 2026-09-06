@@ -67,7 +67,7 @@ if ($connect) {
 
         <div class="sidebar-profile">
             <div class="admin-chip">
-                <div class="admin-avatar">AU</div>
+                <div class="admin-avatar"><?php echo strtoupper(substr($_SESSION['auth_first_name'] ?? 'A', 0, 1) . substr($_SESSION['auth_last_name'] ?? 'U', 0, 1)); ?></div>
                 <div class="admin-chip-info">
                     <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
                     <small>ADMIN</small>
