@@ -214,12 +214,11 @@ function approvePendingUser(userId) {
     var user = pendingUsers.find(function(u) { return u.id === userId; });
     if (!user) return;
     document.getElementById('approvalModalTitle').textContent = 'Approve Registration';
-    document.getElementById('approvalMessage').textContent = 'Are you sure you want to approve this registration?';
-    document.getElementById('approvalUserName').textContent = user.fullName;
+    document.getElementById('approvalMessage').textContent = 'Approve this registration? They will be able to log in.';
+    document.getElementById('approvalUserName').querySelector('strong').textContent = user.fullName;
     document.getElementById('approvalUserId').value = userId;
     document.getElementById('approvalAction').value = 'approve';
-    document.getElementById('approvalConfirmBtn').style.background = 'var(--success)';
-    document.getElementById('approvalConfirmBtn').innerHTML = '<i class="fa-solid fa-check"></i> <span>Approve</span>';
+    document.getElementById('approvalConfirmBtn').innerHTML = '<i class="fa-solid fa-check"></i> <span>Yes</span>';
     document.getElementById('approvalModal').classList.add('active');
 }
 
@@ -227,32 +226,72 @@ function rejectPendingUser(userId) {
     var user = pendingUsers.find(function(u) { return u.id === userId; });
     if (!user) return;
     document.getElementById('approvalModalTitle').textContent = 'Reject Registration';
-    document.getElementById('approvalMessage').textContent = 'Are you sure you want to reject and delete this registration request?';
-    document.getElementById('approvalUserName').textContent = user.fullName;
+    document.getElementById('approvalMessage').textContent = 'Reject this registration? They will not be able to log in.';
+    document.getElementById('approvalUserName').querySelector('strong').textContent = user.fullName;
     document.getElementById('approvalUserId').value = userId;
     document.getElementById('approvalAction').value = 'reject';
-    document.getElementById('approvalConfirmBtn').style.background = 'var(--danger)';
-    document.getElementById('approvalConfirmBtn').innerHTML = '<i class="fa-solid fa-xmark"></i> <span>Reject</span>';
+    document.getElementById('approvalConfirmBtn').innerHTML = '<i class="fa-solid fa-xmark"></i> <span>Yes</span>';
     document.getElementById('approvalModal').classList.add('active');
 }
 
 document.getElementById('approvalConfirmBtn').addEventListener('click', function() {
     var userId = document.getElementById('approvalUserId').value;
     var action = document.getElementById('approvalAction').value;
-    var row = document.querySelector('tr[data-user-id="' + userId + '"]');
-    if (row) row.remove();
-    closeApprovalModal();
-    var t = document.getElementById('toast');
-    t.textContent = action === 'approve' ? 'Registration approved!' : 'Registration rejected.';
-    t.className = 'toast show';
-    setTimeout(function() { t.classList.remove('show'); }, 3000);
+    var confirmBtn = document.getElementById('approvalConfirmBtn');
+
+    confirmBtn.disabled = true;
+    confirmBtn.style.opacity = '0.5';
+    confirmBtn.style.cursor = 'not-allowed';
+
+    var fd = new FormData();
+    fd.append('action', action);
+    fd.append('user_id', userId);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../../server/user_management.php', true);
+    xhr.onload = function() {
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '';
+        confirmBtn.style.cursor = '';
+        if (xhr.status === 200) {
+            var res;
+            try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+            if (res.success) {
+                var row = document.querySelector('tr[data-user-id="' + userId + '"]');
+                if (row) row.remove();
+                var idx = pendingUsers.findIndex(function(u) { return u.id === userId; });
+                if (idx !== -1) pendingUsers.splice(idx, 1);
+                closeApprovalModal();
+                var t = document.getElementById('toast');
+                t.textContent = res.message || (action === 'approve' ? 'Registration approved!' : 'Registration rejected.');
+                t.className = 'toast show';
+                setTimeout(function() { t.classList.remove('show'); }, 3000);
+                if (pendingUsers.length === 0) {
+                    var tableSection = document.querySelector('.users-section');
+                    if (tableSection) tableSection.style.display = 'none';
+                    var empty = document.getElementById('emptyPending');
+                    if (empty) empty.style.display = '';
+                }
+            } else {
+                alert(res.message || 'Action failed.');
+            }
+        } else {
+            alert('Server error. Please try again.');
+        }
+    };
+    xhr.onerror = function() {
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '';
+        confirmBtn.style.cursor = '';
+        alert('Network error. Please try again.');
+    };
+    xhr.send(fd);
 });
 
 function closeApprovalModal() {
     document.getElementById('approvalModal').classList.remove('active');
 }
 
-document.getElementById('approvalModalCancel').addEventListener('click', closeApprovalModal);
 document.getElementById('viewPendingModalClose').addEventListener('click', closeViewPendingModal);
 document.getElementById('viewPendingModalCloseBtn').addEventListener('click', closeViewPendingModal);
 

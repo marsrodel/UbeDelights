@@ -2335,11 +2335,41 @@ document.addEventListener('DOMContentLoaded', function() {
     var editEmailTimeoutId = null;
     var editUsernameTimeoutId = null;
 
+    var blockPasswordAttempts = 0;
+    var blockPasswordMaxAttempts = 3;
+    var blockPasswordLocked = false;
+
+    function resetBlockPasswordLockout() {
+        blockPasswordAttempts = 0;
+        blockPasswordLocked = false;
+        var errEl = document.getElementById('blockPasswordError');
+        if (errEl) errEl.textContent = '';
+        var inp = document.getElementById('blockPasswordInput');
+        if (inp) { inp.value = ''; inp.disabled = false; inp.style.cursor = ''; }
+        var btn = document.getElementById('blockPasswordConfirmBtn');
+        if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+    }
+
     function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
     function roleBadge(r) { return '<span class="role-pill role-'+esc(r)+'">'+esc(r==='super_admin'?'Super Admin':r==='admin'?'Admin':'Customer')+'</span>'; }
 
     function statusBadge(s) { return '<span class="status-pill status-'+esc(s)+'">'+esc(s.charAt(0).toUpperCase()+s.slice(1))+'</span>'; }
+
+    var successModalOkCallback = null;
+    function showSuccessModal(message, callback) {
+        document.getElementById('successModalTitle').textContent = 'Success';
+        document.getElementById('successModalMessage').textContent = message;
+        successModalOkCallback = callback || null;
+        document.getElementById('successModal').classList.add('active');
+    }
+    var successOkBtn = document.getElementById('successModalOkBtn');
+    if (successOkBtn) {
+        successOkBtn.addEventListener('click', function() {
+            closeModal('successModal');
+            if (successModalOkCallback) { successModalOkCallback(); successModalOkCallback = null; }
+        });
+    }
 
     function validateEditAddressField(profileId, registerId) {
         var el = document.getElementById(profileId);
@@ -2519,7 +2549,11 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
             }
-            h += '<button class="um-dropdown-item danger" data-action="request-deletion" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Request Deletion</button>';
+            if (user.hasPendingDeletion) {
+                h += '<button class="um-dropdown-item" disabled style="opacity:0.5;cursor:not-allowed;color:var(--text-secondary);"><i class="fa-solid fa-clock"></i> Pending Deletion</button>';
+            } else {
+                h += '<button class="um-dropdown-item danger" data-action="request-deletion" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Request Deletion</button>';
+            }
             h += '</div></div>';
         }
 
@@ -2531,7 +2565,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return users.filter(function(u) {
             if (f.search) {
                 var s = f.search.toLowerCase();
-                if ((u.username||'').toLowerCase().indexOf(s)===-1 && (u.fullName||'').toLowerCase().indexOf(s)===-1 && (u.email||'').toLowerCase().indexOf(s)===-1 && (u.id||'').toLowerCase().indexOf(s)===-1) return false;
+                if ((u.username||'').toLowerCase().indexOf(s)===-1 && (u.fullName||'').toLowerCase().indexOf(s)===-1) return false;
+            }
+            if (f.idFilter) {
+                var idSearch = f.idFilter.toLowerCase();
+                if ((u.id||'').toLowerCase().indexOf(idSearch) === -1) return false;
             }
             if (f.role && u.role !== f.role) return false;
             if (f.status && u.status !== f.status) return false;
@@ -2647,12 +2685,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.addEventListener('DOMContentLoaded', function() {
         var searchInput = document.getElementById('userSearch');
+        var idFilterInput = document.getElementById('idFilter');
         var roleFilter = document.getElementById('roleFilter');
         var statusFilter = document.getElementById('statusFilter');
 
         function updateFilters() {
             state.filters = {
                 search: searchInput ? searchInput.value.trim() : '',
+                idFilter: idFilterInput ? idFilterInput.value.trim() : '',
                 role: roleFilter ? roleFilter.value : '',
                 status: statusFilter ? statusFilter.value : ''
             };
@@ -2662,6 +2702,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (searchInput) {
             searchInput.addEventListener('input', function() { updateFilters(); });
+        }
+        if (idFilterInput) {
+            idFilterInput.addEventListener('input', function() { updateFilters(); });
         }
         if (roleFilter) {
             roleFilter.addEventListener('change', function() { updateFilters(); });
@@ -2741,8 +2784,156 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
                 document.getElementById('resetPasswordUserId').value = userId;
+                document.getElementById('resetPassStrength').textContent = '';
+                document.getElementById('resetRepassMatch').textContent = '';
+                clearErrorMessage('resetNewPassword');
+                clearErrorMessage('resetConfirmPassword');
                 document.getElementById('resetPasswordModal').classList.add('active');
             });
+
+            function getPasswordStrength(p) {
+                var s = (p || '').replace(/\s+/g, '');
+                if (!s) return '';
+                var types = 0;
+                if (/[a-z]/.test(s)) types++;
+                if (/[A-Z]/.test(s)) types++;
+                if (/[0-9]/.test(s)) types++;
+                if (/[^A-Za-z0-9]/.test(s)) types++;
+                if (s.length < 8 || types < 2) return 'Weak';
+                if (s.length >= 12 && types >= 4) return 'Strong';
+                return 'Medium';
+            }
+
+            function hasSpace(str) { return /\s/.test(str || ''); }
+
+            var resetPassEl = document.getElementById('resetNewPassword');
+            var resetRepassEl = document.getElementById('resetConfirmPassword');
+            var resetPassStrengthSpan = document.getElementById('resetPassStrength');
+            var resetRepassMatchSpan = document.getElementById('resetRepassMatch');
+
+            function updateResetPasswordStrength() {
+                if (!resetPassStrengthSpan) return;
+                var val = (resetPassEl && resetPassEl.value) || '';
+                var strength = getPasswordStrength(val);
+                if (!strength) {
+                    resetPassStrengthSpan.textContent = '';
+                    resetPassStrengthSpan.style.color = '';
+                    resetPassStrengthSpan.style.fontSize = '12px';
+                    if (hasSpace(val)) {
+                        showErrorMessage('resetNewPassword', 'Spaces are not allowed in password.');
+                        return;
+                    }
+                    clearErrorMessage('resetNewPassword');
+                    return;
+                }
+                resetPassStrengthSpan.textContent = strength ? (strength + ' Password') : '';
+                resetPassStrengthSpan.style.color = strength === 'Strong' ? '#16a34a' : (strength === 'Medium' ? '#f59e0b' : '#dc2626');
+                resetPassStrengthSpan.style.fontSize = '11px';
+
+                if (hasSpace(val)) {
+                    showErrorMessage('resetNewPassword', 'Spaces are not allowed in password.');
+                    return;
+                }
+                if (val.length < 8) {
+                    showErrorMessage('resetNewPassword', 'Password must be at least 8 characters long.');
+                    return;
+                }
+                if (val.length > 50) {
+                    showErrorMessage('resetNewPassword', 'Password cannot exceed 50 characters.');
+                    return;
+                }
+                if (!/[A-Z]/.test(val)) {
+                    showErrorMessage('resetNewPassword', 'Password must contain at least 1 uppercase letter.');
+                    return;
+                }
+                if (!/[a-z]/.test(val)) {
+                    showErrorMessage('resetNewPassword', 'Password must contain at least 1 lowercase letter.');
+                    return;
+                }
+                if (!/[0-9]/.test(val)) {
+                    showErrorMessage('resetNewPassword', 'Password must contain at least 1 number.');
+                    return;
+                }
+                if (!/[^A-Za-z0-9]/.test(val)) {
+                    showErrorMessage('resetNewPassword', 'Password must contain at least 1 special character.');
+                    return;
+                }
+                clearErrorMessage('resetNewPassword');
+            }
+
+            function updateResetPasswordMatch() {
+                if (!resetRepassMatchSpan) return;
+                var p1 = (resetPassEl && resetPassEl.value) || '';
+                var p2 = (resetRepassEl && resetRepassEl.value) || '';
+                if (!p2) { resetRepassMatchSpan.textContent = ''; resetRepassMatchSpan.style.color = ''; resetRepassMatchSpan.style.fontSize = '11px'; return; }
+                if (p1 === p2) { resetRepassMatchSpan.textContent = 'Password Matched'; resetRepassMatchSpan.style.color = '#16a34a'; resetRepassMatchSpan.style.fontSize = '10px'; }
+                else { resetRepassMatchSpan.textContent = 'Password does not match'; resetRepassMatchSpan.style.color = '#dc2626'; resetRepassMatchSpan.style.fontSize = '10px'; }
+            }
+
+            if (resetPassEl) {
+                resetPassEl.addEventListener('input', function() {
+                    updateResetPasswordStrength();
+                    updateResetPasswordMatch();
+                });
+            }
+            if (resetRepassEl) {
+                resetRepassEl.addEventListener('input', function() {
+                    updateResetPasswordMatch();
+                });
+            }
+
+            var resetPasswordConfirmBtn = document.getElementById('resetPasswordConfirmBtn');
+            if (resetPasswordConfirmBtn) {
+                resetPasswordConfirmBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    var resetRequiredOrder = ['resetNewPassword', 'resetConfirmPassword'];
+                    var firstEmpty = null;
+                    var anyEmpty = false;
+                    for (var i = 0; i < resetRequiredOrder.length; i++) {
+                        var fid = resetRequiredOrder[i];
+                        var f = document.getElementById(fid);
+                        if (!f) continue;
+                        var v = (f.value || '').trim();
+                        if (v === '') {
+                            anyEmpty = true;
+                            if (!firstEmpty) firstEmpty = f;
+                            showErrorMessage(fid, 'This field is required');
+                        }
+                    }
+                    if (anyEmpty) {
+                        return;
+                    }
+
+                    updateResetPasswordStrength();
+                    updateResetPasswordMatch();
+
+                    var hasPasswordError = document.getElementById('resetNewPassword-error');
+                    var hasMatchError = resetRepassMatchSpan && /does not match/.test(resetRepassMatchSpan.textContent || '');
+                    if (hasPasswordError || hasMatchError) {
+                        return;
+                    }
+
+                    showSuccessModal('Password reset successfully.', function() {
+                        closeModal('resetPasswordModal');
+                    });
+                });
+            }
+
+            var resetPasswordModal = document.getElementById('resetPasswordModal');
+            if (resetPasswordModal) {
+                var resetObserver = new MutationObserver(function() {
+                    if (!resetPasswordModal.classList.contains('active')) {
+                        if (resetPassEl) resetPassEl.value = '';
+                        if (resetRepassEl) resetRepassEl.value = '';
+                        if (resetPassStrengthSpan) { resetPassStrengthSpan.textContent = ''; resetPassStrengthSpan.style.color = ''; }
+                        if (resetRepassMatchSpan) { resetRepassMatchSpan.textContent = ''; resetRepassMatchSpan.style.color = ''; }
+                        clearErrorMessage('resetNewPassword');
+                        clearErrorMessage('resetConfirmPassword');
+                    }
+                });
+                resetObserver.observe(resetPasswordModal, { attributes: true, attributeFilter: ['class'] });
+            }
 
             usersTableBody.addEventListener('click', function(e) {
                 var item = e.target.closest('[data-action="request-deletion"]');
@@ -2750,8 +2941,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
                 document.getElementById('deletionUserId').value = userId;
+                document.getElementById('deletionReason').value = '';
+                document.getElementById('deletionError').textContent = '';
                 document.getElementById('requestDeletionModal').classList.add('active');
             });
+
+            var deletionReasonEl = document.getElementById('deletionReason');
+            if (deletionReasonEl) {
+                deletionReasonEl.addEventListener('input', function() {
+                    document.getElementById('deletionError').textContent = '';
+                });
+            }
+
+            var deletionConfirmBtn = document.getElementById('deletionConfirmBtn');
+            if (deletionConfirmBtn) {
+                deletionConfirmBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    var reason = (document.getElementById('deletionReason').value || '').trim();
+                    if (!reason) {
+                        document.getElementById('deletionError').textContent = 'A reason is required.';
+                        return;
+                    }
+
+                    pendingDeletionUserId = document.getElementById('deletionUserId').value;
+                    pendingDeletionReason = reason;
+                    closeModal('requestDeletionModal');
+                    document.getElementById('blockPasswordUserId').value = pendingDeletionUserId;
+                    document.getElementById('blockPasswordAction').value = 'delete-request';
+                    document.getElementById('blockPasswordTitle').textContent = 'Enter your password to request deletion.';
+                    resetBlockPasswordLockout();
+                    document.getElementById('blockPasswordModal').classList.add('active');
+                });
+            }
+
+            var pendingDeletionUserId = '';
+            var pendingDeletionReason = '';
+
+            var requestDeletionModal = document.getElementById('requestDeletionModal');
+            if (requestDeletionModal) {
+                var deletionObserver = new MutationObserver(function() {
+                    if (!requestDeletionModal.classList.contains('active')) {
+                        document.getElementById('deletionReason').value = '';
+                        document.getElementById('deletionError').textContent = '';
+                        pendingDeletionUserId = '';
+                        pendingDeletionReason = '';
+                    }
+                });
+                deletionObserver.observe(requestDeletionModal, { attributes: true, attributeFilter: ['class'] });
+            }
 
             usersTableBody.addEventListener('click', function(e) {
                 var item = e.target.closest('[data-action="edit"]');
@@ -2820,8 +3058,200 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('blockPasswordTitle').textContent = action === 'block'
                     ? 'Enter your password to block this user.'
                     : 'Enter your password to unblock this user.';
+                resetBlockPasswordLockout();
                 document.getElementById('blockPasswordModal').classList.add('active');
             });
+
+            var blockPasswordConfirmBtn = document.getElementById('blockPasswordConfirmBtn');
+            var blockPasswordInput = document.getElementById('blockPasswordInput');
+            var blockPasswordError = document.getElementById('blockPasswordError');
+
+            if (blockPasswordConfirmBtn) {
+                blockPasswordConfirmBtn.addEventListener('click', function() {
+                    if (blockPasswordLocked) {
+                        blockPasswordError.textContent = 'Too many failed attempts. Action is locked.';
+                        return;
+                    }
+
+                    var pwd = blockPasswordInput.value.trim();
+                    if (!pwd) {
+                        blockPasswordError.textContent = 'Password is required.';
+                        return;
+                    }
+
+                    blockPasswordConfirmBtn.disabled = true;
+                    blockPasswordConfirmBtn.style.opacity = '0.5';
+                    blockPasswordConfirmBtn.style.cursor = 'not-allowed';
+
+                    var fd = new FormData();
+                    fd.append('password', pwd);
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '../../server/verify_admin_password.php', true);
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            var res;
+                            try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+
+                            if (res.success) {
+                                var action = document.getElementById('blockPasswordAction').value;
+                                var targetUserId = document.getElementById('blockPasswordUserId').value;
+                                closeModal('blockPasswordModal');
+
+                                if (action === 'edit') {
+                                    submitEditUser(targetUserId);
+                                } else if (action === 'block' || action === 'unblock') {
+                                    submitBlockUnblock(targetUserId, action);
+                                } else if (action === 'delete-request') {
+                                    submitDeletionRequest(targetUserId);
+                                }
+                            } else {
+                                blockPasswordAttempts++;
+                                if (blockPasswordAttempts >= blockPasswordMaxAttempts) {
+                                    blockPasswordLocked = true;
+                                    blockPasswordError.textContent = 'Too many failed attempts. Action is locked.';
+                                    blockPasswordInput.disabled = true;
+                                    blockPasswordInput.style.cursor = 'not-allowed';
+                                } else {
+                                    blockPasswordError.textContent = 'Incorrect Password. Attempt ' + blockPasswordAttempts + ' of ' + blockPasswordMaxAttempts + '.';
+                                    blockPasswordInput.value = '';
+                                    blockPasswordInput.focus();
+                                }
+                                blockPasswordConfirmBtn.disabled = false;
+                                blockPasswordConfirmBtn.style.opacity = '';
+                                blockPasswordConfirmBtn.style.cursor = '';
+                            }
+                        } else {
+                            blockPasswordError.textContent = 'Server error. Please try again.';
+                            blockPasswordConfirmBtn.disabled = false;
+                            blockPasswordConfirmBtn.style.opacity = '';
+                            blockPasswordConfirmBtn.style.cursor = '';
+                        }
+                    };
+                    xhr.onerror = function() {
+                        blockPasswordError.textContent = 'Network error. Please try again.';
+                        blockPasswordConfirmBtn.disabled = false;
+                        blockPasswordConfirmBtn.style.opacity = '';
+                        blockPasswordConfirmBtn.style.cursor = '';
+                    };
+                    xhr.send(fd);
+                });
+            }
+
+            function submitEditUser(targetUserId) {
+                var allData = typeof allUsers !== 'undefined' ? allUsers : [];
+                var user = allData.find(function(u) { return u.id === targetUserId; });
+                var userRole = user ? user.role : 'customer';
+
+                var fd = new FormData();
+                fd.append('action', 'update_user');
+                fd.append('user_id', targetUserId);
+                fd.append('username', document.getElementById('editUsername').value.trim());
+                fd.append('firstName', document.getElementById('editFirstName').value.trim());
+                fd.append('middleName', document.getElementById('editMiddleName').value.trim());
+                fd.append('lastName', document.getElementById('editLastName').value.trim());
+                fd.append('extension', document.getElementById('editExtensionName').value.trim());
+                fd.append('birthday', document.getElementById('editDob').value);
+                fd.append('sex', document.getElementById('editSex').value);
+                fd.append('email', document.getElementById('editEmail').value.trim());
+                fd.append('role', userRole);
+                fd.append('purok', document.getElementById('editStreet').value.trim());
+                fd.append('barangay', document.getElementById('editBarangay').value.trim());
+                fd.append('municipality', document.getElementById('editCity').value.trim());
+                fd.append('province', document.getElementById('editProvince').value.trim());
+                fd.append('country', document.getElementById('editCountry').value.trim());
+                fd.append('zipCode', document.getElementById('editZipcode').value.trim());
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../server/user_management.php', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var res;
+                        try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+                        if (res.success) {
+                            showSuccessModal('User updated successfully', function() { location.reload(); });
+                        } else {
+                            alert(res.message || 'Failed to update user.');
+                        }
+                    } else {
+                        alert('Server error. Please try again.');
+                    }
+                };
+                xhr.onerror = function() { alert('Network error. Please try again.'); };
+                xhr.send(fd);
+            }
+
+            function submitBlockUnblock(targetUserId, action) {
+                var fd = new FormData();
+                fd.append('action', action === 'block' ? 'block' : 'unblock');
+                fd.append('user_id', targetUserId);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../server/user_management.php', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var res;
+                        try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+                        if (res.success) {
+                            var msg = action === 'block' ? 'User blocked successfully.' : 'User unblocked successfully.';
+                            showSuccessModal(msg, function() { location.reload(); });
+                        } else {
+                            alert(res.message || 'Action not available yet.');
+                        }
+                    } else {
+                        alert('Server error. Please try again.');
+                    }
+                };
+                xhr.onerror = function() { alert('Network error. Please try again.'); };
+                xhr.send(fd);
+            }
+
+            function submitDeletionRequest(targetUserId) {
+                var fd = new FormData();
+                fd.append('user_id', targetUserId);
+                fd.append('reason', pendingDeletionReason);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../server/request_deletion.php', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var res;
+                        try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+                        if (res.success) {
+                            showSuccessModal(res.message || 'Deletion request submitted.', function() {
+                                closeModal('requestDeletionModal');
+                                location.reload();
+                            });
+                        } else {
+                            blockPasswordError.textContent = res.message || 'Request failed.';
+                            blockPasswordConfirmBtn.disabled = false;
+                            blockPasswordConfirmBtn.style.opacity = '';
+                            blockPasswordConfirmBtn.style.cursor = '';
+                        }
+                    } else {
+                        blockPasswordError.textContent = 'Server error. Please try again.';
+                        blockPasswordConfirmBtn.disabled = false;
+                        blockPasswordConfirmBtn.style.opacity = '';
+                        blockPasswordConfirmBtn.style.cursor = '';
+                    }
+                };
+                xhr.onerror = function() {
+                    blockPasswordError.textContent = 'Network error. Please try again.';
+                    blockPasswordConfirmBtn.disabled = false;
+                    blockPasswordConfirmBtn.style.opacity = '';
+                    blockPasswordConfirmBtn.style.cursor = '';
+                };
+                xhr.send(fd);
+            }
+
+            if (blockPasswordInput) {
+                blockPasswordInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        blockPasswordConfirmBtn.click();
+                    }
+                });
+            }
 
             usersTableBody.addEventListener('click', function(e) {
                 var btn = e.target.closest('.btn-more');
@@ -2829,8 +3259,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     e.stopPropagation();
                     var wrap = btn.closest('.um-dropdown-wrap');
                     var wasOpen = wrap.classList.contains('open');
-                    document.querySelectorAll('.um-dropdown-wrap.open').forEach(function(el) { el.classList.remove('open'); });
-                    if (!wasOpen) wrap.classList.add('open');
+                    document.querySelectorAll('.um-dropdown-wrap.open').forEach(function(el) {
+                        el.classList.remove('open');
+                        el.classList.remove('flipped');
+                    });
+                    if (!wasOpen) {
+                        wrap.classList.add('open');
+                        var dropdown = wrap.querySelector('.um-dropdown');
+                        if (dropdown) {
+                            var rect = dropdown.getBoundingClientRect();
+                            if (rect.bottom > window.innerHeight) {
+                                wrap.classList.add('flipped');
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -2900,10 +3342,108 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!editModal.classList.contains('active')) clearEditErrors();
             });
             editObserver.observe(editModal, { attributes: true, attributeFilter: ['class'] });
+
+            function clearAllEditRequiredErrors() {
+                var errs = editModal.querySelectorAll('[id$="-error"]');
+                for (var i = 0; i < errs.length; i++) {
+                    if (/this field is required/i.test(errs[i].textContent || '')) {
+                        errs[i].parentNode && errs[i].parentNode.removeChild(errs[i]);
+                    }
+                }
+            }
+            editModal.addEventListener('focusin', function() {
+                clearAllEditRequiredErrors();
+            }, true);
+            editModal.addEventListener('input', function() {
+                clearAllEditRequiredErrors();
+            }, true);
+            editModal.addEventListener('change', function() {
+                clearAllEditRequiredErrors();
+            }, true);
+        }
+
+        var editUserSaveBtn = document.getElementById('editUserSave');
+        if (editUserSaveBtn) {
+            editUserSaveBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                var prevRequired = document.getElementById('editUserModal').querySelectorAll('[id$="-error"]');
+                for (var ci2 = 0; ci2 < prevRequired.length; ci2++) {
+                    var errEl = prevRequired[ci2];
+                    var fidFromErr = errEl.id.replace('-error', '');
+                    var fld = document.getElementById(fidFromErr);
+                    var emptyNow = false;
+                    if (fld) {
+                        var vv = (fld.value || '').trim();
+                        if (fld.tagName === 'SELECT') vv = fld.value;
+                        emptyNow = (vv === '');
+                    }
+                    if (errEl && (emptyNow || /required/i.test(errEl.textContent || ''))) {
+                        errEl.parentNode && errEl.parentNode.removeChild(errEl);
+                    }
+                }
+
+                var editRequiredOrder = ['editFirstName', 'editLastName', 'editDob', 'editStreet', 'editBarangay', 'editCity', 'editProvince', 'editCountry', 'editZipcode', 'editEmail', 'editUsername'];
+                var firstEmpty = null;
+                var anyEmpty = false;
+                for (var i = 0; i < editRequiredOrder.length; i++) {
+                    var fid2 = editRequiredOrder[i];
+                    var f = document.getElementById(fid2);
+                    if (!f) continue;
+                    var v2 = (f.value || '').trim();
+                    if (f.tagName === 'SELECT') v2 = f.value;
+                    if (v2 === '') {
+                        anyEmpty = true;
+                        if (!firstEmpty) firstEmpty = f;
+                        showErrorMessage(fid2, 'This field is required');
+                    }
+                }
+                if (anyEmpty) {
+                    return;
+                }
+
+                var valid = true;
+                var firstError = null;
+
+                function check(fieldId, fn) {
+                    if (!fn()) {
+                        if (valid) { valid = false; firstError = document.getElementById(fieldId); }
+                    }
+                }
+
+                check('editFirstName', function() { return validateName('editFirstName'); });
+                check('editMiddleName', function() { return validateName('editMiddleName'); });
+                check('editLastName', function() { return validateName('editLastName'); });
+                check('editExtensionName', function() { return validateName('editExtensionName'); });
+                check('editEmail', function() { return validateEmail('editEmail'); });
+                check('editUsername', function() { return validateEditUsername(); });
+                check('editStreet', function() { return validateEditAddressField('editStreet', 'street'); });
+                check('editBarangay', function() { return validateEditAddressField('editBarangay', 'brgy'); });
+                check('editCity', function() { return validateEditAddressField('editCity', 'city'); });
+                check('editProvince', function() { return validateEditAddressField('editProvince', 'province'); });
+                check('editCountry', function() { return validateEditAddressField('editCountry', 'country'); });
+                check('editZipcode', function() { return validateZip4('editZipcode'); });
+
+                if (!valid) {
+                    if (firstError) firstError.focus();
+                    return;
+                }
+
+                var userId = document.getElementById('editUserId').value;
+                closeModal('editUserModal');
+                document.getElementById('blockPasswordUserId').value = userId;
+                document.getElementById('blockPasswordAction').value = 'edit';
+                document.getElementById('blockPasswordTitle').textContent = 'Enter your password to save changes.';
+                resetBlockPasswordLockout();
+                document.getElementById('blockPasswordModal').classList.add('active');
+            });
         }
 
         document.addEventListener('click', function() {
-            document.querySelectorAll('.um-dropdown-wrap.open').forEach(function(el) { el.classList.remove('open'); });
+            document.querySelectorAll('.um-dropdown-wrap.open').forEach(function(el) {
+                el.classList.remove('open');
+                el.classList.remove('flipped');
+            });
         });
     });
 })();

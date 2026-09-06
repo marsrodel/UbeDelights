@@ -147,11 +147,6 @@ if ($connect) {
                 </div>
             </div>
 
-            <div class="empty-state" id="emptyLogs" style="display:none;">
-                <div class="empty-icon">📋</div>
-                <h3>No logs found</h3>
-                <p>No logs match your current filters.</p>
-            </div>
         </main>
     </div>
 

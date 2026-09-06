@@ -612,6 +612,9 @@ body.admin-body {
 .status-blocked { background: #fee2e2; color: #dc2626; }
 .status-pending { background: #fef3c7; color: #b45309; }
 .status-incomplete { background: #fef3c7; color: #b45309; }
+.status-active { background: #dcfce7; color: #15803d; }
+.status-blocked { background: #fee2e2; color: #dc2626; }
+.status-rejected { background: #fce4ec; color: #c62828; }
 .status-delivered { background: #dcfce7; color: #15803d; }
 .status-cancelled { background: #fee2e2; color: #dc2626; }
 .status-confirmed { background: #dbeafe; color: #1d4ed8; }
@@ -1029,6 +1032,9 @@ body.admin-body {
     border-top: 1px solid var(--border-light);
     flex-wrap: wrap;
 }
+
+.inline-error { color: #FF0000; font-size: .82rem; margin-top: 2px; }
+.inline-error:empty { display: none; }
 
 /* ==========================================
    INFO ITEMS & PENDING APPROVAL BUTTONS

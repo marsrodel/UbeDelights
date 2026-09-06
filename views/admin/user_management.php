@@ -4,7 +4,8 @@ $users = [];
 if ($connect) {
     $sql = "SELECT user_id, username, first_name, middle_name, last_name, extension_name,
                    email, role, status, date_of_birth, age, sex,
-                   street, barangay, city_municipality, province, country, zip_code
+                   street, barangay, city_municipality, province, country, zip_code,
+                   (SELECT COUNT(*) FROM deletion_requests dr WHERE dr.target_id_number = users.user_id AND dr.status = 'pending') AS has_pending_deletion
             FROM users WHERE status != 'pending'
             ORDER BY FIELD(role, 'super_admin', 'admin', 'customer'), user_id";
     $result = mysqli_query($connect, $sql);
@@ -36,6 +37,7 @@ if ($connect) {
                 'province' => $row['province'],
                 'country'  => $row['country'],
                 'zipCode'  => $row['zip_code'],
+                'hasPendingDeletion' => (int)$row['has_pending_deletion'] === 1,
             ];
         }
     }
@@ -114,9 +116,12 @@ if ($connect) {
                     <div class="card-header-right">
                         <div class="search-input-wrap">
                             <i class="fa-solid fa-search"></i>
-                            <input type="text" id="userSearch" placeholder="Search users...">
+                            <input type="text" id="userSearch" placeholder="Search by name or username...">
                         </div>
-                        <button class="btn-primary" id="btnSearchUsers" style="padding:10px 18px; font-size:0.85rem;">Search</button>
+                        <div class="search-input-wrap">
+                            <i class="fa-solid fa-hashtag"></i>
+                            <input type="text" id="idFilter" placeholder="Filter by ID Number...">
+                        </div>
                         <select class="filter-select" id="roleFilter">
                             <option value="">All Roles</option>
                             <option value="super_admin">Super Admin</option>
@@ -313,6 +318,7 @@ if ($connect) {
                     <label>Password</label>
                     <input type="password" id="blockPasswordInput" placeholder="Enter password">
                 </div>
+                <p id="blockPasswordError" class="inline-error"></p>
                 <input type="hidden" id="blockPasswordUserId">
                 <input type="hidden" id="blockPasswordAction">
             </form>
@@ -333,11 +339,11 @@ if ($connect) {
             <form class="modal-form">
                 <p style="color:var(--text-secondary); font-size:0.82rem;">Set a new password for this user. They will use it the next time they log in.</p>
                 <div class="form-group">
-                    <label>New password</label>
+                    <label>New password <span id="resetPassStrength" class="field-hint"></span></label>
                     <input type="password" id="resetNewPassword" placeholder="Enter new password">
                 </div>
                 <div class="form-group">
-                    <label>Confirm password</label>
+                    <label>Confirm password <span id="resetRepassMatch" class="field-hint"></span></label>
                     <input type="password" id="resetConfirmPassword" placeholder="Confirm new password">
                 </div>
                 <input type="hidden" id="resetPasswordUserId">
@@ -362,6 +368,7 @@ if ($connect) {
                     <label>Reason <span class="required">*</span></label>
                     <textarea id="deletionReason" placeholder="Explain why this account should be deleted" rows="4"></textarea>
                 </div>
+                <p id="deletionError" class="inline-error"></p>
                 <input type="hidden" id="deletionUserId">
             </form>
             <div class="modal-footer">
@@ -495,6 +502,21 @@ if ($connect) {
                         <button type="button" class="add-btn" id="addUserSubmitBtn">Add User</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header" style="border-bottom:none;">
+                <h2 id="successModalTitle">Success</h2>
+            </div>
+            <div class="modal-body" style="padding: 0 24px;">
+                <p id="successModalMessage" style="color:var(--text-secondary); font-size:0.9rem;"></p>
+            </div>
+            <div class="modal-footer" style="border-top:none; justify-content:flex-end;">
+                <button class="btn-primary" id="successModalOkBtn">OK</button>
             </div>
         </div>
     </div>

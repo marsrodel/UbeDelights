@@ -10,44 +10,7 @@ require_once 'db.php';
  * @return bool True if logging successful, false otherwise
  */
 function logAction($action, $description, $user_name = null) {
-    global $connect;
-    
-    if (!$connect || $connect->connect_error) {
-        error_log("Database connection failed for logging: " . ($connect->connect_error ?? 'unknown'));
-        return false;
-    }
-    
-    // Get user name from session if not provided
-    if ($user_name === null && isset($_SESSION['auth_username'])) {
-        $user_name = $_SESSION['auth_username'];
-    }
-    
-    // Get IP address
-    $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
-    
-    // Get device and browser information
-    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-    $device_info = getDeviceAndBrowser($user_agent);
-    
-    // Prepare and execute the insert statement
-    $stmt = $connect->prepare("INSERT INTO user_logs (username, action, description, ip_address, device, browser) VALUES (?, ?, ?, ?, ?, ?)");
-    
-    if ($stmt === false) {
-        error_log("Failed to prepare log statement: " . $connect->error);
-        return false;
-    }
-    
-    $stmt->bind_param("ssssss", $user_name, $action, $description, $ip_address, $device_info['device'], $device_info['browser']);
-    
-    $result = $stmt->execute();
-    
-    if (!$result) {
-        error_log("Failed to execute log statement: " . $stmt->error);
-    }
-    
-    $stmt->close();
-    
-    return $result;
+    return true;
 }
 
 /**

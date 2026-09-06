@@ -111,15 +111,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <main class="main-content">
-        <div class="intro-section">
-            <h2>Welcome to<br><span>Ube Delights</span></h2>
-            <p>Indulge in the rich, vibrant flavors of our signature ube cakes made with authentic purple yam from the Philippines.</p>
-            <ul class="intro-points">
-                <li><i class="fa-solid fa-star"></i> Freshly baked daily with authentic ube</li>
-                <li><i class="fa-solid fa-truck-fast"></i> Free delivery on orders above ₱500</li>
-                <li><i class="fa-solid fa-gift"></i> Custom cake orders accepted</li>
-            </ul>
-        </div>
         <div class="login-form">
             <div class="login-container">
                 <form action="" method="POST" novalidate>
@@ -143,6 +134,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p class="below">Don't have an account? <a onclick="getRegister()">Register</a></p>
                 </form>
             </div>
+        </div>
+        <div class="intro-section">
+            <h2>Welcome to<br><span>Ube Delights</span></h2>
+            <p>Indulge in the rich, vibrant flavors of our signature ube cakes made with authentic purple yam from the Philippines.</p>
         </div>
     </main>
 

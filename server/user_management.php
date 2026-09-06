@@ -305,6 +305,104 @@ try {
             }
             break;
 
+        case 'block':
+            $stmt = $connect->prepare("SELECT username, role, status FROM users WHERE user_id = ?");
+            $stmt->bind_param("s", $userId);
+            $stmt->execute();
+            $target_user = $stmt->get_result()->fetch_assoc();
+
+            if (!$target_user) {
+                throw new Exception('User not found');
+            }
+            if ($currentRole === 'admin' && $target_user['role'] === 'super_admin') {
+                throw new Exception('Admins cannot block Super Admin accounts');
+            }
+            if ($target_user['status'] === 'blocked') {
+                throw new Exception('User is already blocked');
+            }
+
+            $stmt = $connect->prepare("UPDATE users SET status = 'blocked', is_active = 0 WHERE user_id = ?");
+            $stmt->bind_param("s", $userId);
+            if ($stmt->execute()) {
+                logAction('BLOCK_USER', "User {$_SESSION['auth_username']} blocked user {$target_user['username']}");
+                $response = ['success' => true, 'message' => 'User blocked successfully'];
+            } else {
+                throw new Exception('Failed to block user');
+            }
+            break;
+
+        case 'unblock':
+            $stmt = $connect->prepare("SELECT username, role, status FROM users WHERE user_id = ?");
+            $stmt->bind_param("s", $userId);
+            $stmt->execute();
+            $target_user = $stmt->get_result()->fetch_assoc();
+
+            if (!$target_user) {
+                throw new Exception('User not found');
+            }
+            if ($currentRole === 'admin' && $target_user['role'] === 'super_admin') {
+                throw new Exception('Admins cannot unblock Super Admin accounts');
+            }
+            if ($target_user['status'] !== 'blocked') {
+                throw new Exception('User is not blocked');
+            }
+
+            $stmt = $connect->prepare("UPDATE users SET status = 'active', is_active = 1 WHERE user_id = ?");
+            $stmt->bind_param("s", $userId);
+            if ($stmt->execute()) {
+                logAction('UNBLOCK_USER', "User {$_SESSION['auth_username']} unblocked user {$target_user['username']}");
+                $response = ['success' => true, 'message' => 'User unblocked successfully'];
+            } else {
+                throw new Exception('Failed to unblock user');
+            }
+            break;
+
+        case 'approve':
+            $stmt = $connect->prepare("SELECT username, status FROM users WHERE user_id = ?");
+            $stmt->bind_param("s", $userId);
+            $stmt->execute();
+            $target_user = $stmt->get_result()->fetch_assoc();
+
+            if (!$target_user) {
+                throw new Exception('User not found');
+            }
+            if ($target_user['status'] !== 'pending') {
+                throw new Exception('User is not pending approval');
+            }
+
+            $stmt = $connect->prepare("UPDATE users SET status = 'active', is_active = 1 WHERE user_id = ?");
+            $stmt->bind_param("s", $userId);
+            if ($stmt->execute()) {
+                logAction('APPROVE_USER', "User {$_SESSION['auth_username']} approved user {$target_user['username']}");
+                $response = ['success' => true, 'message' => 'Registration approved successfully'];
+            } else {
+                throw new Exception('Failed to approve user');
+            }
+            break;
+
+        case 'reject':
+            $stmt = $connect->prepare("SELECT username, status FROM users WHERE user_id = ?");
+            $stmt->bind_param("s", $userId);
+            $stmt->execute();
+            $target_user = $stmt->get_result()->fetch_assoc();
+
+            if (!$target_user) {
+                throw new Exception('User not found');
+            }
+            if ($target_user['status'] !== 'pending') {
+                throw new Exception('User is not pending approval');
+            }
+
+            $stmt = $connect->prepare("UPDATE users SET status = 'rejected', is_active = 0 WHERE user_id = ?");
+            $stmt->bind_param("s", $userId);
+            if ($stmt->execute()) {
+                logAction('REJECT_USER', "User {$_SESSION['auth_username']} rejected user {$target_user['username']}");
+                $response = ['success' => true, 'message' => 'Registration rejected'];
+            } else {
+                throw new Exception('Failed to reject user');
+            }
+            break;
+
         case 'delete_user':
             // Only super_admin can delete
             if ($currentRole !== 'super_admin') {

@@ -167,21 +167,21 @@ if ($connect) {
     </div>
 
     <!-- Approve/Reject Confirmation Modal -->
-    <div class="modal-overlay" id="approvalModal" role="dialog" aria-modal="true" aria-labelledby="approvalModalTitle">
-        <div class="modal" style="max-width: 500px;">
-            <div class="modal-header">
+    <div class="modal-overlay" id="approvalModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header" style="border-bottom:none;">
                 <h2 id="approvalModalTitle">Approve Registration</h2>
-                <button class="modal-close" id="approvalModalClose" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
+                <button class="modal-close" onclick="closeApprovalModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="modal-body">
-                <p id="approvalMessage">Are you sure you want to approve this registration?</p>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 8px;">User: <strong id="approvalUserName"></strong></p>
+            <div class="modal-body" style="padding:0 24px 24px;">
+                <p id="approvalMessage" style="color:var(--text-secondary); font-size:0.95rem;">Are you sure you want to approve this registration?</p>
+                <p id="approvalUserName" style="color:var(--text-secondary); font-size:0.95rem; margin-top:8px;">User: <strong></strong></p>
                 <input type="hidden" id="approvalUserId">
                 <input type="hidden" id="approvalAction">
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-outline" id="approvalModalCancel">Cancel</button>
-                <button type="button" class="btn-primary" id="approvalConfirmBtn"><i class="fa-solid fa-check"></i> <span id="approvalConfirmText">Approve</span></button>
+            <div class="modal-footer" style="border-top:none;">
+                <button class="btn-outline" onclick="closeApprovalModal()">Cancel</button>
+                <button class="btn-primary" id="approvalConfirmBtn"><i class="fa-solid fa-check"></i> <span id="approvalConfirmText">Yes</span></button>
             </div>
         </div>
     </div>

@@ -86,8 +86,9 @@
         if (!tbody) return;
 
         if (logs.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:var(--text-muted);">No logs found</td></tr>';
-            if (emptyEl) emptyEl.style.display = '';
+            tbody.innerHTML = '';
+            if (emptyEl) emptyEl.style.display = 'none';
+            renderPagination(0);
             return;
         }
         if (emptyEl) emptyEl.style.display = 'none';
