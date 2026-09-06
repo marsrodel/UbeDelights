@@ -211,15 +211,23 @@ if ($connect) {
                         <div class="form-grid cols-3">
                             <div class="form-field">
                                 <label for="profileCurrentPassword">Current Password</label>
-                                <input type="password" id="profileCurrentPassword" name="current_password" autocomplete="current-password">
+                                <div class="password-wrapper">
+                                    <input type="password" id="profileCurrentPassword" name="current_password" autocomplete="current-password">
+                                    <i class="fa-solid fa-eye-slash" id="eyeicon-current"></i>
+                                </div>
                             </div>
                             <div class="form-field">
-                                <label for="profileNewPassword">New Password</label>
-                                <input type="password" id="profileNewPassword" name="new_password" autocomplete="new-password">
+                                <label for="profileNewPassword">New Password <span id="profilePassStrength" class="field-hint"></span></label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="profileNewPassword" name="new_password" autocomplete="new-password">
+                                    <i class="fa-solid fa-eye-slash" id="eyeicon-new"></i>
+                                </div>
                             </div>
                             <div class="form-field">
-                                <label for="profileConfirmPassword">Confirm Password</label>
-                                <input type="password" id="profileConfirmPassword" name="confirm_password" autocomplete="new-password">
+                                <label for="profileConfirmPassword">Confirm Password <span id="profileRepassMatch" class="field-hint"></span></label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="profileConfirmPassword" name="confirm_password" autocomplete="new-password">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -234,6 +242,21 @@ if ($connect) {
     </div>
 
     <div class="profile-toast" id="profileToast"></div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header" style="border-bottom:none;">
+                <h2>Success</h2>
+            </div>
+            <div class="modal-body" style="padding: 0 24px;">
+                <p id="successModalMessage" style="color:var(--text-secondary); font-size:0.9rem;"></p>
+            </div>
+            <div class="modal-footer" style="border-top:none; justify-content:flex-end;">
+                <button class="btn-primary" id="successModalOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
 
     <script>var adminProfile = <?php echo json_encode($profile); ?>;</script>
     <script src="../../javascript/admin-routing.js?v=2.0"></script>

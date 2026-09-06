@@ -167,6 +167,35 @@
     margin: 0 0 6px 0;
 }
 
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 45px;
+}
+
+.password-wrapper input::-ms-reveal {
+    display: none;
+}
+
+.password-wrapper i {
+    position: absolute;
+    right: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    color: #6B7280;
+    transition: color 0.3s ease;
+    pointer-events: auto;
+}
+
+.password-wrapper i.fa-eye {
+    color: #667eea;
+}
+
 /* ==========================================
    ACTION BUTTONS
    ========================================== */

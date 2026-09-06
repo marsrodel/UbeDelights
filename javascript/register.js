@@ -84,7 +84,7 @@ function showErrorMessage(fieldId, message) {
     
     var parentBox = fieldInput.parentNode; // usually .form-box or .password-wrapper
     // Place password errors just after the wrapper to keep them below the field in the same column
-    if ((fieldId === 'pass' || fieldId === 'repass') && parentBox && parentBox.classList && parentBox.classList.contains('password-wrapper')) {
+    if (parentBox && parentBox.classList && parentBox.classList.contains('password-wrapper')) {
         var col = parentBox.parentNode; // column container
         if (col && col.insertBefore) {
             col.insertBefore(errorDiv, parentBox.nextSibling);

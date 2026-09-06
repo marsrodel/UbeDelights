@@ -83,6 +83,10 @@
         clearErrorMessage('profileCurrentPassword');
         clearErrorMessage('profileNewPassword');
         clearErrorMessage('profileConfirmPassword');
+        var strengthSpan = document.getElementById('profilePassStrength');
+        var matchSpan = document.getElementById('profileRepassMatch');
+        if (strengthSpan) { strengthSpan.textContent = ''; strengthSpan.style.color = ''; }
+        if (matchSpan) { matchSpan.textContent = ''; matchSpan.style.color = ''; }
     }
 
     function validateAddressField(profileId, registerId) {
@@ -236,19 +240,115 @@
         }, 500);
     }
 
-    function validatePasswordMatch() {
-        var np = document.getElementById('profileNewPassword');
-        var rp = document.getElementById('profileConfirmPassword');
-        if (!np || !rp) return;
-        if (np.value && rp.value && np.value !== rp.value) {
-            showErrorMessage('profileConfirmPassword', 'Passwords do not match');
-        } else {
+    function getPasswordStrength(p) {
+        var s = (p || '').replace(/\s+/g, '');
+        if (!s) return '';
+        var types = 0;
+        if (/[a-z]/.test(s)) types++;
+        if (/[A-Z]/.test(s)) types++;
+        if (/[0-9]/.test(s)) types++;
+        if (/[^A-Za-z0-9]/.test(s)) types++;
+        if (s.length < 8 || types < 2) return 'Weak';
+        if (s.length >= 12 && types >= 4) return 'Strong';
+        return 'Medium';
+    }
+
+    function hasSpace(str) { return /\s/.test(str || ''); }
+
+    function updateProfilePasswordStrength() {
+        var npEl = document.getElementById('profileNewPassword');
+        var strengthSpan = document.getElementById('profilePassStrength');
+        if (!npEl || !strengthSpan) return;
+        var val = npEl.value || '';
+        var strength = getPasswordStrength(val);
+        if (!strength) {
+            strengthSpan.textContent = '';
+            strengthSpan.style.color = '';
+            clearErrorMessage('profileNewPassword');
+            return;
+        }
+        strengthSpan.textContent = strength + ' Password';
+        strengthSpan.style.color = strength === 'Strong' ? '#16a34a' : (strength === 'Medium' ? '#f59e0b' : '#dc2626');
+        strengthSpan.style.fontSize = '11px';
+
+        if (hasSpace(val)) {
+            showErrorMessage('profileNewPassword', 'Spaces are not allowed in password.');
+            return;
+        }
+        if (val.length < 8) {
+            showErrorMessage('profileNewPassword', 'Password must be at least 8 characters long.');
+            return;
+        }
+        if (val.length > 50) {
+            showErrorMessage('profileNewPassword', 'Password cannot exceed 50 characters.');
+            return;
+        }
+        if (!/[A-Z]/.test(val)) {
+            showErrorMessage('profileNewPassword', 'Password must contain at least 1 uppercase letter.');
+            return;
+        }
+        if (!/[a-z]/.test(val)) {
+            showErrorMessage('profileNewPassword', 'Password must contain at least 1 lowercase letter.');
+            return;
+        }
+        if (!/[0-9]/.test(val)) {
+            showErrorMessage('profileNewPassword', 'Password must contain at least 1 number.');
+            return;
+        }
+        if (!/[^A-Za-z0-9]/.test(val)) {
+            showErrorMessage('profileNewPassword', 'Password must contain at least 1 special character.');
+            return;
+        }
+        clearErrorMessage('profileNewPassword');
+    }
+
+    function updateProfilePasswordMatch() {
+        var npEl = document.getElementById('profileNewPassword');
+        var rpEl = document.getElementById('profileConfirmPassword');
+        var matchSpan = document.getElementById('profileRepassMatch');
+        if (!matchSpan) return;
+        var p1 = (npEl && npEl.value) || '';
+        var p2 = (rpEl && rpEl.value) || '';
+        if (!p2) {
+            matchSpan.textContent = '';
+            matchSpan.style.color = '';
+            matchSpan.style.fontSize = '';
             clearErrorMessage('profileConfirmPassword');
+            return;
+        }
+        if (p1 === p2) {
+            matchSpan.textContent = 'Password Matched';
+            matchSpan.style.color = '#16a34a';
+            matchSpan.style.fontSize = '10px';
+            clearErrorMessage('profileConfirmPassword');
+        } else {
+            matchSpan.textContent = 'Password does not match';
+            matchSpan.style.color = '#dc2626';
+            matchSpan.style.fontSize = '10px';
         }
     }
 
     function submitProfile(e) {
         e.preventDefault();
+
+        var requiredOrder = ['profileFirstName', 'profileLastName', 'profileBirthdate', 'profileStreet', 'profileBarangay', 'profileCity', 'profileProvince', 'profileCountry', 'profileZipcode', 'profileEmail', 'profileUsername'];
+        var firstEmpty = null;
+        var anyEmpty = false;
+        for (var i = 0; i < requiredOrder.length; i++) {
+            var fid = requiredOrder[i];
+            var f = document.getElementById(fid);
+            if (!f) continue;
+            var v = (f.value || '').trim();
+            if (f.tagName === 'SELECT') v = f.value;
+            if (v === '') {
+                anyEmpty = true;
+                if (!firstEmpty) firstEmpty = f;
+                showErrorMessage(fid, 'This field is required');
+            }
+        }
+        if (anyEmpty) {
+            return;
+        }
 
         var valid = true;
         var firstError = null;
@@ -272,11 +372,26 @@
         check('profileCountry', function() { return validateAddressField('profileCountry', 'country'); });
         check('profileZipcode', function() { return validateZip4('profileZipcode'); });
 
+        var cp = document.getElementById('profileCurrentPassword');
         var np = document.getElementById('profileNewPassword');
         var rp = document.getElementById('profileConfirmPassword');
-        if (np && rp && np.value && np.value !== rp.value) {
-            showErrorMessage('profileConfirmPassword', 'Passwords do not match');
-            if (valid) { valid = false; firstError = rp; }
+
+        if (np && np.value) {
+            updateProfilePasswordStrength();
+            var npErr = document.getElementById('profileNewPassword-error');
+            if (npErr && npErr.textContent) {
+                if (valid) { valid = false; firstError = np; }
+            }
+
+            updateProfilePasswordMatch();
+            var rpErr = document.getElementById('profileConfirmPassword-error');
+            if (rpErr && rpErr.textContent) {
+                if (valid) { valid = false; firstError = rp; }
+            }
+            var matchSpan = document.getElementById('profileRepassMatch');
+            if (matchSpan && /does not match/.test(matchSpan.textContent || '')) {
+                if (valid) { valid = false; firstError = rp; }
+            }
         }
 
         if (!valid) {
@@ -295,7 +410,7 @@
                     try {
                         var res = JSON.parse(xhr.responseText);
                         if (res.success) {
-                            showToast('Profile updated successfully.', 'success');
+                            showSuccessModal(res.message || 'Account information updated!');
                             if (cp) document.getElementById('profileCurrentPassword').value = '';
                             if (np) np.value = '';
                             if (rp) rp.value = '';
@@ -311,6 +426,29 @@
             }
         };
         xhr.send(data);
+    }
+
+    function showSuccessModal(message) {
+        document.getElementById('successModalMessage').textContent = message;
+        document.getElementById('successModal').classList.add('active');
+    }
+
+    function clearAllRequiredErrors() {
+        var errEls = document.getElementById('adminProfileForm').querySelectorAll('[id$="-error"]');
+        for (var i = 0; i < errEls.length; i++) {
+            var errEl = errEls[i];
+            var fieldId = errEl.id.replace('-error', '');
+            var fld = document.getElementById(fieldId);
+            var emptyNow = false;
+            if (fld) {
+                var vv = (fld.value || '').trim();
+                if (fld.tagName === 'SELECT') vv = fld.value;
+                emptyNow = (vv === '');
+            }
+            if (errEl && (emptyNow || /required/i.test(errEl.textContent || ''))) {
+                errEl.parentNode && errEl.parentNode.removeChild(errEl);
+            }
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -380,13 +518,76 @@
 
         var npEl = document.getElementById('profileNewPassword');
         var rpEl = document.getElementById('profileConfirmPassword');
-        if (npEl) npEl.addEventListener('input', validatePasswordMatch);
-        if (rpEl) rpEl.addEventListener('input', validatePasswordMatch);
+        if (npEl) npEl.addEventListener('input', function() {
+            updateProfilePasswordStrength();
+            updateProfilePasswordMatch();
+        });
+        if (rpEl) rpEl.addEventListener('input', function() {
+            updateProfilePasswordMatch();
+        });
+
+        var eyeiconCurrent = document.getElementById('eyeicon-current');
+        var currentPassEl = document.getElementById('profileCurrentPassword');
+        if (eyeiconCurrent && currentPassEl) {
+            eyeiconCurrent.onclick = function() {
+                if (currentPassEl.type === 'password') {
+                    currentPassEl.type = 'text';
+                    eyeiconCurrent.classList.remove('fa-eye-slash');
+                    eyeiconCurrent.classList.add('fa-eye');
+                } else {
+                    currentPassEl.type = 'password';
+                    eyeiconCurrent.classList.remove('fa-eye');
+                    eyeiconCurrent.classList.add('fa-eye-slash');
+                }
+            };
+        }
+
+        var eyeiconNew = document.getElementById('eyeicon-new');
+        var newPassEl = document.getElementById('profileNewPassword');
+        var confirmPassEl = document.getElementById('profileConfirmPassword');
+        if (eyeiconNew) {
+            eyeiconNew.onclick = function() {
+                var shouldShow = (newPassEl && newPassEl.type === 'password') || (confirmPassEl && confirmPassEl.type === 'password');
+                if (shouldShow) {
+                    if (newPassEl) newPassEl.type = 'text';
+                    if (confirmPassEl) confirmPassEl.type = 'text';
+                    eyeiconNew.classList.remove('fa-eye-slash');
+                    eyeiconNew.classList.add('fa-eye');
+                } else {
+                    if (newPassEl) newPassEl.type = 'password';
+                    if (confirmPassEl) confirmPassEl.type = 'password';
+                    eyeiconNew.classList.remove('fa-eye');
+                    eyeiconNew.classList.add('fa-eye-slash');
+                }
+            };
+        }
 
         var form = document.getElementById('adminProfileForm');
         if (form) form.addEventListener('submit', submitProfile);
 
+        if (form) {
+            form.addEventListener('focusin', function() { clearAllRequiredErrors(); }, true);
+            form.addEventListener('input', function() { clearAllRequiredErrors(); }, true);
+            form.addEventListener('change', function() { clearAllRequiredErrors(); }, true);
+        }
+
         var resetBtn = document.getElementById('profileCancelBtn');
-        if (resetBtn) resetBtn.addEventListener('click', resetForm);
+        if (resetBtn) resetBtn.addEventListener('click', function() {
+            clearAllRequiredErrors();
+            resetForm();
+        });
+
+        var successOkBtn = document.getElementById('successModalOkBtn');
+        if (successOkBtn) {
+            successOkBtn.addEventListener('click', function() {
+                document.getElementById('successModal').classList.remove('active');
+            });
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) overlay.classList.remove('active');
+            });
+        });
     });
 })();
