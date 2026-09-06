@@ -231,3 +231,9 @@
 .add-user-modal .add-btn:active { transform: translateY(-1px); }
 
 .field-hint { font-size: 0.75rem; font-weight: 500; }
+
+#resetPasswordModal .password-wrapper { position: relative; display: flex; align-items: center; }
+#resetPasswordModal .password-wrapper input { width: 100%; padding-right: 45px; }
+#resetPasswordModal .password-wrapper input::-ms-reveal { display: none; }
+#resetPasswordModal .password-wrapper i { position: absolute; right: 12px; font-size: 18px; cursor: pointer; color: #6B7280; transition: color 0.3s ease; }
+#resetPasswordModal .password-wrapper i.fa-eye { color: #667eea; }

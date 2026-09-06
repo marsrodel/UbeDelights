@@ -84,7 +84,7 @@ function showErrorMessage(fieldId, message) {
     
     var parentBox = fieldInput.parentNode; // usually .form-box or .password-wrapper
     // Place password errors just after the wrapper to keep them below the field in the same column
-    if ((fieldId === 'pass' || fieldId === 'repass') && parentBox && parentBox.classList && parentBox.classList.contains('password-wrapper')) {
+    if (parentBox && parentBox.classList && parentBox.classList.contains('password-wrapper')) {
         var col = parentBox.parentNode; // column container
         if (col && col.insertBefore) {
             col.insertBefore(errorDiv, parentBox.nextSibling);
@@ -2920,12 +2920,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
 
+            var eyeiconReset = document.getElementById('eyeicon-reset');
+            if (eyeiconReset) {
+                eyeiconReset.onclick = function() {
+                    var shouldShow = (resetPassEl && resetPassEl.type === 'password') || (resetRepassEl && resetRepassEl.type === 'password');
+                    if (shouldShow) {
+                        if (resetPassEl) resetPassEl.type = 'text';
+                        if (resetRepassEl) resetRepassEl.type = 'text';
+                        eyeiconReset.classList.remove('fa-eye-slash');
+                        eyeiconReset.classList.add('fa-eye');
+                    } else {
+                        if (resetPassEl) resetPassEl.type = 'password';
+                        if (resetRepassEl) resetRepassEl.type = 'password';
+                        eyeiconReset.classList.remove('fa-eye');
+                        eyeiconReset.classList.add('fa-eye-slash');
+                    }
+                };
+            }
+
             var resetPasswordModal = document.getElementById('resetPasswordModal');
             if (resetPasswordModal) {
                 var resetObserver = new MutationObserver(function() {
                     if (!resetPasswordModal.classList.contains('active')) {
                         if (resetPassEl) resetPassEl.value = '';
+                        if (resetPassEl) resetPassEl.type = 'password';
                         if (resetRepassEl) resetRepassEl.value = '';
+                        if (resetRepassEl) resetRepassEl.type = 'password';
+                        if (eyeiconReset) { eyeiconReset.classList.remove('fa-eye'); eyeiconReset.classList.add('fa-eye-slash'); }
                         if (resetPassStrengthSpan) { resetPassStrengthSpan.textContent = ''; resetPassStrengthSpan.style.color = ''; }
                         if (resetRepassMatchSpan) { resetRepassMatchSpan.textContent = ''; resetRepassMatchSpan.style.color = ''; }
                         clearErrorMessage('resetNewPassword');

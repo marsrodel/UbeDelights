@@ -340,11 +340,16 @@ if ($connect) {
                 <p style="color:var(--text-secondary); font-size:0.82rem;">Set a new password for this user. They will use it the next time they log in.</p>
                 <div class="form-group">
                     <label>New password <span id="resetPassStrength" class="field-hint"></span></label>
-                    <input type="password" id="resetNewPassword" placeholder="Enter new password">
+                    <div class="password-wrapper">
+                        <input type="password" id="resetNewPassword" placeholder="Enter new password">
+                        <i class="fa-solid fa-eye-slash" id="eyeicon-reset"></i>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Confirm password <span id="resetRepassMatch" class="field-hint"></span></label>
-                    <input type="password" id="resetConfirmPassword" placeholder="Confirm new password">
+                    <div class="password-wrapper">
+                        <input type="password" id="resetConfirmPassword" placeholder="Confirm new password">
+                    </div>
                 </div>
                 <input type="hidden" id="resetPasswordUserId">
             </form>

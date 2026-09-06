@@ -414,6 +414,12 @@
                             if (cp) document.getElementById('profileCurrentPassword').value = '';
                             if (np) np.value = '';
                             if (rp) rp.value = '';
+                            var strengthSpan = document.getElementById('profilePassStrength');
+                            var matchSpan = document.getElementById('profileRepassMatch');
+                            if (strengthSpan) { strengthSpan.textContent = ''; strengthSpan.style.color = ''; }
+                            if (matchSpan) { matchSpan.textContent = ''; matchSpan.style.color = ''; }
+                            clearErrorMessage('profileNewPassword');
+                            clearErrorMessage('profileConfirmPassword');
                         } else {
                             showToast(res.message || 'Failed to update profile.', 'error');
                         }
