@@ -6,8 +6,9 @@ if ($connect) {
                    email, role, status, date_of_birth, age, sex,
                    street, barangay, city_municipality, province, country, zip_code,
                    (SELECT COUNT(*) FROM deletion_requests dr WHERE dr.target_id_number = users.user_id AND dr.status = 'pending') AS has_pending_deletion
-            FROM users WHERE status != 'pending'
-            ORDER BY FIELD(role, 'super_admin', 'admin', 'customer'), user_id";
+            FROM users WHERE status != 'pending'" .
+            ($_SESSION['auth_role'] !== 'super_admin' ? " AND role != 'super_admin'" : "") .
+            " ORDER BY FIELD(role, 'super_admin', 'admin', 'customer'), user_id";
     $result = mysqli_query($connect, $sql);
     if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
@@ -63,39 +64,7 @@ if ($connect) {
     <link rel="stylesheet" href="../../css/user_management.css?v=2.0">
 </head>
 <body class="admin-body">
-    <aside class="admin-sidebar" id="adminSidebar">
-        <div class="sidebar-header">
-            <img src="../../images/logo.png" alt="Ube Delights" class="sidebar-logo">
-            <div>
-                <h2>Ube Delights</h2>
-                <span class="sidebar-tag">Admin Panel</span>
-            </div>
-        </div>
-
-        <div class="sidebar-profile">
-            <div class="admin-chip">
-                <div class="admin-avatar"><?php echo strtoupper(substr($_SESSION['auth_first_name'] ?? 'A', 0, 1) . substr($_SESSION['auth_last_name'] ?? 'U', 0, 1)); ?></div>
-                <div class="admin-chip-info">
-                    <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
-                    <small>ADMIN</small>
-                </div>
-            </div>
-        </div>
-
-        <nav class="sidebar-nav">
-            <a onclick="getAdminDashboard()" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
-            <a onclick="getAdminProducts()" class="sidebar-link"><i class="fa-solid fa-box"></i><span>Products</span></a>
-            <a onclick="getAdminOrders()" class="sidebar-link"><i class="fa-solid fa-bag-shopping"></i><span>Orders</span><?php if ($orderCount > 0): ?><span class="sidebar-badge"><?php echo $orderCount; ?></span><?php endif; ?></a>
-            <a onclick="getAdminUserManagement()" class="sidebar-link active"><i class="fa-solid fa-users-cog"></i><span>User Management</span></a>
-            <a onclick="getAdminPendingApprovals()" class="sidebar-link"><i class="fa-solid fa-user-clock"></i><span>Pending Approvals</span><?php if ($pendingCount > 0): ?><span class="sidebar-badge"><?php echo $pendingCount; ?></span><?php endif; ?></a>
-            <a onclick="getAdminSystemLogs()" class="sidebar-link"><i class="fa-solid fa-list-alt"></i><span>System Logs</span></a>
-            <a onclick="getAdminProfile()" class="sidebar-link"><i class="fa-solid fa-user"></i><span>My Account</span></a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <a onclick="getAdminLogout()" class="sidebar-logout"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></a>
-        </div>
-    </aside>
+<?php $activePage = 'user_management'; include '_sidebar.php'; ?>
 
     <div class="admin-main">
         <header class="admin-topbar">
@@ -483,7 +452,9 @@ if ($connect) {
                                         <option value="">-Select Role-</option>
                                         <option value="customer">Customer</option>
                                         <option value="admin">Admin</option>
+                                        <?php if ($_SESSION['auth_role'] === 'super_admin'): ?>
                                         <option value="super_admin">Super Admin</option>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                                 <div class="form-box">

@@ -2533,6 +2533,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var isOwn = (user.id === currentUserId);
         var isCustomer = (user.role === 'customer');
+        var isSuperAdmin = (user.role === 'super_admin');
+        var iAmSuperAdmin = (currentUserRole === 'super_admin');
+
+        if (isSuperAdmin && !iAmSuperAdmin) {
+            return h;
+        }
 
         if (isOwn) {
             h += '<button class="um-action-btn btn-edit" data-action="edit" data-id="'+esc(user.id)+'" title="Edit"><i class="fa-solid fa-pen"></i></button>';

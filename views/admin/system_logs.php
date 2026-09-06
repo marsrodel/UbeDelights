@@ -19,39 +19,7 @@ if ($connect) {
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
 </head>
 <body class="admin-body">
-    <aside class="admin-sidebar" id="adminSidebar">
-        <div class="sidebar-header">
-            <img src="../../images/logo.png" alt="Ube Delights" class="sidebar-logo">
-            <div>
-                <h2>Ube Delights</h2>
-                <span class="sidebar-tag">Admin Panel</span>
-            </div>
-        </div>
-
-        <div class="sidebar-profile">
-            <div class="admin-chip">
-                <div class="admin-avatar"><?php echo strtoupper(substr($_SESSION['auth_first_name'] ?? 'A', 0, 1) . substr($_SESSION['auth_last_name'] ?? 'U', 0, 1)); ?></div>
-                <div class="admin-chip-info">
-                    <strong><?php echo htmlspecialchars($currentUser['username']); ?></strong>
-                    <small>ADMIN</small>
-                </div>
-            </div>
-        </div>
-
-        <nav class="sidebar-nav">
-            <a onclick="getAdminDashboard()" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
-            <a onclick="getAdminProducts()" class="sidebar-link"><i class="fa-solid fa-box"></i><span>Products</span></a>
-            <a onclick="getAdminOrders()" class="sidebar-link"><i class="fa-solid fa-bag-shopping"></i><span>Orders</span><?php if ($orderCount > 0): ?><span class="sidebar-badge"><?php echo $orderCount; ?></span><?php endif; ?></a>
-            <a onclick="getAdminUserManagement()" class="sidebar-link"><i class="fa-solid fa-users-cog"></i><span>User Management</span></a>
-            <a onclick="getAdminPendingApprovals()" class="sidebar-link"><i class="fa-solid fa-user-clock"></i><span>Pending Approvals</span><?php if ($pendingCount > 0): ?><span class="sidebar-badge"><?php echo $pendingCount; ?></span><?php endif; ?></a>
-            <a onclick="getAdminSystemLogs()" class="sidebar-link active"><i class="fa-solid fa-list-alt"></i><span>System Logs</span></a>
-            <a onclick="getAdminProfile()" class="sidebar-link"><i class="fa-solid fa-user"></i><span>My Account</span></a>
-        </nav>
-
-        <div class="sidebar-footer">
-            <a onclick="getAdminLogout()" class="sidebar-logout"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></a>
-        </div>
-    </aside>
+<?php $activePage = 'system_logs'; include '_sidebar.php'; ?>
 
     <div class="admin-main">
         <header class="admin-topbar">

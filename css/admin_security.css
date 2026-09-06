@@ -1266,7 +1266,7 @@ body.admin-body {
         width: 72px;
     }
 
-    .admin-sidebar .sidebar-logo h2,
+    .admin-sidebar .sidebar-header h2,
     .admin-sidebar .sidebar-tag,
     .admin-sidebar .sidebar-link span,
     .admin-sidebar .admin-chip,
@@ -1274,7 +1274,7 @@ body.admin-body {
         display: none;
     }
 
-    .sidebar-logo {
+    .sidebar-header {
         justify-content: center;
         padding: 20px 0;
     }

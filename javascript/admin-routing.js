@@ -22,6 +22,10 @@ const getAdminSystemLogs = () => {
     window.location.href = "./system_logs.php";
 };
 
+const getAdminDeletionRequests = () => {
+    window.location.href = "./deletion_requests.php";
+};
+
 const getAdminProfile = () => {
     window.location.href = "./admin_profile.php";
 };
