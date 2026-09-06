@@ -1,139 +1,157 @@
 <?php
-// User Activity Logger Helper Function
-require_once 'db.php';
+require_once __DIR__ . '/db.php';
 
-/**
- * Logs user activity to the user_logs table
- * @param string $action The action performed (e.g., LOGIN, LOGOUT, CREATE_USER)
- * @param string $description Human-readable description of the action
- * @param string|null $user_name User name (defaults to current session user, null for system actions)
- * @return bool True if logging successful, false otherwise
- */
-function logAction($action, $description, $user_name = null) {
-    return true;
+function log_activity($action, $details, $module = 'General', $idNumber = null, $username = null) {
+    global $connect;
+    if (!$connect) return false;
+
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $uaInfo = parse_user_agent($ua);
+
+    $fullName = null;
+    $role = null;
+    if ($idNumber || $username) {
+        $lookup = log_lookup_user($connect, $idNumber, $username);
+        if ($lookup) {
+            $fullName = $lookup['fullName'];
+            $role = $lookup['role'];
+        }
+    }
+
+    $severity = log_severity_for_action($action);
+
+    $detailsText = $details;
+    if (!empty($uaInfo['browser']) || !empty($uaInfo['os']) || !empty($uaInfo['device'])) {
+        $parts = [];
+        if (!empty($uaInfo['browser'])) $parts[] = 'Browser: ' . $uaInfo['browser'];
+        if (!empty($uaInfo['os'])) $parts[] = 'OS: ' . $uaInfo['os'];
+        if (!empty($uaInfo['device'])) $parts[] = 'Device: ' . $uaInfo['device'];
+        $detailsText .= ' | ' . implode(' | ', $parts);
+    }
+
+    $sql = "INSERT INTO activity_logs (idNumber, username, fullName, role, module, action, details, ip_address, severity, browser, device, os) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($connect, $sql);
+    if (!$stmt) return false;
+    mysqli_stmt_bind_param($stmt, 'ssssssssssss',
+        $idNumber, $username, $fullName, $role, $module, $action, $detailsText, $ip, $severity,
+        $uaInfo['browser'], $uaInfo['device'], $uaInfo['os']
+    );
+    $ok = mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    return $ok;
 }
 
-/**
- * Parse user agent string to extract device and browser information
- * @param string $user_agent The HTTP_USER_AGENT string
- * @return array Array containing device and browser information
- */
-function getDeviceAndBrowser($user_agent) {
-    $device = 'Unknown';
-    $browser = 'Unknown';
-    $os = getOS($user_agent);
-    
-    // Detect browser
-    if (preg_match('/Chrome\/([0-9\.]+)/', $user_agent, $matches)) {
-        $browser = 'Google Chrome ' . $matches[1];
-    } elseif (preg_match('/Firefox\/([0-9\.]+)/', $user_agent, $matches)) {
-        $browser = 'Mozilla Firefox ' . $matches[1];
-    } elseif (preg_match('/Safari\/([0-9\.]+)/', $user_agent, $matches)) {
-        $browser = 'Safari ' . $matches[1];
-    } elseif (preg_match('/Edge\/([0-9\.]+)/', $user_agent, $matches)) {
-        $browser = 'Microsoft Edge ' . $matches[1];
-    } elseif (preg_match('/Opera\/([0-9\.]+)/', $user_agent, $matches)) {
-        $browser = 'Opera ' . $matches[1];
-    } elseif (strpos($user_agent, 'MSIE') !== false) {
-        $browser = 'Internet Explorer';
+function log_lookup_user($db, $idNumber = null, $username = null) {
+    if ($idNumber) {
+        $stmt = mysqli_prepare($db, "SELECT user_id, username, CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name, IFNULL(CONCAT(' ', extension_name), '')) AS fullName, role FROM users WHERE user_id = ? LIMIT 1");
+        mysqli_stmt_bind_param($stmt, 's', $idNumber);
+    } elseif ($username) {
+        $stmt = mysqli_prepare($db, "SELECT user_id, username, CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name, IFNULL(CONCAT(' ', extension_name), '')) AS fullName, role FROM users WHERE username = ? LIMIT 1");
+        mysqli_stmt_bind_param($stmt, 's', $username);
+    } else {
+        return null;
     }
-    
-    // Detect device type and create specific device names
-    if (preg_match('/Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/', $user_agent)) {
-        if (preg_match('/iPad/', $user_agent)) {
-            $device = 'Device: iPad Tablet';
-        } elseif (preg_match('/Android/', $user_agent)) {
-            if (preg_match('/Mobile/', $user_agent)) {
-                $device = 'Device: Android Phone';
-            } else {
-                $device = 'Device: Android Tablet';
-            }
-        } elseif (preg_match('/iPhone/', $user_agent)) {
-            $device = 'Device: iPhone';
-        } elseif (preg_match('/iPod/', $user_agent)) {
-            $device = 'Device: iPod Touch';
-        } else {
-            $device = 'Device: Mobile Phone';
-        }
-    } elseif (preg_match('/Windows NT|Macintosh|Linux/', $user_agent)) {
-        if (preg_match('/Windows NT/', $user_agent)) {
-            $device = 'Device: Windows PC';
-        } elseif (preg_match('/Macintosh/', $user_agent)) {
-            $device = 'Device: Mac Computer';
-        } elseif (preg_match('/Linux/', $user_agent)) {
-            $device = 'Device: Linux PC';
-        } else {
-            $device = 'Device: Desktop Computer';
-        }
-    }
-    
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = $result ? mysqli_fetch_assoc($result) : null;
+    mysqli_stmt_close($stmt);
+    if (!$row) return null;
     return [
-        'device' => $device,
-        'browser' => $browser,
-        'os' => $os
+        'idNumber' => $row['user_id'],
+        'username' => $row['username'],
+        'fullName' => trim($row['fullName']),
+        'role' => $row['role'],
     ];
 }
 
-/**
- * Detect operating system from user agent
- * @param string $user_agent The HTTP_USER_AGENT string
- * @return string Operating system name
- */
-function getOS($user_agent) {
-    if (preg_match('/Windows NT/i', $user_agent)) return 'Windows';
-    if (preg_match('/Macintosh|Mac OS X/i', $user_agent)) return 'MacOS';
-    if (preg_match('/iPhone/i', $user_agent)) return 'iOS';
-    if (preg_match('/Android/i', $user_agent)) return 'Android';
-    if (preg_match('/Linux/i', $user_agent)) return 'Linux';
-    return 'Unknown OS';
+function log_severity_for_action($action) {
+    $map = [
+        'failed_login' => 'WARNING',
+        'login_blocked' => 'ERROR',
+        'login_pending' => 'WARNING',
+        'login_rejected' => 'WARNING',
+        'unauthorized_access' => 'ERROR',
+        'session_timeout' => 'ERROR',
+        'account_lockout' => 'CRITICAL',
+    ];
+    return $map[$action] ?? 'INFO';
 }
 
-/**
- * Get current user's ID number from session
- * @return string|null
- */
-function getCurrentUserId() {
-    return $_SESSION['auth_user_id'] ?? null;
+function parse_user_agent($ua) {
+    $browser = 'Unknown';
+    $device = 'Desktop';
+    $os = 'Unknown';
+
+    if (preg_match('/Chrome\/([0-9\.]+)/', $ua, $m) && !preg_match('/Edg\//', $ua)) {
+        $browser = 'Chrome ' . $m[1];
+    } elseif (preg_match('/Edg\/([0-9\.]+)/', $ua, $m)) {
+        $browser = 'Edge ' . $m[1];
+    } elseif (preg_match('/Firefox\/([0-9\.]+)/', $ua, $m)) {
+        $browser = 'Firefox ' . $m[1];
+    } elseif (preg_match('/Safari\/([0-9\.]+)/', $ua, $m) && !preg_match('/Chrome/', $ua)) {
+        $browser = 'Safari ' . $m[1];
+    } elseif (preg_match('/Opera\/|OPR\/([0-9\.]+)/', $ua, $m)) {
+        $browser = 'Opera ' . ($m[1] ?? '');
+    }
+
+    if (preg_match('/Windows/i', $ua)) $os = 'Windows';
+    elseif (preg_match('/Mac OS X/i', $ua)) $os = 'macOS';
+    elseif (preg_match('/Android/i', $ua)) $os = 'Android';
+    elseif (preg_match('/iPhone|iPad|iPod/i', $ua)) $os = 'iOS';
+    elseif (preg_match('/Linux/i', $ua)) $os = 'Linux';
+
+    if (preg_match('/Mobile|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i', $ua)) {
+        $device = 'Mobile';
+    } elseif (preg_match('/iPad|Tablet/i', $ua)) {
+        $device = 'Tablet';
+    }
+
+    return ['browser' => $browser, 'device' => $device, 'os' => $os];
 }
 
-/**
- * Get current user's role from session
- * @return string|null
- */
-function getCurrentUserRole() {
-    return $_SESSION['auth_role'] ?? null;
+function logs_attach_time_out($db, $rows) {
+    foreach ($rows as &$row) {
+        $row['time_in'] = $row['created_at'] ?? null;
+        $row['time_out'] = null;
+
+        if (($row['action'] ?? '') !== 'login' || empty($row['idNumber']) || empty($row['created_at'])) {
+            continue;
+        }
+
+        $nextStmt = mysqli_prepare($db, "SELECT created_at FROM activity_logs WHERE idNumber = ? AND action = 'login' AND created_at > ? ORDER BY created_at ASC LIMIT 1");
+        mysqli_stmt_bind_param($nextStmt, 'ss', $row['idNumber'], $row['created_at']);
+        mysqli_stmt_execute($nextStmt);
+        $nextResult = mysqli_stmt_get_result($nextStmt);
+        $nextLogin = $nextResult ? mysqli_fetch_assoc($nextResult) : null;
+        mysqli_stmt_close($nextStmt);
+
+        if ($nextLogin) {
+            $sql = "SELECT created_at FROM activity_logs WHERE idNumber = ? AND action IN ('logout', 'session_timeout') AND created_at > ? AND created_at < ? ORDER BY created_at ASC LIMIT 1";
+            $stmt = mysqli_prepare($db, $sql);
+            mysqli_stmt_bind_param($stmt, 'sss', $row['idNumber'], $row['created_at'], $nextLogin['created_at']);
+        } else {
+            $sql = "SELECT created_at FROM activity_logs WHERE idNumber = ? AND action IN ('logout', 'session_timeout') AND created_at > ? ORDER BY created_at ASC LIMIT 1";
+            $stmt = mysqli_prepare($db, $sql);
+            mysqli_stmt_bind_param($stmt, 'ss', $row['idNumber'], $row['created_at']);
+        }
+        mysqli_stmt_execute($stmt);
+        $logoutResult = mysqli_stmt_get_result($stmt);
+        $logout = $logoutResult ? mysqli_fetch_assoc($logoutResult) : null;
+        mysqli_stmt_close($stmt);
+
+        if ($logout) {
+            $row['time_out'] = $logout['created_at'];
+        }
+    }
+    unset($row);
+    return $rows;
 }
 
-/**
- * Check if current user can perform action on target user
- * @param string $target_role Target user's role
- * @param string $action Action being performed
- * @return bool
- */
 function canPerformAction($target_role, $action) {
-    $current_role = getCurrentUserRole();
-    $current_user_id = getCurrentUserId();
-    
-    // Prevent self-destructive actions
-    if (in_array($action, ['block', 'unblock', 'delete', 'approve', 'reject'])) {
-        // Note: We'd need to check if target is self, but we don't have target ID here
-        // This check is done in user_actions.php
-    }
-    
-    // Admin cannot modify super_admin
-    if ($current_role === 'admin' && $target_role === 'super_admin') {
-        return false;
-    }
-    
-    // Admin cannot create super_admin
-    if ($current_role === 'admin' && $action === 'create_super_admin') {
-        return false;
-    }
-    
-    // Only super_admin can delete
-    if ($action === 'delete' && $current_role !== 'super_admin') {
-        return false;
-    }
-    
+    $current_role = $_SESSION['auth_role'] ?? null;
+    if ($current_role === 'admin' && $target_role === 'super_admin') return false;
+    if ($current_role === 'admin' && $action === 'create_super_admin') return false;
+    if ($action === 'delete' && $current_role !== 'super_admin') return false;
     return true;
 }

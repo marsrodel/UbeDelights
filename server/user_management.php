@@ -225,7 +225,7 @@ try {
                 $purok, $barangay, $municipality, $province, $country, $zipCode
             );
             if ($ins->execute()) {
-                logAction('CREATE_USER', "User {$_SESSION['auth_username']} created new user $username (ID: $idNo)");
+                log_activity('CREATE_USER', "{$_SESSION['auth_username']} created user $username (ID: $idNo)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => 'User created successfully', 'user_id' => $idNo];
             } else {
                 throw new Exception('Failed to create user');
@@ -280,11 +280,8 @@ try {
                 throw new Exception('Admins cannot modify Super Admin accounts');
             }
 
-            // Handle optional password update (super_admin only)
+            // Handle optional password update
             if (!empty($new_password)) {
-                if ($currentRole !== 'super_admin') {
-                    throw new Exception('Only Super Admins can update user passwords');
-                }
                 if (strlen($new_password) < 8) {
                     throw new Exception('Password must be at least 8 characters');
                 }
@@ -298,7 +295,7 @@ try {
 
             if ($stmt->execute()) {
                 $pw_msg = !empty($new_password) ? ' (password updated)' : '';
-                logAction('UPDATE_USER', "User {$_SESSION['auth_username']} updated user $username$pw_msg");
+                log_activity('UPDATE_USER', "{$_SESSION['auth_username']} updated user $username$pw_msg", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => 'User updated successfully' . $pw_msg];
             } else {
                 throw new Exception('Failed to update user');
@@ -324,7 +321,7 @@ try {
             $stmt = $connect->prepare("UPDATE users SET status = 'blocked', is_active = 0 WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('BLOCK_USER', "User {$_SESSION['auth_username']} blocked user {$target_user['username']}");
+                log_activity('BLOCK_USER', "{$_SESSION['auth_username']} blocked {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => 'User blocked successfully'];
             } else {
                 throw new Exception('Failed to block user');
@@ -350,7 +347,7 @@ try {
             $stmt = $connect->prepare("UPDATE users SET status = 'active', is_active = 1 WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('UNBLOCK_USER', "User {$_SESSION['auth_username']} unblocked user {$target_user['username']}");
+                log_activity('UNBLOCK_USER', "{$_SESSION['auth_username']} unblocked {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => 'User unblocked successfully'];
             } else {
                 throw new Exception('Failed to unblock user');
@@ -373,7 +370,7 @@ try {
             $stmt = $connect->prepare("UPDATE users SET status = 'active', is_active = 1 WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('APPROVE_USER', "User {$_SESSION['auth_username']} approved user {$target_user['username']}");
+                log_activity('APPROVE_USER', "{$_SESSION['auth_username']} approved {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => 'Registration approved successfully'];
             } else {
                 throw new Exception('Failed to approve user');
@@ -396,7 +393,7 @@ try {
             $stmt = $connect->prepare("UPDATE users SET status = 'rejected', is_active = 0 WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('REJECT_USER', "User {$_SESSION['auth_username']} rejected user {$target_user['username']}");
+                log_activity('REJECT_USER', "{$_SESSION['auth_username']} rejected {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => 'Registration rejected'];
             } else {
                 throw new Exception('Failed to reject user');
@@ -429,10 +426,45 @@ try {
             $del_stmt = $connect->prepare("DELETE FROM users WHERE user_id = ?");
             $del_stmt->bind_param("s", $userId);
             if ($del_stmt->execute()) {
-                logAction('DELETE_USER', "User {$_SESSION['auth_username']} deleted user {$target_user['username']} (ID: $userId)");
+                log_activity('DELETE_USER', "{$_SESSION['auth_username']} deleted {$target_user['username']} (ID: $userId)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => "User {$target_user['username']} has been deleted successfully"];
             } else {
                 throw new Exception('Failed to delete user');
+            }
+            break;
+
+        case 'reset_password':
+            $new_password = $_POST['new_password'] ?? '';
+
+            if (empty($new_password)) {
+                throw new Exception('New password is required');
+            }
+            if (strlen($new_password) < 8) {
+                throw new Exception('Password must be at least 8 characters');
+            }
+
+            // Get target user
+            $stmt = $connect->prepare("SELECT username, role FROM users WHERE user_id = ?");
+            $stmt->bind_param("s", $userId);
+            $stmt->execute();
+            $target_user = $stmt->get_result()->fetch_assoc();
+
+            if (!$target_user) {
+                throw new Exception('User not found');
+            }
+
+            if ($currentRole === 'admin' && $target_user['role'] === 'super_admin') {
+                throw new Exception('Admins cannot reset Super Admin passwords');
+            }
+
+            $hashed_pw = password_hash($new_password, PASSWORD_DEFAULT);
+            $stmt = $connect->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
+            $stmt->bind_param("ss", $hashed_pw, $userId);
+            if ($stmt->execute()) {
+                log_activity('RESET_PASSWORD', "{$_SESSION['auth_username']} reset password for {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
+                $response = ['success' => true, 'message' => 'Password reset successfully'];
+            } else {
+                throw new Exception('Failed to reset password');
             }
             break;
 

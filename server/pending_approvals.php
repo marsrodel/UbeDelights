@@ -49,7 +49,7 @@ try {
             $stmt = $conn->prepare("UPDATE users SET status = 'active' WHERE idNo = ? AND status = 'pending'");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('APPROVE_USER', "User {$_SESSION['username']} approved pending user $target_username");
+                log_activity('APPROVE_USER', "{$_SESSION['username']} approved pending user $target_username", 'Pending Approvals', $_SESSION['user_id'], $_SESSION['username']);
                 $response = ['success' => true, 'message' => 'User approved successfully'];
             } else {
                 throw new Exception('Failed to approve user');
@@ -60,7 +60,7 @@ try {
             $stmt = $conn->prepare("DELETE FROM users WHERE idNo = ? AND status = 'pending'");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('REJECT_USER', "User {$_SESSION['username']} rejected pending user $target_username");
+                log_activity('REJECT_USER', "{$_SESSION['username']} rejected pending user $target_username", 'Pending Approvals', $_SESSION['user_id'], $_SESSION['username']);
                 $response = ['success' => true, 'message' => 'User rejected successfully'];
             } else {
                 throw new Exception('Failed to reject user');

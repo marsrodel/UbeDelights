@@ -1,28 +1,5 @@
 <?php require_once __DIR__ . '/../../server/admin_auth.php';
 
-$logs = [];
-if ($connect) {
-    $sql = "SELECT l.username AS user_name, IFNULL(l.idNumber, 'N/A') AS idNo, IFNULL(l.role, 'system') AS user_role, l.action, l.details, IFNULL(l.device, 'Unknown') AS device, IFNULL(l.browser, 'Unknown') AS browser, l.ip_address, l.created_at
-            FROM activity_logs l
-            ORDER BY l.created_at DESC";
-    $result = mysqli_query($connect, $sql);
-    if ($result) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $logs[] = [
-                'user_name'  => $row['user_name'] ?? 'System',
-                'idNo'       => $row['idNo'] ?? 'N/A',
-                'user_role'  => $row['user_role'],
-                'action'     => $row['action'],
-                'description'=> $row['details'],
-                'device'     => $row['device'],
-                'browser'    => $row['browser'],
-                'ip_address' => $row['ip_address'] ?? 'N/A',
-                'created_at' => $row['created_at'],
-            ];
-        }
-    }
-}
-
 $orderCount = 0;
 $pendingCount = 0;
 if ($connect) {
@@ -91,8 +68,8 @@ if ($connect) {
             <div class="card logs-card">
                 <div class="filters-grid" style="padding:18px 18px 14px; border-bottom:1px solid var(--border);">
                     <div class="filter-field">
-                        <label>User Name</label>
-                        <input type="text" id="logsSearch" placeholder="Username...">
+                        <label>Search</label>
+                        <input type="text" id="logsSearch" placeholder="Search username, name, action...">
                     </div>
                     <div class="filter-field">
                         <label>Role</label>
@@ -120,13 +97,17 @@ if ($connect) {
                     <table class="data-table" id="logsTable">
                         <thead>
                             <tr>
-                                <th>User</th>
+                                <th>User ID</th>
+                                <th>Name</th>
                                 <th>Role</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Device / Browser</th>
+                                <th>Action</th>
+                                <th>Device</th>
+                                <th>Browser</th>
+                                <th>Software</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
                                 <th>IP Address</th>
-                                <th>Activity</th>
+                                <th>Details</th>
                             </tr>
                         </thead>
                         <tbody id="logsTableBody">
@@ -151,7 +132,6 @@ if ($connect) {
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_logs.js"></script>
-    <script>var allLogs = <?php echo json_encode($logs); ?>;</script>
     <script src="../../javascript/inspect.js"></script>
 </body>
 </html>

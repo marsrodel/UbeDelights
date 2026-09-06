@@ -63,7 +63,7 @@ try {
             $stmt = $conn->prepare("UPDATE users SET status = 'blocked' WHERE idNo = ?");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('BLOCK_USER', "User {$_SESSION['username']} blocked user $target_username");
+                log_activity('BLOCK_USER', "{$_SESSION['username']} blocked $target_username", 'User Management', $_SESSION['user_id'], $_SESSION['username']);
                 $response = ['success' => true, 'message' => 'User blocked successfully'];
             } else {
                 throw new Exception('Failed to block user');
@@ -78,7 +78,7 @@ try {
             $stmt = $conn->prepare("UPDATE users SET status = 'active' WHERE idNo = ?");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('UNBLOCK_USER', "User {$_SESSION['username']} unblocked user $target_username");
+                log_activity('UNBLOCK_USER', "{$_SESSION['username']} unblocked $target_username", 'User Management', $_SESSION['user_id'], $_SESSION['username']);
                 $response = ['success' => true, 'message' => 'User unblocked successfully'];
             } else {
                 throw new Exception('Failed to unblock user');
@@ -89,7 +89,7 @@ try {
             $stmt = $conn->prepare("UPDATE users SET status = 'active' WHERE idNo = ?");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('APPROVE_USER', "User {$_SESSION['username']} approved user ID $userId");
+                log_activity('APPROVE_USER', "{$_SESSION['username']} approved user $userId", 'Pending Approvals', $_SESSION['user_id'], $_SESSION['username']);
                 $response = ['success' => true, 'message' => 'User approved successfully'];
             } else {
                 throw new Exception('Failed to approve user');
@@ -100,7 +100,7 @@ try {
             $stmt = $conn->prepare("DELETE FROM users WHERE idNo = ?");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
-                logAction('REJECT_USER', "User {$_SESSION['username']} rejected user ID $userId");
+                log_activity('REJECT_USER', "{$_SESSION['username']} rejected user $userId", 'Pending Approvals', $_SESSION['user_id'], $_SESSION['username']);
                 $response = ['success' => true, 'message' => 'User rejected successfully'];
             } else {
                 throw new Exception('Failed to reject user');
@@ -138,7 +138,7 @@ try {
             $del_stmt = $conn->prepare("DELETE FROM users WHERE idNo = ?");
             $del_stmt->bind_param("s", $userId);
             if ($del_stmt->execute()) {
-                logAction('DELETE_USER', "User {$_SESSION['username']} deleted user $target_username (ID: $userId)");
+                log_activity('DELETE_USER', "{$_SESSION['username']} deleted $target_username (ID: $userId)", 'User Management', $_SESSION['user_id'], $_SESSION['username']);
                 $response = ['success' => true, 'message' => "User $target_username has been deleted successfully"];
             } else {
                 throw new Exception('Failed to delete user');

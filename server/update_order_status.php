@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/admin_auth.php';
+require_once __DIR__ . '/user_logger.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -31,6 +32,7 @@ $stmt = mysqli_prepare($connect, $sql);
 mysqli_stmt_bind_param($stmt, 'si', $status, $orderId);
 
 if (mysqli_stmt_execute($stmt)) {
+    log_activity('ORDER_STATUS', "{$_SESSION['auth_username']} changed order #$orderId status to '$status'", 'Orders', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
     echo json_encode(['success' => true]);
 } else {
     http_response_code(500);

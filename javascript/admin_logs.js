@@ -1,133 +1,186 @@
-/**
- * Admin Logs JavaScript
- * Handles client-side filtering, pagination, and display for system logs
- */
-
 (function() {
     'use strict';
 
     var state = {
         page: 1,
         perPage: 10,
-        filters: { search: '', role: '', from_date: '', to_date: '' }
+        filters: { search: '', role: '', date_from: '', date_to: '' },
+        loading: false
     };
 
+    var searchTimer = null;
+
     function escapeHtml(str) {
-        return String(str)
+        return String(str || '')
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
     }
 
-    function formatDate(dateStr) {
-        if (!dateStr) return '-';
-        var d = new Date(dateStr);
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    function formatLogTimestamp(ts) {
+        if (!ts) return '—';
+        var d = new Date(ts.replace(' ', 'T'));
+        if (isNaN(d)) return ts;
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var month = months[d.getMonth()];
+        var day = d.getDate();
+        var year = d.getFullYear();
+        var hours = d.getHours();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        var mins = d.getMinutes().toString().padStart(2, '0');
+        return month + ' ' + day + ', ' + year + ', ' + hours + ':' + mins + ' ' + ampm;
     }
 
-    function formatTime(dateStr) {
-        if (!dateStr) return '-';
-        var d = new Date(dateStr);
-        return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-    }
-
-    function getActivityInfo(action) {
-        var map = {
-            'LOGIN':         { cls: 'activity-login', icon: 'fa-right-to-bracket', label: 'Login' },
-            'LOGOUT':        { cls: 'activity-logout', icon: 'fa-right-from-bracket', label: 'Logout' },
-            'FAILED_LOGIN':  { cls: 'activity-failed_login', icon: 'fa-triangle-exclamation', label: 'Failed Login' },
-            'CREATE_USER':   { cls: 'activity-create', icon: 'fa-user-plus', label: 'Create User' },
-            'UPDATE_USER':   { cls: 'activity-update', icon: 'fa-user-pen', label: 'Update User' },
-            'BLOCK_USER':    { cls: 'activity-block', icon: 'fa-user-slash', label: 'Block User' },
-            'UNBLOCK_USER':  { cls: 'activity-unblock', icon: 'fa-user-check', label: 'Unblock User' },
-            'DELETE_USER':   { cls: 'activity-delete', icon: 'fa-trash-can', label: 'Delete User' },
-            'APPROVE_USER':  { cls: 'activity-approve', icon: 'fa-user-check', label: 'Approve User' },
-            'REJECT_USER':   { cls: 'activity-reject', icon: 'fa-user-xmark', label: 'Reject User' }
-        };
-        return map[action] || { cls: 'activity-login', icon: 'fa-circle-info', label: action };
-    }
-
-    function getRoleClass(role) {
-        var map = { 'admin': 'role-admin', 'super_admin': 'role-super_admin', 'customer': 'role-customer' };
-        return map[role] || 'role-customer';
+    function cleanLogDetails(details) {
+        if (!details) return '';
+        return details.replace(/\s*\|\s*Browser:.*$/i, '').trim();
     }
 
     function getRoleLabel(role) {
-        var map = { 'admin': 'Admin', 'super_admin': 'Super Admin', 'customer': 'Customer' };
-        return map[role] || role;
+        var map = { 'super_admin': 'Super Admin', 'admin': 'Admin', 'customer': 'Customer' };
+        return map[role] || role || '—';
     }
 
-    function filterLogs(logs) {
-        var f = state.filters;
-        return logs.filter(function(log) {
-            if (f.search) {
-                var s = f.search.toLowerCase();
-                var name = (log.user_name || '').toLowerCase();
-                var id = (log.idNo || '').toLowerCase();
-                if (name.indexOf(s) === -1 && id.indexOf(s) === -1) return false;
+    function getRoleClass(role) {
+        var map = { 'super_admin': 'role-super_admin', 'admin': 'role-admin', 'customer': 'role-customer' };
+        return map[role] || 'role-customer';
+    }
+
+    function getActionLabel(action) {
+        var map = {
+            'login': 'Login',
+            'logout': 'Logout',
+            'failed_login': 'Failed Login',
+            'login_blocked': 'Login Blocked',
+            'CREATE_USER': 'Create User',
+            'UPDATE_USER': 'Update User',
+            'BLOCK_USER': 'Block User',
+            'UNBLOCK_USER': 'Unblock User',
+            'DELETE_USER': 'Delete User',
+            'APPROVE_USER': 'Approve User',
+            'REJECT_USER': 'Reject User',
+            'PROFILE_UPDATE': 'Profile Update',
+            'ORDER_STATUS': 'Order Status',
+            'PRODUCT_ADD': 'Add Product',
+            'PRODUCT_EDIT': 'Edit Product',
+            'PRODUCT_DELETE': 'Delete Product',
+            'DELETION_REQUEST': 'Deletion Request',
+            'RESET_PASSWORD': 'Reset Password'
+        };
+        return map[action] || action;
+    }
+
+    function getActionClass(action) {
+        var map = {
+            'login': 'activity-login',
+            'logout': 'activity-logout',
+            'failed_login': 'activity-failed_login',
+            'login_blocked': 'activity-block',
+            'CREATE_USER': 'activity-create',
+            'UPDATE_USER': 'activity-update',
+            'PROFILE_UPDATE': 'activity-update',
+            'BLOCK_USER': 'activity-block',
+            'UNBLOCK_USER': 'activity-unblock',
+            'DELETE_USER': 'activity-delete',
+            'PRODUCT_DELETE': 'activity-delete',
+            'DELETION_REQUEST': 'activity-delete',
+            'APPROVE_USER': 'activity-approve',
+            'REJECT_USER': 'activity-reject',
+            'PRODUCT_ADD': 'activity-create',
+            'PRODUCT_EDIT': 'activity-update',
+            'ORDER_STATUS': 'activity-update',
+            'RESET_PASSWORD': 'activity-update'
+        };
+        return map[action] || 'activity-login';
+    }
+
+    function buildParams() {
+        var p = new URLSearchParams();
+        p.set('page', state.page);
+        p.set('limit', state.perPage);
+        if (state.filters.search) p.set('search', state.filters.search);
+        if (state.filters.role) p.set('role', state.filters.role);
+        if (state.filters.date_from) p.set('date_from', state.filters.date_from);
+        if (state.filters.date_to) p.set('date_to', state.filters.date_to);
+        return p.toString();
+    }
+
+    function loadLogs() {
+        if (state.loading) return;
+        state.loading = true;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '../../server/admin_get_logs.php?' + buildParams(), true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== 4) return;
+            state.loading = false;
+            if (xhr.status === 200) {
+                try {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.success) {
+                        renderTable(data.logs);
+                        renderPagination(data.pagination);
+                    }
+                } catch (e) {}
             }
-            if (f.role && log.user_role !== f.role) return false;
-            if (f.from_date) {
-                var logDate = log.created_at ? log.created_at.split(' ')[0] : '';
-                if (logDate < f.from_date) return false;
-            }
-            if (f.to_date) {
-                var logDate2 = log.created_at ? log.created_at.split(' ')[0] : '';
-                if (logDate2 > f.to_date) return false;
-            }
-            return true;
-        });
+        };
+        xhr.send();
     }
 
     function renderTable(logs) {
         var tbody = document.getElementById('logsTableBody');
         var emptyEl = document.getElementById('emptyLogs');
         var tableEl = document.getElementById('logsTable');
-        var paginationEl = document.getElementById('logsPaginationContainer');
         if (!tbody) return;
 
-        if (logs.length === 0) {
+        if (!logs || logs.length === 0) {
             tbody.innerHTML = '';
             if (tableEl) tableEl.style.display = 'none';
-            if (paginationEl) paginationEl.style.display = '';
             if (emptyEl) emptyEl.style.display = '';
-            renderPagination(0);
             return;
         }
+
         if (tableEl) tableEl.style.display = '';
-        if (paginationEl) paginationEl.style.display = '';
         if (emptyEl) emptyEl.style.display = 'none';
 
         var html = '';
         for (var i = 0; i < logs.length; i++) {
             var log = logs[i];
-            var act = getActivityInfo(log.action);
-            var roleClass = getRoleClass(log.user_role);
-            var roleLabel = getRoleLabel(log.user_role);
-            var ip = log.ip_address === '::1' ? '127.0.0.1' : (log.ip_address || 'N/A');
+            var ip = log.ip_address === '::1' ? '127.0.0.1' : (log.ip_address || '—');
+            var timeIn = formatLogTimestamp(log.time_in || log.created_at);
+            var timeOut = '—';
+            if (log.action === 'login') {
+                timeOut = log.time_out ? formatLogTimestamp(log.time_out) : '<span style="color:var(--success);font-weight:600;">Active</span>';
+            }
+            var browser = (log.browser || 'Unknown').replace(/\s+\S+$/, '').trim();
 
             html += '<tr>' +
-                '<td><div class="log-user-cell">' + escapeHtml(log.user_name || 'System') + '</div><div class="log-id-cell">ID: ' + escapeHtml(log.idNo || 'N/A') + '</div></td>' +
-                '<td><span class="role-pill ' + roleClass + '">' + roleLabel + '</span></td>' +
-                '<td style="font-size:13px; color:var(--text-secondary);">' + formatDate(log.created_at) + '</td>' +
-                '<td style="font-size:13px; color:var(--text-secondary);">' + formatTime(log.created_at) + '</td>' +
-                '<td class="device-cell"><span style="font-weight:600;">' + escapeHtml(log.device || 'Unknown') + '</span> / ' + escapeHtml(log.browser || 'Unknown') + '</td>' +
+                '<td>' + escapeHtml(log.idNumber || '—') + '</td>' +
+                '<td>' + escapeHtml(log.fullName || log.username || '—') + '</td>' +
+                '<td><span class="role-pill ' + getRoleClass(log.role) + '">' + getRoleLabel(log.role) + '</span></td>' +
+                '<td><span class="activity-badge ' + getActionClass(log.action) + '">' + escapeHtml(getActionLabel(log.action)) + '</span></td>' +
+                '<td>' + escapeHtml(log.device || 'Desktop') + '</td>' +
+                '<td>' + escapeHtml(browser) + '</td>' +
+                '<td>' + escapeHtml(log.os || 'Unknown') + '</td>' +
+                '<td>' + timeIn + '</td>' +
+                '<td>' + timeOut + '</td>' +
                 '<td><code class="ip-badge">' + escapeHtml(ip) + '</code></td>' +
-                '<td><span class="activity-badge ' + act.cls + '"><i class="fas ' + act.icon + '" style="font-size:10px;"></i> ' + act.label + '</span>' +
-                (log.description ? '<div class="activity-desc">' + escapeHtml(log.description) + '</div>' : '') +
-                '</td></tr>';
+                '<td>' + escapeHtml(cleanLogDetails(log.details) || '—') + '</td>' +
+                '</tr>';
         }
         tbody.innerHTML = html;
     }
 
-    function renderPagination(total) {
+    function renderPagination(pagination) {
         var container = document.getElementById('logsPaginationContainer');
-        if (!container) return;
+        if (!container || !pagination) return;
 
-        var page = state.page;
-        var perPage = state.perPage;
-        var totalPages = Math.ceil(total / perPage);
+        var page = pagination.page;
+        var totalPages = pagination.totalPages;
+        var total = pagination.total;
+        var perPage = pagination.limit;
         var start = (page - 1) * perPage + 1;
         var end = Math.min(page * perPage, total);
 
@@ -176,83 +229,79 @@
 
         container.innerHTML = html;
 
-        document.getElementById('perPageSelect').addEventListener('change', function() {
-            state.perPage = parseInt(this.value);
-            state.page = 1;
-            render(allLogs);
-        });
+        var perPageSelect = document.getElementById('perPageSelect');
+        if (perPageSelect) {
+            perPageSelect.addEventListener('change', function() {
+                state.perPage = parseInt(this.value);
+                state.page = 1;
+                loadLogs();
+            });
+        }
 
         container.querySelectorAll('.pagination-link[data-page]').forEach(function(link) {
             link.addEventListener('click', function() {
                 state.page = parseInt(this.getAttribute('data-page'));
-                render(allLogs);
+                loadLogs();
             });
         });
     }
 
-    function render(logs) {
-        var filtered = filterLogs(logs);
-        var start = (state.page - 1) * state.perPage;
-        var paged = filtered.slice(start, start + state.perPage);
-        renderTable(paged);
-        renderPagination(filtered.length);
-
-        var countEl = document.getElementById('logsTotalCount');
-        if (countEl) countEl.textContent = '(' + filtered.length + ' total)';
+    function collectFilters() {
+        state.filters = {
+            search: (document.getElementById('logsSearch') || {}).value ? document.getElementById('logsSearch').value.trim() : '',
+            role: (document.getElementById('logsRoleFilter') || {}).value || '',
+            date_from: (document.getElementById('logsFromDate') || {}).value || '',
+            date_to: (document.getElementById('logsToDate') || {}).value || ''
+        };
+        state.page = 1;
+        loadLogs();
     }
 
-    window.initSystemLogs = function(logs) {
-        allLogs = logs;
+    function clearFilters() {
+        var s = document.getElementById('logsSearch');
+        var r = document.getElementById('logsRoleFilter');
+        var fd = document.getElementById('logsFromDate');
+        var td = document.getElementById('logsToDate');
+        if (s) s.value = '';
+        if (r) r.value = '';
+        if (fd) fd.value = '';
+        if (td) td.value = '';
+        state.filters = { search: '', role: '', date_from: '', date_to: '' };
+        state.page = 1;
+        loadLogs();
+    }
 
+    function bindEvents() {
         var searchInput = document.getElementById('logsSearch');
+        var btnApply = document.getElementById('btnApplyLogsFilter');
+        var btnClear = document.getElementById('btnClearLogsFilter');
         var roleFilter = document.getElementById('logsRoleFilter');
         var fromDate = document.getElementById('logsFromDate');
         var toDate = document.getElementById('logsToDate');
-        var btnApply = document.getElementById('btnApplyLogsFilter');
-        var btnClear = document.getElementById('btnClearLogsFilter');
 
-        if (btnApply) btnApply.addEventListener('click', function() {
-            state.filters = {
-                search: searchInput ? searchInput.value.trim() : '',
-                role: roleFilter ? roleFilter.value : '',
-                from_date: fromDate ? fromDate.value : '',
-                to_date: toDate ? toDate.value : ''
-            };
-            state.page = 1;
-            render(allLogs);
-        });
-
-        if (btnClear) btnClear.addEventListener('click', function() {
-            if (searchInput) searchInput.value = '';
-            if (roleFilter) roleFilter.value = '';
-            if (fromDate) fromDate.value = '';
-            if (toDate) toDate.value = '';
-            state.filters = { search: '', role: '', from_date: '', to_date: '' };
-            state.page = 1;
-            render(allLogs);
-        });
-
-        [searchInput, roleFilter, fromDate, toDate].forEach(function(el) {
-            if (el) el.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    state.filters = {
-                        search: searchInput ? searchInput.value.trim() : '',
-                        role: roleFilter ? roleFilter.value : '',
-                        from_date: fromDate ? fromDate.value : '',
-                        to_date: toDate ? toDate.value : ''
-                    };
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(function() {
+                    state.filters.search = searchInput.value.trim();
                     state.page = 1;
-                    render(allLogs);
-                }
+                    loadLogs();
+                }, 350);
+            });
+        }
+
+        if (btnApply) btnApply.addEventListener('click', collectFilters);
+        if (btnClear) btnClear.addEventListener('click', clearFilters);
+
+        [roleFilter, fromDate, toDate].forEach(function(el) {
+            if (el) el.addEventListener('change', function() {
+                collectFilters();
             });
         });
-
-        render(allLogs);
-    };
-})();
-
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof allLogs !== 'undefined' && typeof initSystemLogs === 'function') {
-        initSystemLogs(allLogs);
     }
-});
+
+    document.addEventListener('DOMContentLoaded', function() {
+        bindEvents();
+        loadLogs();
+    });
+})();

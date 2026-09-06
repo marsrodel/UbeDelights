@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/admin_auth.php';
+require_once __DIR__ . '/user_logger.php';
 header('Content-Type: application/json');
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
@@ -73,6 +74,7 @@ if ($action === 'add') {
         if (mysqli_stmt_execute($stmt)) {
             $newId = mysqli_insert_id($connect);
             mysqli_stmt_close($stmt);
+            log_activity('PRODUCT_ADD', "{$_SESSION['auth_username']} added product '$name'", 'Products', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
             $sql2 = "SELECT * FROM products WHERE product_id = ?";
             if ($stmt2 = mysqli_prepare($connect, $sql2)) {
                 mysqli_stmt_bind_param($stmt2, 'i', $newId);
@@ -137,6 +139,7 @@ if ($action === 'add') {
         $row = mysqli_fetch_assoc($res);
         mysqli_stmt_close($stmt3);
         if ($row) {
+            log_activity('PRODUCT_EDIT', "{$_SESSION['auth_username']} edited product '$name'", 'Products', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
             echo json_encode(['success' => true, 'product' => formatProduct($row)]);
         } else {
             http_response_code(404);
@@ -174,6 +177,7 @@ if ($action === 'add') {
     if ($stmt2 = mysqli_prepare($connect, $sql2)) {
         mysqli_stmt_bind_param($stmt2, 'i', $id);
         if (mysqli_stmt_execute($stmt2)) {
+            log_activity('PRODUCT_DELETE', "{$_SESSION['auth_username']} deleted product ID $id", 'Products', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
             echo json_encode(['success' => true]);
         } else {
             http_response_code(500);

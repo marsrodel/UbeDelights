@@ -570,6 +570,25 @@ body.admin-body {
     background: #fafafd;
 }
 
+.logs-card .data-table thead th {
+    padding: 10px 12px;
+    font-size: 0.68rem;
+}
+
+.logs-card .data-table tbody td {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.logs-card .data-table tbody td:last-child {
+    white-space: normal;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    max-width: 220px;
+    line-height: 1.4;
+}
+
 .cell-id {
     font-weight: 700;
     color: var(--accent);

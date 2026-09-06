@@ -1,6 +1,7 @@
 <?php
 // Simple login: prepared statements + password_verify + basic lockout
 include '../server/db.php';
+require_once __DIR__ . '/../server/user_logger.php';
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // If already authenticated, send to dashboard
 if (isset($_SESSION['auth_user_id'])) {
@@ -34,10 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_stmt_close($stmtUser);
 
     if (!$user) {
+        log_activity('failed_login', 'Unknown user: ' . $login, 'Authentication', null, $login);
         header('Location: ./login.php?error=user');
         exit();
     }
     if (!$user['is_active']) {
+        log_activity('login_blocked', 'Inactive user attempted login', 'Authentication', (string)$user['user_id'], $user['username']);
         header('Location: ./login.php?error=inactive');
         exit();
     }
@@ -46,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 2) Verify password (lockout and attempt counting are handled in JavaScript)
     if (!password_verify($password, $user['password_hash'])) {
+        log_activity('failed_login', 'Wrong password attempt', 'Authentication', $userId, $user['username']);
         $u = urlencode($login);
         header("Location: ./login.php?error=pass&u=$u");
         exit();
@@ -72,6 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ./set_security_questions.php');
         exit();
     }
+
+    log_activity('login', $user['username'] . ' logged in successfully', 'Authentication', $userId, $user['username']);
 
     // Role-based redirect
     if (in_array($_SESSION['auth_role'], ['admin', 'super_admin'])) {

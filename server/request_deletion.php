@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/db.php';
+require_once __DIR__ . '/user_logger.php';
 
 header('Content-Type: application/json');
 
@@ -62,6 +63,7 @@ $escapedReason = mysqli_real_escape_string($connect, $reason);
 $insert = mysqli_query($connect, "INSERT INTO deletion_requests (target_id_number, requested_by, reason) VALUES ('$escapedTarget', '$escapedRequestedBy', '$escapedReason')");
 
 if ($insert) {
+    log_activity('DELETION_REQUEST', "{$_SESSION['auth_username']} requested deletion of {$target['username']} (ID: $targetId)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
     echo json_encode(['success' => true, 'message' => 'Deletion request submitted for super admin review.']);
 } else {
     echo json_encode(['success' => false, 'message' => 'Failed to submit deletion request.']);

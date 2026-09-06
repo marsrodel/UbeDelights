@@ -2914,9 +2914,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
 
-                    showSuccessModal('Password reset successfully.', function() {
-                        closeModal('resetPasswordModal');
-                    });
+                    var targetUserId = document.getElementById('resetPasswordUserId').value;
+                    pendingResetNewPassword = document.getElementById('resetNewPassword').value;
+                    closeModal('resetPasswordModal');
+                    document.getElementById('blockPasswordUserId').value = targetUserId;
+                    document.getElementById('blockPasswordAction').value = 'reset-password';
+                    document.getElementById('blockPasswordTitle').textContent = 'Enter your password to reset this user\'s password.';
+                    resetBlockPasswordLockout();
+                    document.getElementById('blockPasswordModal').classList.add('active');
                 });
             }
 
@@ -2998,6 +3003,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             var pendingDeletionUserId = '';
             var pendingDeletionReason = '';
+            var pendingResetNewPassword = '';
 
             var requestDeletionModal = document.getElementById('requestDeletionModal');
             if (requestDeletionModal) {
@@ -3005,8 +3011,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!requestDeletionModal.classList.contains('active')) {
                         document.getElementById('deletionReason').value = '';
                         document.getElementById('deletionError').textContent = '';
-                        pendingDeletionUserId = '';
-                        pendingDeletionReason = '';
                     }
                 });
                 deletionObserver.observe(requestDeletionModal, { attributes: true, attributeFilter: ['class'] });
@@ -3125,6 +3129,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                     submitBlockUnblock(targetUserId, action);
                                 } else if (action === 'delete-request') {
                                     submitDeletionRequest(targetUserId);
+                                } else if (action === 'reset-password') {
+                                    submitResetPassword(targetUserId);
                                 }
                             } else {
                                 blockPasswordAttempts++;
@@ -3227,6 +3233,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 xhr.send(fd);
             }
 
+            function submitResetPassword(targetUserId) {
+                var fd = new FormData();
+                fd.append('action', 'reset_password');
+                fd.append('user_id', targetUserId);
+                fd.append('new_password', pendingResetNewPassword);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../server/user_management.php', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var res;
+                        try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+                        if (res.success) {
+                            showSuccessModal('Password reset successfully.', function() {
+                                closeModal('resetPasswordModal');
+                                location.reload();
+                            });
+                        } else {
+                            alert(res.message || 'Failed to reset password.');
+                        }
+                    } else {
+                        alert('Server error. Please try again.');
+                    }
+                };
+                xhr.onerror = function() { alert('Network error. Please try again.'); };
+                xhr.send(fd);
+            }
+
             function submitDeletionRequest(targetUserId) {
                 var fd = new FormData();
                 fd.append('user_id', targetUserId);
@@ -3240,27 +3274,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
                         if (res.success) {
                             showSuccessModal(res.message || 'Deletion request submitted.', function() {
-                                closeModal('requestDeletionModal');
                                 location.reload();
                             });
                         } else {
-                            blockPasswordError.textContent = res.message || 'Request failed.';
-                            blockPasswordConfirmBtn.disabled = false;
-                            blockPasswordConfirmBtn.style.opacity = '';
-                            blockPasswordConfirmBtn.style.cursor = '';
+                            alert(res.message || 'Request failed.');
                         }
                     } else {
-                        blockPasswordError.textContent = 'Server error. Please try again.';
-                        blockPasswordConfirmBtn.disabled = false;
-                        blockPasswordConfirmBtn.style.opacity = '';
-                        blockPasswordConfirmBtn.style.cursor = '';
+                        alert('Server error. Please try again.');
                     }
                 };
                 xhr.onerror = function() {
-                    blockPasswordError.textContent = 'Network error. Please try again.';
-                    blockPasswordConfirmBtn.disabled = false;
-                    blockPasswordConfirmBtn.style.opacity = '';
-                    blockPasswordConfirmBtn.style.cursor = '';
+                    alert('Network error. Please try again.');
                 };
                 xhr.send(fd);
             }

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/db.php';
+require_once __DIR__ . '/user_logger.php';
 
 header('Content-Type: application/json');
 
@@ -92,6 +93,8 @@ $sql = "UPDATE users SET
 
 if (mysqli_query($connect, $sql)) {
     $_SESSION['auth_username'] = $username;
+    $pwChanged = !empty($newPass) ? ' (password changed)' : '';
+    log_activity('PROFILE_UPDATE', "{$_SESSION['auth_username']} updated their profile$pwChanged", 'Account Management', $userId, $username);
     echo json_encode(['success' => true, 'message' => 'Profile updated successfully.']);
 } else {
     echo json_encode(['success' => false, 'message' => 'Failed to update profile.']);
