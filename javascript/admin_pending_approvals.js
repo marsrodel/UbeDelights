@@ -160,7 +160,7 @@ function viewPendingUser(userId) {
     if (!user) return;
     var body = document.getElementById('viewPendingBody');
     if (!body) return;
-    var dob = user.dob ? new Date(user.dob).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+    var dob = (user.dob && user.dob !== '0000-00-00') ? new Date(user.dob).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
     var sex = user.sex || '';
     var age = user.age != null ? String(user.age) : '';
     body.innerHTML =
@@ -237,12 +237,110 @@ function rejectPendingUser(userId) {
 document.getElementById('approvalConfirmBtn').addEventListener('click', function() {
     var userId = document.getElementById('approvalUserId').value;
     var action = document.getElementById('approvalAction').value;
-    var confirmBtn = document.getElementById('approvalConfirmBtn');
 
+    closeApprovalModal();
+
+    document.getElementById('approvalPasswordUserId').value = userId;
+    document.getElementById('approvalPasswordAction').value = action;
+    document.getElementById('approvalPasswordTitle').textContent = action === 'approve'
+        ? 'Enter your security key to approve this account.'
+        : 'Enter your security key to reject this account.';
+    resetApprovalPasswordLockout();
+    document.getElementById('approvalPasswordModal').classList.add('active');
+});
+
+var approvalPasswordAttempts = 0;
+var approvalPasswordMaxAttempts = 3;
+var approvalPasswordLocked = false;
+
+function resetApprovalPasswordLockout() {
+    approvalPasswordAttempts = 0;
+    approvalPasswordLocked = false;
+    var errEl = document.getElementById('approvalPasswordError');
+    if (errEl) errEl.textContent = '';
+    var inp = document.getElementById('approvalPasswordInput');
+    if (inp) { inp.value = ''; inp.disabled = false; inp.style.cursor = ''; }
+    var btn = document.getElementById('approvalPasswordConfirmBtn');
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+}
+
+function closeApprovalPasswordModal() {
+    document.getElementById('approvalPasswordModal').classList.remove('active');
+    resetApprovalPasswordLockout();
+}
+
+document.getElementById('approvalPasswordConfirmBtn').addEventListener('click', function() {
+    if (approvalPasswordLocked) {
+        document.getElementById('approvalPasswordError').textContent = 'Too many failed attempts. Action is locked.';
+        return;
+    }
+
+    var pwd = document.getElementById('approvalPasswordInput').value.trim();
+    if (!pwd) {
+        document.getElementById('approvalPasswordError').textContent = 'Password is required.';
+        return;
+    }
+
+    var confirmBtn = document.getElementById('approvalPasswordConfirmBtn');
     confirmBtn.disabled = true;
     confirmBtn.style.opacity = '0.5';
     confirmBtn.style.cursor = 'not-allowed';
 
+    var fd = new FormData();
+    fd.append('password', pwd);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '../../server/verify_admin_password.php', true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            var res;
+            try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+
+            if (res.success) {
+                var userId = document.getElementById('approvalPasswordUserId').value;
+                var action = document.getElementById('approvalPasswordAction').value;
+                closeApprovalPasswordModal();
+                submitApprovalAction(userId, action);
+            } else {
+                approvalPasswordAttempts++;
+                if (approvalPasswordAttempts >= approvalPasswordMaxAttempts) {
+                    approvalPasswordLocked = true;
+                    document.getElementById('approvalPasswordError').textContent = 'Too many failed attempts. Action is locked.';
+                    document.getElementById('approvalPasswordInput').disabled = true;
+                    document.getElementById('approvalPasswordInput').style.cursor = 'not-allowed';
+                } else {
+                    document.getElementById('approvalPasswordError').textContent = 'Incorrect Password. Attempt ' + approvalPasswordAttempts + ' of ' + approvalPasswordMaxAttempts + '.';
+                    document.getElementById('approvalPasswordInput').value = '';
+                    document.getElementById('approvalPasswordInput').focus();
+                }
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = '';
+                confirmBtn.style.cursor = '';
+            }
+        } else {
+            document.getElementById('approvalPasswordError').textContent = 'Server error. Please try again.';
+            confirmBtn.disabled = false;
+            confirmBtn.style.opacity = '';
+            confirmBtn.style.cursor = '';
+        }
+    };
+    xhr.onerror = function() {
+        document.getElementById('approvalPasswordError').textContent = 'Network error. Please try again.';
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '';
+        confirmBtn.style.cursor = '';
+    };
+    xhr.send(fd);
+});
+
+document.getElementById('approvalPasswordInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('approvalPasswordConfirmBtn').click();
+    }
+});
+
+function submitApprovalAction(userId, action) {
     var fd = new FormData();
     fd.append('action', action);
     fd.append('user_id', userId);
@@ -250,9 +348,6 @@ document.getElementById('approvalConfirmBtn').addEventListener('click', function
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '../../server/user_management.php', true);
     xhr.onload = function() {
-        confirmBtn.disabled = false;
-        confirmBtn.style.opacity = '';
-        confirmBtn.style.cursor = '';
         if (xhr.status === 200) {
             var res;
             try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
@@ -261,7 +356,6 @@ document.getElementById('approvalConfirmBtn').addEventListener('click', function
                 if (row) row.remove();
                 var idx = pendingUsers.findIndex(function(u) { return u.id === userId; });
                 if (idx !== -1) pendingUsers.splice(idx, 1);
-                closeApprovalModal();
                 var t = document.getElementById('toast');
                 t.textContent = res.message || (action === 'approve' ? 'Registration approved!' : 'Registration rejected.');
                 t.className = 'toast show';
@@ -280,13 +374,10 @@ document.getElementById('approvalConfirmBtn').addEventListener('click', function
         }
     };
     xhr.onerror = function() {
-        confirmBtn.disabled = false;
-        confirmBtn.style.opacity = '';
-        confirmBtn.style.cursor = '';
         alert('Network error. Please try again.');
     };
     xhr.send(fd);
-});
+}
 
 function closeApprovalModal() {
     document.getElementById('approvalModal').classList.remove('active');

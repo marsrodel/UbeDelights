@@ -120,8 +120,8 @@
                 for (var i = 0; i < errs.length; i++) errs[i].parentNode.removeChild(errs[i]);
             }
             var titleEl = document.getElementById('addUserModalTitle');
-            if (titleEl) titleEl.textContent = 'Add New User';
-            if (addUserSubmitBtn) addUserSubmitBtn.textContent = 'Add User';
+            if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-user-plus" style="color:var(--accent);"></i> Create Account';
+            if (addUserSubmitBtn) addUserSubmitBtn.textContent = 'Save';
             addUserModal.classList.add('active');
             document.body.style.overflow = 'hidden';
 
@@ -147,7 +147,6 @@
     if (addUserSubmitBtn && addUserForm) {
         addUserSubmitBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            addUserForm.requestSubmit();
         });
     }
 

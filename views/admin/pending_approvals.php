@@ -154,6 +154,30 @@ if ($connect) {
         </div>
     </div>
 
+    <!-- Security Key Confirmation Modal -->
+    <div class="modal-overlay" id="approvalPasswordModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header">
+                <h2 id="approvalPasswordTitle">Enter your security key to approve this account.</h2>
+                <button class="modal-close" onclick="closeApprovalPasswordModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form class="modal-form" onsubmit="return false;">
+                <p style="color:var(--text-secondary); font-size:0.82rem;">Enter your account password to confirm this action.</p>
+                <div class="form-group">
+                    <label>Security Key</label>
+                    <input type="password" id="approvalPasswordInput" placeholder="Enter security key">
+                </div>
+                <p id="approvalPasswordError" style="color:var(--danger); font-size:0.8rem; margin-top:4px; min-height:18px;"></p>
+                <input type="hidden" id="approvalPasswordUserId">
+                <input type="hidden" id="approvalPasswordAction">
+            </form>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeApprovalPasswordModal()">Cancel</button>
+                <button class="btn-primary" id="approvalPasswordConfirmBtn"><i class="fa-solid fa-check"></i> Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script src="../../javascript/admin-routing.js"></script>

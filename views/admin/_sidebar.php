@@ -4,6 +4,10 @@ $activePage = $activePage ?? 'dashboard';
 $orderCount = $orderCount ?? 0;
 $pendingCount = $pendingCount ?? 0;
 $deletionPendingCount = $deletionPendingCount ?? 0;
+if ($isSuperAdmin && $connect) {
+    $rDel = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM deletion_requests WHERE status = 'pending'");
+    if ($rDel) $deletionPendingCount = mysqli_fetch_assoc($rDel)['cnt'];
+}
 ?>
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-header">

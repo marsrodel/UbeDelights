@@ -160,7 +160,7 @@
 /* ==========================================
    ADD USER MODAL
    ========================================== */
-.add-user-modal .modal { max-width: 960px; max-height: 90vh; display: flex; flex-direction: column; border-radius: 12px; }
+.add-user-modal .modal { max-width: 700px; max-height: 90vh; display: flex; flex-direction: column; border-radius: 12px; }
 .add-user-modal .modal-body { padding: 0; overflow-y: auto; flex: 1; }
 .add-user-modal .form-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -172,14 +172,14 @@
 .add-user-modal .modal-close:hover { background: var(--bg-main); color: var(--text-primary); }
 .add-user-modal .register-container {
     background: #ffffff; border-radius: var(--radius-sm); border: 1px solid var(--border);
-    padding: 4px 15px 2px; margin: 0; width: 100%; box-sizing: border-box;
+    padding: 8px 18px 10px; margin: 0; width: 100%; box-sizing: border-box;
 }
 .add-user-modal h1 {
     font-size: 0.95rem; margin: 0; padding: 0; border-bottom: none; color: var(--text-primary); font-weight: 600;
 }
 .add-user-modal .form-sections { display: block; width: 100%; }
-.add-user-modal .section { margin-bottom: 12px; }
-.add-user-modal .form-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 6px; margin: 0; }
+.add-user-modal .section { margin-bottom: 18px; }
+.add-user-modal .form-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 10px; margin: 0; }
 .add-user-modal .form-box { position: relative; margin: 0; }
 .add-user-modal .form-box label {
     position: absolute; top: 2px; left: 12px; font-weight: 600; color: var(--text-secondary); font-size: 0.9rem;
@@ -187,8 +187,8 @@
 }
 .add-user-modal .form-box input,
 .add-user-modal .form-box select {
-    width: 100%; padding: 18px 12px 2px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.875rem;
-    background-color: var(--bg-main); transition: border-color 0.2s ease; height: 40px; box-sizing: border-box;
+    width: 100%; padding: 20px 12px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.875rem;
+    background-color: var(--bg-main); transition: border-color 0.2s ease; height: 44px; box-sizing: border-box;
     font-family: inherit; color: var(--text-primary);
 }
 .add-user-modal .form-box input:focus,
@@ -215,6 +215,11 @@
     position: absolute; right: 12px; font-size: 18px; cursor: pointer; color: #6B7280; transition: color 0.3s ease;
 }
 .add-user-modal .field-error { color: var(--danger); font-size: 0.8rem; margin-top: 0; padding-left: 12px; }
+.add-user-modal .form-hint-text {
+    font-size: 0.78rem; color: var(--text-muted); margin-top: 12px; padding: 0 2px;
+    line-height: 1.4; font-style: italic;
+}
+.add-user-modal .section h1 i { margin-right: 6px; }
 .add-user-modal .form-actions { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 10px; margin-bottom: 8px; }
 .add-user-modal .btn-cancel {
     background: #fff; border: 1px solid var(--border); color: var(--text-primary);

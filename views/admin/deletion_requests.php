@@ -12,10 +12,12 @@ if ($connect) {
                    t.username AS target_username, t.first_name AS target_first_name,
                    t.middle_name AS target_middle_name, t.last_name AS target_last_name,
                    t.extension_name AS target_extension_name, t.role AS target_role,
-                   r.username AS reviewer_username
+                   r.username AS reviewer_username,
+                   CONCAT(rb.first_name, ' ', IFNULL(rb.middle_name, ''), ' ', rb.last_name) AS requester_name
             FROM deletion_requests dr
             JOIN users t ON t.user_id = dr.target_id_number
             LEFT JOIN users r ON r.user_id = dr.reviewed_by
+            LEFT JOIN users rb ON rb.user_id = dr.requested_by
             ORDER BY FIELD(dr.status, 'pending', 'rejected', 'approved'), dr.created_at DESC";
     $result = mysqli_query($connect, $sql);
     if ($result) {
@@ -32,7 +34,7 @@ if ($connect) {
                 'targetName'      => $targetName,
                 'targetUsername'   => $row['target_username'],
                 'targetRole'      => $row['target_role'],
-                'requestedBy'     => $row['requested_by'],
+                'requestedBy'     => trim($row['requester_name']),
                 'reason'          => $row['reason'],
                 'status'          => $row['status'],
                 'reviewedBy'      => $row['reviewer_username'] ?? '',
@@ -45,14 +47,11 @@ if ($connect) {
 
 $orderCount = 0;
 $pendingCount = 0;
-$deletionPendingCount = 0;
 if ($connect) {
     $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'pending'");
     if ($r) $orderCount = mysqli_fetch_assoc($r)['cnt'];
     $r2 = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'pending'");
     if ($r2) $pendingCount = mysqli_fetch_assoc($r2)['cnt'];
-    $r3 = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM deletion_requests WHERE status = 'pending'");
-    if ($r3) $deletionPendingCount = mysqli_fetch_assoc($r3)['cnt'];
 }
 ?>
 <!DOCTYPE html>

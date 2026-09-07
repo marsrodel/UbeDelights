@@ -2304,21 +2304,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var addUserFormRef = document.getElementById('addUserForm');
     if (addUserFormRef) {
         addUserFormRef.addEventListener('submit', function(e) {
-            trimNameFields();
-            // Final address validations
-            var ok = true;
-            for (var q = 0; q < placeFields.length; q++) {
-                var id = placeFields[q].id, label = placeFields[q].label;
-                ok = validateRequiredOnBlur(id, label) && validateNoSpacePlace(id, label) && ok;
-            }
-            // Email final validation
-            ok = validateRequiredOnBlur('email', 'Email Address') && validateEmail('email') && ok;
-            ok = validateRequiredOnBlur('zipcode', 'Zip Code') && validateZip4('zipcode') && ok;
-            // Block if server-side duplicate error exists
-            if (document.getElementById('email-error') && /exists/i.test(document.getElementById('email-error').textContent || '')) {
-                ok = false;
-            }
-            if (!ok) e.preventDefault();
+            e.preventDefault();
         });
     }
 });
@@ -2348,6 +2334,114 @@ document.addEventListener('DOMContentLoaded', function() {
         if (inp) { inp.value = ''; inp.disabled = false; inp.style.cursor = ''; }
         var btn = document.getElementById('blockPasswordConfirmBtn');
         if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+    }
+
+    // ==========================================
+    // CREATE ACCOUNT FLOW
+    // Save → Confirm → Security Key → Submit → Success
+    // ==========================================
+    var addUserSubmitBtn = document.getElementById('addUserSubmitBtn');
+    var createAccountConfirmBtn = document.getElementById('createAccountConfirmBtn');
+
+    function getRoleLabel(role) {
+        if (role === 'super_admin') return 'Super Admin';
+        if (role === 'admin') return 'Admin';
+        if (role === 'customer') return 'Customer';
+        return 'User';
+    }
+
+    function validateCreateAccountFields() {
+        var fields = [
+            { id: 'id', label: 'ID Number' },
+            { id: 'email', label: 'Email' },
+            { id: 'user', label: 'Username' },
+            { id: 'role', label: 'Role' }
+        ];
+        for (var i = 0; i < fields.length; i++) {
+            var el = document.getElementById(fields[i].id);
+            if (!el || !el.value.trim()) {
+                window.adminToast(fields[i].label + ' is required', 'error');
+                if (el) el.focus();
+                return false;
+            }
+        }
+        var emailEl = document.getElementById('email');
+        if (emailEl && emailEl.value.trim()) {
+            var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRe.test(emailEl.value.trim())) {
+                window.adminToast('Invalid email format', 'error');
+                emailEl.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (addUserSubmitBtn) {
+        addUserSubmitBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!validateCreateAccountFields()) return;
+            var role = document.getElementById('role').value;
+            var confirmMsg = document.getElementById('createAccountConfirmMessage');
+            if (confirmMsg) confirmMsg.textContent = 'Create this account as ' + getRoleLabel(role) + '?';
+            document.getElementById('createAccountConfirmModal').classList.add('active');
+        });
+    }
+
+    if (createAccountConfirmBtn) {
+        createAccountConfirmBtn.addEventListener('click', function() {
+            closeModal('createAccountConfirmModal');
+            closeModal('addUserModal');
+            document.body.style.overflow = '';
+            document.getElementById('blockPasswordUserId').value = '';
+            document.getElementById('blockPasswordAction').value = 'create-account';
+            document.getElementById('blockPasswordTitle').textContent = 'Enter your security key to create this account.';
+            resetBlockPasswordLockout();
+            document.getElementById('blockPasswordModal').classList.add('active');
+        });
+    }
+
+    function submitCreateAccount() {
+        var idNo = (document.getElementById('id').value || '').trim();
+        var email = (document.getElementById('email').value || '').trim();
+        var username = (document.getElementById('user').value || '').trim();
+        var role = document.getElementById('role').value;
+
+        var params = 'action=create_account'
+            + '&idNo=' + encodeURIComponent(idNo)
+            + '&email=' + encodeURIComponent(email)
+            + '&username=' + encodeURIComponent(username)
+            + '&role=' + encodeURIComponent(role);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '../../server/user_management.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                try {
+                    var resp = JSON.parse(xhr.responseText);
+                    if (resp.success) {
+                        var addModal = document.getElementById('addUserModal');
+                        if (addModal) { addModal.classList.remove('active'); document.body.style.overflow = ''; }
+                        document.getElementById('successModalTitle').textContent = 'Account Created';
+                        document.getElementById('successModalMessage').textContent = 'User account created. Default password: UbeDelights_123 Share it with them \u2014 they must set their own during first login.';
+                        document.getElementById('successModal').classList.add('active');
+                        var okBtn = document.getElementById('successModalOkBtn');
+                        if (okBtn) {
+                            okBtn.onclick = function() {
+                                closeModal('successModal');
+                                window.location.reload();
+                            };
+                        }
+                    } else {
+                        window.adminToast(resp.message || 'Failed to create account', 'error');
+                    }
+                } catch(ex) {
+                    window.adminToast('An error occurred while creating account', 'error');
+                }
+            }
+        };
+        xhr.send(params);
     }
 
     function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -2547,7 +2641,7 @@ document.addEventListener('DOMContentLoaded', function() {
             h += '<button class="um-action-btn btn-more" title="More Actions"><i class="fa-solid fa-ellipsis-vertical"></i></button>';
             h += '<div class="um-dropdown">';
             h += '<button class="um-dropdown-item" data-action="edit" data-id="'+esc(user.id)+'"><i class="fa-solid fa-pen"></i> Edit</button>';
-            if (isCustomer) {
+            if (isCustomer || (iAmSuperAdmin && !isSuperAdmin)) {
                 h += '<button class="um-dropdown-item" data-action="reset-password" data-id="'+esc(user.id)+'"><i class="fa-solid fa-key"></i> Reset Password</button>';
             }
             if (user.status === 'blocked') {
@@ -2555,10 +2649,14 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
             }
-            if (user.hasPendingDeletion) {
-                h += '<button class="um-dropdown-item" disabled style="opacity:0.5;cursor:not-allowed;color:var(--text-secondary);"><i class="fa-solid fa-clock"></i> Pending Deletion</button>';
+            if (iAmSuperAdmin) {
+                h += '<button class="um-dropdown-item danger" data-action="request-deletion" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Delete</button>';
             } else {
-                h += '<button class="um-dropdown-item danger" data-action="request-deletion" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Request Deletion</button>';
+                if (user.hasPendingDeletion) {
+                    h += '<button class="um-dropdown-item" disabled style="opacity:0.5;cursor:not-allowed;color:var(--text-secondary);"><i class="fa-solid fa-clock"></i> Pending Deletion</button>';
+                } else {
+                    h += '<button class="um-dropdown-item danger" data-action="request-deletion" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Request Deletion</button>';
+                }
             }
             h += '</div></div>';
         }
@@ -2733,7 +2831,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 var body = document.getElementById('viewUserBody');
                 if (!body) return;
                 var roleLabel = user.role === 'super_admin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : 'Customer';
-                var dob = user.dob ? new Date(user.dob).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+                var dob = (user.dob && user.dob !== '0000-00-00') ? new Date(user.dob).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
                 var statusLabel = user.status.charAt(0).toUpperCase() + user.status.slice(1);
                 body.innerHTML =
                     '<div class="um-view-form">' +
@@ -2748,8 +2846,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             '<div class="fields-row cols-4">' +
                                 '<div class="form-group"><label>Extension Name</label><input type="text" value="' + esc(user.extensionName || '') + '" readonly></div>' +
                                 '<div class="form-group"><label>Date of Birth</label><input type="text" value="' + esc(dob) + '" readonly></div>' +
-                                '<div class="form-group"><label>Age</label><input type="text" value="' + esc(String(user.age)) + '" readonly></div>' +
-                                '<div class="form-group"><label>Sex</label><input type="text" value="' + esc(user.sex) + '" readonly></div>' +
+                                '<div class="form-group"><label>Age</label><input type="text" value="' + esc(user.age ? String(user.age) : '') + '" readonly></div>' +
+                                '<div class="form-group"><label>Sex</label><input type="text" value="' + esc(user.sex || '') + '" readonly></div>' +
                             '</div>' +
                         '</div>' +
                         '<div class="section-block">' +
@@ -3137,6 +3235,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                     submitDeletionRequest(targetUserId);
                                 } else if (action === 'reset-password') {
                                     submitResetPassword(targetUserId);
+                                } else if (action === 'create-account') {
+                                    submitCreateAccount();
                                 }
                             } else {
                                 blockPasswordAttempts++;

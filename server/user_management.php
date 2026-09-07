@@ -468,6 +468,67 @@ try {
             }
             break;
 
+        case 'create_account':
+            $username = trim($_POST['username'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $role = $_POST['role'] ?? '';
+            $idNo = trim($_POST['idNo'] ?? '');
+
+            $errors = [];
+
+            if (empty($idNo)) $errors[] = 'ID Number is required';
+            if (empty($email)) $errors[] = 'Email is required';
+            if (empty($username)) $errors[] = 'Username is required';
+            if (empty($role)) $errors[] = 'Role is required';
+
+            if (!in_array($role, ['admin', 'super_admin', 'customer'])) {
+                $errors[] = 'Invalid role';
+            } elseif ($currentRole === 'admin' && $role === 'super_admin') {
+                $errors[] = 'Admins cannot create Super Admin accounts';
+            }
+
+            if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'Invalid email format';
+            }
+
+            if (!empty($username)) {
+                $c = $connect->prepare("SELECT user_id FROM users WHERE username = ?");
+                $c->bind_param("s", $username); $c->execute();
+                if ($c->get_result()->num_rows > 0) $errors[] = 'Username already exists';
+                $c->close();
+            }
+            if (!empty($email)) {
+                $c = $connect->prepare("SELECT user_id FROM users WHERE email = ?");
+                $c->bind_param("s", $email); $c->execute();
+                if ($c->get_result()->num_rows > 0) $errors[] = 'Email already exists';
+                $c->close();
+            }
+            if (!empty($idNo)) {
+                $c = $connect->prepare("SELECT user_id FROM users WHERE user_id = ?");
+                $c->bind_param("s", $idNo); $c->execute();
+                if ($c->get_result()->num_rows > 0) $errors[] = 'ID Number already exists';
+                $c->close();
+            }
+
+            if (!empty($errors)) {
+                throw new Exception(implode("\n", $errors));
+            }
+
+            $defaultPassword = 'UbeDelights_123';
+            $hashed = password_hash($defaultPassword, PASSWORD_DEFAULT);
+
+            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, '', NULL, '', NULL, '0000-00-00', 0, '', ?, ?, ?, 'incomplete', 0, '', '', '', '', '', '')");
+            $ins->bind_param("sssss",
+                $idNo, $username, $email, $hashed, $role
+            );
+            if ($ins->execute()) {
+                log_activity('CREATE_ACCOUNT', "{$_SESSION['auth_username']} created account for $username (ID: $idNo) with role $role", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
+                $response = ['success' => true, 'message' => 'Account created successfully', 'user_id' => $idNo];
+            } else {
+                throw new Exception('Failed to create account');
+            }
+            break;
+
         default:
             throw new Exception('Invalid action');
     }

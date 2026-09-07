@@ -103,6 +103,7 @@ if ($connect) {
                             <option value="blocked">Blocked</option>
                             <option value="incomplete">Incomplete</option>
                         </select>
+                        <button id="btnAddUser" class="btn-primary" style="padding:10px 14px; font-size:1rem; border-radius:8px; min-width:40px;" title="Add New User"><i class="fa-solid fa-plus"></i></button>
                     </div>
                 </div>
                 <div class="table-container">
@@ -352,132 +353,71 @@ if ($connect) {
         </div>
     </div>
 
-    <!-- Add New User Modal -->
+    <!-- Create Account Modal -->
     <div class="modal-overlay add-user-modal" id="addUserModal" role="dialog" aria-modal="true">
         <div class="modal">
             <div class="modal-body">
                 <div class="register-container">
                     <div class="form-header">
-                        <h2 id="addUserModalTitle"><i class="fa-solid fa-user-plus" style="color:var(--accent);"></i> Add New User</h2>
+                        <h2 id="addUserModalTitle"><i class="fa-solid fa-user-plus" style="color:var(--accent);"></i> Create Account</h2>
                         <button class="modal-close" onclick="closeModal('addUserModal')"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                     <form id="addUserForm">
-                    <div class="form-sections">
-                        <div class="section">
-                            <h1>Personal Information</h1>
-                            <div class="form-group">
-                                <div class="form-box">
-                                    <label for="id">ID Number <span class="required">*</span></label>
-                                    <input type="text" id="id" placeholder="xxxx-xxxx" readonly>
-                                </div>
-                                <div class="form-box">
-                                    <label for="fname">First Name <span class="required">*</span></label>
-                                    <input type="text" id="fname">
-                                </div>
-                                <div class="form-box">
-                                    <label for="mname">Middle Name <span class="optional">(optional)</span></label>
-                                    <input type="text" id="mname">
-                                </div>
-                                <div class="form-box">
-                                    <label for="lname">Last Name <span class="required">*</span></label>
-                                    <input type="text" id="lname">
-                                </div>
-                                <div class="form-box">
-                                    <label for="ename">Extension Name <span class="optional">(optional)</span></label>
-                                    <input type="text" id="ename">
-                                </div>
-                                <div class="form-box">
-                                    <label for="bday">Date of Birth <span class="required">*</span></label>
-                                    <input type="date" id="bday" onchange="calculateAge()">
-                                </div>
-                                <div class="form-box">
-                                    <label for="age">Age <span class="required">*</span></label>
-                                    <input type="text" id="age" readonly>
-                                </div>
-                                <div class="form-box">
-                                    <label for="sex">Sex <span class="required">*</span></label>
-                                    <select id="sex">
-                                        <option value="">-Select Sex-</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
-                                </div>
-                                <div class="form-box">
-                                    <label for="email">Email Address <span class="required">*</span></label>
-                                    <input type="text" id="email">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="section">
-                            <h1>Address Information</h1>
-                            <div class="form-group">
-                                <div class="form-box">
-                                    <label for="street">Purok/Street <span class="required">*</span></label>
-                                    <input type="text" id="street">
-                                </div>
-                                <div class="form-box">
-                                    <label for="brgy">Barangay <span class="required">*</span></label>
-                                    <input type="text" id="brgy">
-                                </div>
-                                <div class="form-box">
-                                    <label for="city">City/Municipality <span class="required">*</span></label>
-                                    <input type="text" id="city">
-                                </div>
-                                <div class="form-box">
-                                    <label for="province">Province <span class="required">*</span></label>
-                                    <input type="text" id="province">
-                                </div>
-                                <div class="form-box">
-                                    <label for="country">Country <span class="required">*</span></label>
-                                    <input type="text" id="country">
-                                </div>
-                                <div class="form-box">
-                                    <label for="zipcode">Zip Code <span class="required">*</span></label>
-                                    <input type="number" id="zipcode">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="section">
-                            <h1>Account Information</h1>
-                            <div class="form-group">
-                                <div class="form-box">
-                                    <label for="user">Username <span class="required">*</span></label>
-                                    <input type="text" id="user">
-                                </div>
-                                <div class="form-box">
-                                    <label for="role">Role <span class="required">*</span></label>
-                                    <select id="role">
-                                        <option value="">-Select Role-</option>
-                                        <option value="customer">Customer</option>
-                                        <option value="admin">Admin</option>
-                                        <?php if ($_SESSION['auth_role'] === 'super_admin'): ?>
-                                        <option value="super_admin">Super Admin</option>
-                                        <?php endif; ?>
-                                    </select>
-                                </div>
-                                <div class="form-box">
-                                    <label for="pass">Password <span class="required">*</span> <span id="pass-strength" class="field-hint"></span></label>
-                                    <div class="password-wrapper">
-                                        <input type="password" id="pass">
-                                        <i class="fa-solid fa-eye-slash" id="eyeicon-register"></i>
+                        <div class="form-sections">
+                            <div class="section">
+                                <h1><i class="fa-regular fa-file-lines" style="color:var(--accent); margin-right:6px;"></i>Account Information</h1>
+                                <div class="form-group" style="grid-template-columns: repeat(2, 1fr);">
+                                    <div class="form-box">
+                                        <label for="id">ID Number <span class="required">*</span></label>
+                                        <input type="text" id="id" placeholder="xxxx-xxxx" readonly>
+                                    </div>
+                                    <div class="form-box">
+                                        <label for="email">Email <span class="required">*</span></label>
+                                        <input type="text" id="email" placeholder="Working email — code is sent here">
+                                    </div>
+                                    <div class="form-box">
+                                        <label for="user">Username <span class="required">*</span></label>
+                                        <input type="text" id="user">
+                                    </div>
+                                    <div class="form-box">
+                                        <label for="role">Role <span class="required">*</span></label>
+                                        <select id="role">
+                                            <option value="">-- Select a role --</option>
+                                            <option value="customer">Customer</option>
+                                            <option value="admin">Admin</option>
+                                            <?php if ($_SESSION['auth_role'] === 'super_admin'): ?>
+                                            <option value="super_admin">Super Admin</option>
+                                            <?php endif; ?>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="form-box">
-                                    <label for="repass">Re-Enter Password <span class="required">*</span> <span id="repass-match" class="field-hint"></span></label>
-                                    <input type="password" id="repass">
-                                </div>
+                                <p class="form-hint-text"><i class="fa-solid fa-circle-info" style="color:var(--accent); margin-right:4px;"></i>The account starts on the shared default password and must change it during first login.</p>
                             </div>
                         </div>
-                    </div>
                     </form>
 
                     <div class="form-actions">
                         <button type="button" class="btn-cancel" onclick="closeModal('addUserModal')">Cancel</button>
-                        <button type="button" class="add-btn" id="addUserSubmitBtn">Add User</button>
+                        <button type="button" class="add-btn" id="addUserSubmitBtn">Save</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Account Confirmation Modal -->
+    <div class="modal-overlay" id="createAccountConfirmModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header" style="border-bottom:none;">
+                <h2>Create Account</h2>
+                <button class="modal-close" onclick="closeModal('createAccountConfirmModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="padding:0 24px;">
+                <p id="createAccountConfirmMessage" style="color:var(--text-secondary); font-size:0.95rem;">Create this account as User?</p>
+            </div>
+            <div class="modal-footer" style="border-top:none;">
+                <button class="btn-outline" onclick="closeModal('createAccountConfirmModal')">Cancel</button>
+                <button class="btn-primary" id="createAccountConfirmBtn">Create</button>
             </div>
         </div>
     </div>
@@ -500,9 +440,9 @@ if ($connect) {
     <div class="toast" id="toast"></div>
 
     <script src="../../javascript/admin-routing.js?v=2.0"></script>
-    <script src="../../javascript/admin_security.js?v=3.0"></script>
+    <script src="../../javascript/admin_security.js?v=4.0"></script>
     <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>;</script>
-    <script src="../../javascript/user_management.js?v=3.0"></script>
+    <script src="../../javascript/user_management.js?v=4.0"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
 </body>
 </html>

@@ -5,7 +5,6 @@ $pendingOrders = 0;
 $deliveredOrders = 0;
 $cancelledOrders = 0;
 $pendingCount = 0;
-$deletionPendingCount = 0;
 
 if ($connect) {
     $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders");
@@ -22,9 +21,6 @@ if ($connect) {
 
     $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'pending'");
     if ($r) $pendingCount = mysqli_fetch_assoc($r)['cnt'];
-
-    $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM deletion_requests WHERE status = 'pending'");
-    if ($r) $deletionPendingCount = mysqli_fetch_assoc($r)['cnt'];
 }
 
 $stats = [
