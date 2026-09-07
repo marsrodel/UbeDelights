@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                     <div class="auth-alt">
-                        <p id="forgot-section" class="forgot">Forgot Password? <a onclick="getRecover()">Reset Here</a></p>
+                        <p id="forgot-section" class="forgot">Forgot Password? <a onclick="getForgotPassword()">Reset Here</a></p>
                     </div>
                     <div id="lockout-timer" class="lockout-timer"></div>
                     <button class="btn" type="submit">Login</button>

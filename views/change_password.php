@@ -2,9 +2,9 @@
 include '../server/db.php';
 session_start();
 
-// Require reset session set by recover.php
+// Require reset session set by forgot_password.php
 if (!isset($_SESSION['pw_reset_user_id'])) {
-    header('Location: ./recover.php');
+    header('Location: ./forgot_password.php');
     exit();
 }
 

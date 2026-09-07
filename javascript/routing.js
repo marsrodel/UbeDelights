@@ -11,7 +11,11 @@ const getRegister = () => {
 };
 
 const getRecover = () => {
-    window.location.href = "./recover.php";
+    window.location.href = "./forgot_password.php";
+};
+
+const getForgotPassword = () => {
+    window.location.href = "./forgot_password.php";
 };
 
 const getIndex = () => {

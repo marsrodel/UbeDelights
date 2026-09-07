@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
     if (forgot) {
       forgot.style.display = 'block';
-      forgot.innerHTML = 'Forgot Password? <a href="./recover.php">Reset Here</a>';
+      forgot.innerHTML = 'Forgot Password? <a href="./forgot_password.php">Reset Here</a>';
     }
   } else {
     if (forgot) forgot.style.display = 'none';
