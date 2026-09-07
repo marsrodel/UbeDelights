@@ -161,13 +161,13 @@ if ($connect) {
                 <h2 id="approvalPasswordTitle">Enter your security key to approve this account.</h2>
                 <button class="modal-close" onclick="closeApprovalPasswordModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <form class="modal-form" onsubmit="return false;">
+                <form class="modal-form">
                 <p style="color:var(--text-secondary); font-size:0.82rem;">Enter your account password to confirm this action.</p>
                 <div class="form-group">
-                    <label>Security Key</label>
-                    <input type="password" id="approvalPasswordInput" placeholder="Enter security key">
+                    <label>Password</label>
+                    <input type="password" id="approvalPasswordInput" placeholder="Enter password">
                 </div>
-                <p id="approvalPasswordError" style="color:var(--danger); font-size:0.8rem; margin-top:4px; min-height:18px;"></p>
+                <p id="approvalPasswordError" class="inline-error"></p>
                 <input type="hidden" id="approvalPasswordUserId">
                 <input type="hidden" id="approvalPasswordAction">
             </form>

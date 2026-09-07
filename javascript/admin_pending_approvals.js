@@ -243,8 +243,8 @@ document.getElementById('approvalConfirmBtn').addEventListener('click', function
     document.getElementById('approvalPasswordUserId').value = userId;
     document.getElementById('approvalPasswordAction').value = action;
     document.getElementById('approvalPasswordTitle').textContent = action === 'approve'
-        ? 'Enter your security key to approve this account.'
-        : 'Enter your security key to reject this account.';
+        ? 'Enter your password to approve this registration.'
+        : 'Enter your password to reject this registration.';
     resetApprovalPasswordLockout();
     document.getElementById('approvalPasswordModal').classList.add('active');
 });
