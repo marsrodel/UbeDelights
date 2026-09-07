@@ -62,7 +62,14 @@ function fetch_question_groups() {
 
 /* ── POST Handlers ── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = isset($_POST['fp_action']) ? $_POST['fp_action'] : '';
+    $isJson = !empty($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false;
+    $jsonData = $isJson ? json_decode(file_get_contents('php://input'), true) : null;
+    $action = '';
+    if ($isJson && isset($jsonData['fp_action'])) {
+        $action = $jsonData['fp_action'];
+    } elseif (isset($_POST['fp_action'])) {
+        $action = $_POST['fp_action'];
+    }
 
     /* Step 1: Verify ID */
     if ($action === 'verify_id') {
@@ -78,17 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = fetch_user_full($connect, $idnum);
         if (!$user) {
             header('Location: ./forgot_password.php?step=1&error=unknown_id');
-            exit();
-        }
-
-        // Rate limiting: max 3 OTP requests per hour
-        $rateStmt = mysqli_prepare($connect, 'SELECT COUNT(*) AS sent FROM password_reset_otp WHERE idNumber = ? AND created_at > (NOW() - INTERVAL 1 HOUR)');
-        mysqli_stmt_bind_param($rateStmt, 's', $idnum);
-        mysqli_stmt_execute($rateStmt);
-        $rateRes = mysqli_stmt_get_result($rateStmt)->fetch_assoc();
-        mysqli_stmt_close($rateStmt);
-        if ((int)$rateRes['sent'] >= 3) {
-            header('Location: ./forgot_password.php?step=1&error=rate_limit');
             exit();
         }
 
@@ -221,17 +217,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_SESSION['fp_email'] ?? '';
         $username = $_SESSION['fp_username'] ?? '';
 
-        // Rate limiting: max 3 OTP requests per hour
-        $rateStmt = mysqli_prepare($connect, 'SELECT COUNT(*) AS sent FROM password_reset_otp WHERE idNumber = ? AND created_at > (NOW() - INTERVAL 1 HOUR)');
-        mysqli_stmt_bind_param($rateStmt, 's', $idnum);
-        mysqli_stmt_execute($rateStmt);
-        $rateRes = mysqli_stmt_get_result($rateStmt)->fetch_assoc();
-        mysqli_stmt_close($rateStmt);
-        if ((int)$rateRes['sent'] >= 3) {
-            header('Location: ./forgot_password.php?step=2&error=rate_limit');
-            exit();
-        }
-
         // Generate new OTP
         $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $otpHash = password_hash($otp, PASSWORD_BCRYPT);
@@ -272,23 +257,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     /* Step 3: Verify Security Questions */
     if ($action === 'verify_security') {
         if (!isset($_SESSION['fp_user_id']) || !isset($_SESSION['fp_qa'])) {
-            header('Location: ./forgot_password.php?step=1');
+            if ($isJson) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Session expired. Please start over.']);
+            } else {
+                header('Location: ./forgot_password.php?step=1');
+            }
             exit();
         }
-        $sq1 = isset($_POST['sq_q1']) ? trim($_POST['sq_q1']) : '';
-        $sq2 = isset($_POST['sq_q2']) ? trim($_POST['sq_q2']) : '';
-        $sq3 = isset($_POST['sq_q3']) ? trim($_POST['sq_q3']) : '';
-        $a1 = isset($_POST['sq_a1']) ? trim($_POST['sq_a1']) : '';
-        $a2 = isset($_POST['sq_a2']) ? trim($_POST['sq_a2']) : '';
-        $a3 = isset($_POST['sq_a3']) ? trim($_POST['sq_a3']) : '';
+
+        if ($isJson) {
+            $sq1 = isset($jsonData['questions'][0]) ? trim($jsonData['questions'][0]) : '';
+            $sq2 = isset($jsonData['questions'][1]) ? trim($jsonData['questions'][1]) : '';
+            $sq3 = isset($jsonData['questions'][2]) ? trim($jsonData['questions'][2]) : '';
+            $a1 = isset($jsonData['answers'][0]) ? trim($jsonData['answers'][0]) : '';
+            $a2 = isset($jsonData['answers'][1]) ? trim($jsonData['answers'][1]) : '';
+            $a3 = isset($jsonData['answers'][2]) ? trim($jsonData['answers'][2]) : '';
+        } else {
+            $sq1 = isset($_POST['sq_q1']) ? trim($_POST['sq_q1']) : '';
+            $sq2 = isset($_POST['sq_q2']) ? trim($_POST['sq_q2']) : '';
+            $sq3 = isset($_POST['sq_q3']) ? trim($_POST['sq_q3']) : '';
+            $a1 = isset($_POST['sq_a1']) ? trim($_POST['sq_a1']) : '';
+            $a2 = isset($_POST['sq_a2']) ? trim($_POST['sq_a2']) : '';
+            $a3 = isset($_POST['sq_a3']) ? trim($_POST['sq_a3']) : '';
+        }
         $qa = $_SESSION['fp_qa'];
 
         if ($sq1 === '' || $sq2 === '' || $sq3 === '' || $a1 === '' || $a2 === '' || $a3 === '') {
-            header('Location: ./forgot_password.php?step=3&error=empty_answers');
+            if ($isJson) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'All fields are required.']);
+            } else {
+                header('Location: ./forgot_password.php?step=3&error=empty_answers');
+            }
             exit();
         }
         if (count(array_unique([$sq1, $sq2, $sq3])) < 3) {
-            header('Location: ./forgot_password.php?step=3&error=duplicate_questions');
+            if ($isJson) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Each security question must be different.']);
+            } else {
+                header('Location: ./forgot_password.php?step=3&error=duplicate_questions');
+            }
             exit();
         }
         $stored = [
@@ -298,20 +308,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         $selectedQuestions = [$sq1, $sq2, $sq3];
         $selectedAnswers = [$a1, $a2, $a3];
+        $answerResults = [];
         $correct = 0;
         for ($i = 0; $i < 3; $i++) {
             $q = $selectedQuestions[$i];
             $a = $selectedAnswers[$i];
             if ($q !== '' && isset($stored[$q]) && password_verify($a, $stored[$q])) {
+                $answerResults[] = true;
                 $correct++;
+            } else {
+                $answerResults[] = false;
             }
         }
-        if ($correct < 2) {
-            header('Location: ./forgot_password.php?step=3&error=not_enough');
-            exit();
+        if ($isJson) {
+            header('Content-Type: application/json');
+            if ($correct >= 2) {
+                unset($_SESSION['fp_qa']);
+                echo json_encode(['success' => true, 'answerResults' => $answerResults, 'correctCount' => $correct]);
+            } else {
+                $msg = $correct === 1
+                    ? 'At least 1 correct answer now to proceed.'
+                    : 'You need at least 2 correct answers to proceed.';
+                echo json_encode(['success' => false, 'answerResults' => $answerResults, 'correctCount' => $correct, 'message' => $msg]);
+            }
+        } else {
+            if ($correct < 2) {
+                header('Location: ./forgot_password.php?step=3&error=not_enough');
+                exit();
+            }
+            unset($_SESSION['fp_qa']);
+            header('Location: ./forgot_password.php?step=4');
         }
-        unset($_SESSION['fp_qa']);
-        header('Location: ./forgot_password.php?step=4');
         exit();
     }
 
@@ -515,15 +542,14 @@ $questionGroups = fetch_question_groups();
               <span>Username: <strong><?php echo htmlspecialchars($maskedUsername); ?></strong></span>
             </div>
             <div class="form-group">
-              <label for="newPassword">New Password <span class="required">*</span></label>
+              <label for="newPassword">New Password <span class="required">*</span> <span id="strengthIndicator" class="strength-text"></span></label>
               <div class="password-wrapper">
                 <input type="password" id="newPassword" name="new_password" placeholder="Enter new password" required />
                 <i class="fa-solid fa-eye-slash"></i>
               </div>
-              <small id="strengthIndicator" class="strength-text"></small>
             </div>
             <div class="form-group">
-              <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
+              <label for="confirmPassword">Confirm Password <span class="required">*</span> <span id="confirmMatch"></span></label>
               <div class="password-wrapper">
                 <input type="password" id="confirmPassword" name="confirm_password" placeholder="Re-enter new password" required />
                 <i class="fa-solid fa-eye-slash"></i>

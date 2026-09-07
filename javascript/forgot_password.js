@@ -38,7 +38,12 @@
     var div = document.createElement('div');
     div.className = 'block-error inline-error';
     div.textContent = message;
-    container.appendChild(div);
+    var actions = container.querySelector('.form-actions');
+    if (actions) {
+      container.insertBefore(div, actions);
+    } else {
+      container.appendChild(div);
+    }
   }
 
   function clearBlockError(containerId) {
@@ -158,32 +163,127 @@
   }
 
   /* ── Password Strength (Step 4) ── */
-  function checkStrength(pw) {
-    if (!pw) return '';
-    var score = 0;
-    if (pw.length >= 8) score++;
-    if (pw.length >= 10) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    if (score <= 2) return 'Weak';
-    if (score <= 3) return 'Medium';
-    return 'Strong';
+  function getPasswordStrength(pw) {
+    var s = (pw || '').replace(/\s+/g, '');
+    if (!s) return '';
+    var types = 0;
+    if (/[a-z]/.test(s)) types++;
+    if (/[A-Z]/.test(s)) types++;
+    if (/[0-9]/.test(s)) types++;
+    if (/[^A-Za-z0-9]/.test(s)) types++;
+    if (s.length < 8 || types < 2) return 'Weak';
+    if (s.length >= 12 && types >= 4) return 'Strong';
+    return 'Medium';
   }
+
+  function hasSpace(str) { return /\s/.test(str || ''); }
 
   function initPasswordStrength() {
     var newPw = document.getElementById('newPassword');
+    var confirmPw = document.getElementById('confirmPassword');
     var strengthEl = document.getElementById('strengthIndicator');
-    if (!newPw || !strengthEl) return;
+    var matchEl = document.getElementById('confirmMatch');
+    if (!newPw) return;
+
+    function updateStrength() {
+      if (!strengthEl) return;
+      var val = newPw.value || '';
+      var strength = getPasswordStrength(val);
+
+      if (!val) {
+        strengthEl.textContent = '';
+        strengthEl.className = 'strength-text';
+        clearFieldError('newPassword');
+        return;
+      }
+
+      if (hasSpace(val)) {
+        strengthEl.textContent = '';
+        strengthEl.className = 'strength-text';
+        showFieldError('newPassword', 'Spaces are not allowed in password.');
+        return;
+      }
+      if (val.length < 8) {
+        showFieldError('newPassword', 'Password must be at least 8 characters long.');
+        strengthEl.textContent = strength ? strength + ' Password' : '';
+        strengthEl.className = 'strength-text' + (strength ? ' ' + strength.toLowerCase() : '');
+        return;
+      }
+      if (val.length > 50) {
+        showFieldError('newPassword', 'Password cannot exceed 50 characters.');
+        return;
+      }
+      if (!/[A-Z]/.test(val)) {
+        showFieldError('newPassword', 'Password must contain at least 1 uppercase letter.');
+        strengthEl.textContent = strength ? strength + ' Password' : '';
+        strengthEl.className = 'strength-text' + (strength ? ' ' + strength.toLowerCase() : '');
+        return;
+      }
+      if (!/[a-z]/.test(val)) {
+        showFieldError('newPassword', 'Password must contain at least 1 lowercase letter.');
+        strengthEl.textContent = strength ? strength + ' Password' : '';
+        strengthEl.className = 'strength-text' + (strength ? ' ' + strength.toLowerCase() : '');
+        return;
+      }
+      if (!/[0-9]/.test(val)) {
+        showFieldError('newPassword', 'Password must contain at least 1 number.');
+        strengthEl.textContent = strength ? strength + ' Password' : '';
+        strengthEl.className = 'strength-text' + (strength ? ' ' + strength.toLowerCase() : '');
+        return;
+      }
+      if (!/[^A-Za-z0-9]/.test(val)) {
+        showFieldError('newPassword', 'Password must contain at least 1 special character.');
+        strengthEl.textContent = strength ? strength + ' Password' : '';
+        strengthEl.className = 'strength-text' + (strength ? ' ' + strength.toLowerCase() : '');
+        return;
+      }
+
+      clearFieldError('newPassword');
+      strengthEl.textContent = strength + ' Password';
+      strengthEl.className = 'strength-text ' + strength.toLowerCase();
+    }
+
+    function updateMatch() {
+      if (!matchEl) return;
+      var p1 = newPw.value || '';
+      var p2 = confirmPw ? confirmPw.value : '';
+      if (!p2) {
+        matchEl.textContent = '';
+        matchEl.style.color = '';
+        return;
+      }
+      if (p1 === p2) {
+        matchEl.textContent = 'Password Matched';
+        matchEl.style.color = '#16a34a';
+        clearFieldError('confirmPassword');
+      } else {
+        matchEl.textContent = 'Password does not match';
+        matchEl.style.color = '#dc2626';
+      }
+    }
 
     newPw.addEventListener('input', function () {
-      var s = checkStrength(this.value);
-      strengthEl.textContent = s ? 'Strength: ' + s : '';
-      strengthEl.className = 'strength-text';
-      if (s === 'Weak') strengthEl.classList.add('weak');
-      else if (s === 'Medium') strengthEl.classList.add('medium');
-      else if (s === 'Strong') strengthEl.classList.add('strong');
+      updateStrength();
+      updateMatch();
     });
+    if (confirmPw) {
+      confirmPw.addEventListener('input', function () {
+        if (!confirmPw.value) {
+          clearFieldError('confirmPassword');
+        }
+        updateMatch();
+        if (hasSpace(confirmPw.value)) {
+          showFieldError('confirmPassword', 'Spaces are not allowed in password.');
+        } else {
+          var errEl = document.getElementById('confirmPassword-error');
+          if (errEl && /spaces/i.test(errEl.textContent || '')) {
+            errEl.parentNode && errEl.parentNode.removeChild(errEl);
+          }
+        }
+      });
+    }
+
+    updateStrength();
   }
 
   /* ── Step 3: Question Dropdown Duplicate Prevention ── */
@@ -209,25 +309,54 @@
     refreshDisables();
   }
 
-  /* ── Step 3: Real-time answer validation ── */
-  function validateAnswer(fieldId) {
-    var el = document.getElementById(fieldId);
-    if (!el) return true;
-    var raw = (el.value || '');
-    if (/^\s|\s$/.test(raw)) {
-      showFieldError(fieldId, 'No leading or trailing spaces');
-      return false;
+  /* ── Step 3: Security Question Group Validation ── */
+  function buildGroups() {
+    var groups = [];
+    for (var i = 1; i <= 3; i++) {
+      var select = document.getElementById('sq_q' + i);
+      var input = document.getElementById('sq_a' + i);
+      if (!select || !input) continue;
+      var feedback = document.createElement('small');
+      feedback.className = 'answer-feedback';
+      input.parentNode.parentNode.appendChild(feedback);
+      var error = document.createElement('small');
+      error.className = 'field-error';
+      input.parentNode.parentNode.appendChild(error);
+      groups.push({ select: select, input: input, feedback: feedback, error: error });
     }
-    var v = raw.trim();
-    if (v === '') { clearFieldError(fieldId); return false; }
-    if (!/^[A-Za-z0-9 .'-]+$/.test(v)) {
-      showFieldError(fieldId, "Only letters, numbers, spaces, periods, apostrophes, or hyphens allowed.");
-      return false;
+    return groups;
+  }
+
+  function validateGroup(g, triggeredBySubmit) {
+    var question = g.select.value;
+    var answer = g.input.value.trim();
+
+    if (!triggeredBySubmit) {
+      if (question && answer) {
+        g.error.textContent = '';
+        g.error.style.display = 'none';
+      }
+      return true;
     }
-    if (v.length < 3) { showFieldError(fieldId, 'Must be at least 3 characters'); return false; }
-    if (v.length > 50) { showFieldError(fieldId, 'Maximum of 50 characters only'); return false; }
-    clearFieldError(fieldId);
-    return true;
+
+    var message = '';
+    if (!question) {
+      message = 'Select a question.';
+    } else if (answer === '') {
+      message = 'Answer is required.';
+    }
+
+    g.error.textContent = message;
+    g.error.style.display = message ? 'block' : 'none';
+    return message === '';
+  }
+
+  function clearFeedback(g) {
+    if (g.feedback.textContent === 'Wrong answer') {
+      g.feedback.textContent = '';
+      g.feedback.style.display = 'none';
+      g.input.style.borderColor = '';
+    }
   }
 
   /* ── Server-side Errors from URL ── */
@@ -242,10 +371,6 @@
       if (error === 'empty_id') showFieldError('id_number', 'This field is required');
       else if (error === 'invalid_id') showFieldError('id_number', 'Please enter ID in format: xxxx-xxxx');
       else if (error === 'unknown_id') showFieldError('id_number', 'ID not found');
-      else if (error === 'rate_limit') {
-        var errEl = document.getElementById('otpError');
-        if (errEl) { errEl.textContent = 'Too many OTP requests. Try again in an hour.'; errEl.classList.add('show'); }
-      }
     }
 
     if (step === '2') {
@@ -268,24 +393,6 @@
       else if (error === 'otp_locked') {
         var errEl = document.getElementById('otpError');
         if (errEl) { errEl.textContent = 'Too many failed attempts. Request a new OTP.'; errEl.classList.add('show'); }
-      }
-      else if (error === 'rate_limit') {
-        var errEl = document.getElementById('otpError');
-        if (errEl) { errEl.textContent = 'Too many OTP requests. Try again in an hour.'; errEl.classList.add('show'); }
-      }
-    }
-
-    if (step === '3') {
-      if (error === 'empty_answers') {
-        ['sq_a1', 'sq_a2', 'sq_a3'].forEach(function (id) {
-          showFieldError(id, 'This field is required');
-        });
-      }
-      else if (error === 'not_enough') {
-        showBlockError('step-3', 'Please answer at least 2 questions correctly.');
-      }
-      else if (error === 'duplicate_questions') {
-        showBlockError('step-3', 'Each security question must be different.');
       }
     }
 
@@ -380,16 +487,125 @@
       });
     }
 
-    ['sq_a1', 'sq_a2', 'sq_a3'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('input', function () { validateAnswer(id); });
-      el.addEventListener('blur', function () { validateAnswer(id); });
-    });
-
     var fpForm = document.getElementById('fp-form');
     if (fpForm) {
       fpForm.setAttribute('novalidate', 'novalidate');
+    }
+
+    /* ── Step 3: AJAX Verify ── */
+    var step3VerifyBtn = document.querySelector('#step-3 .btn-submit');
+    if (step3VerifyBtn) {
+      var groups = buildGroups();
+
+      groups.forEach(function (g) {
+        g.input.addEventListener('input', function () {
+          validateGroup(g, false);
+          clearFeedback(g);
+        });
+        g.select.addEventListener('change', function () {
+          validateGroup(g, false);
+          g.error.textContent = '';
+          g.error.style.display = 'none';
+        });
+      });
+
+      step3VerifyBtn.addEventListener('click', async function (e) {
+        e.preventDefault();
+
+        var allValid = true;
+        groups.forEach(function (g) {
+          if (!validateGroup(g, true)) allValid = false;
+        });
+        if (!allValid) {
+          clearBlockError('step-3');
+          return;
+        }
+
+        var questions = groups.map(function (g) { return g.select.value; });
+        var answers = groups.map(function (g) { return g.input.value.trim(); });
+
+        step3VerifyBtn.disabled = true;
+        step3VerifyBtn.textContent = 'Verifying...';
+
+        try {
+          var res = await fetch('forgot_password.php?step=3', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fp_action: 'verify_security', questions: questions, answers: answers }),
+            credentials: 'same-origin'
+          });
+          var data = await res.json();
+
+          if (data.success) {
+            window.location.href = 'forgot_password.php?step=4';
+            return;
+          }
+
+          var answerResults = data.answerResults || [];
+          groups.forEach(function (g, idx) {
+            g.feedback.style.display = 'block';
+            if (answerResults[idx]) {
+              g.feedback.textContent = 'Correct answer';
+              g.feedback.style.color = 'green';
+              g.input.style.borderColor = '#28a745';
+            } else {
+              g.feedback.textContent = 'Wrong answer';
+              g.feedback.style.color = 'red';
+              g.input.style.borderColor = '#dc3545';
+            }
+          });
+
+          showBlockError('step-3', data.message || 'You need at least 2 correct answers to proceed.');
+        } catch (err) {
+          showBlockError('step-3', 'Something went wrong. Please try again.');
+        } finally {
+          step3VerifyBtn.disabled = false;
+          step3VerifyBtn.textContent = 'Verify';
+        }
+      });
+    }
+
+    /* ── Step 4: Password Submit Guard ── */
+    var step4SubmitBtn = document.querySelector('#step-4 .btn-submit');
+    if (step4SubmitBtn) {
+      step4SubmitBtn.addEventListener('click', function (e) {
+        var newPw = document.getElementById('newPassword');
+        var confirmPw = document.getElementById('confirmPassword');
+        if (!newPw || !confirmPw) return;
+
+        var pVal = newPw.value || '';
+        var cVal = confirmPw.value || '';
+
+        clearFieldError('newPassword');
+        clearFieldError('confirmPassword');
+        clearBlockError('step-4');
+
+        if (!pVal || !cVal) {
+          e.preventDefault();
+          showBlockError('step-4', 'Please fill in both password fields.');
+          return;
+        }
+        if (hasSpace(pVal) || hasSpace(cVal)) {
+          e.preventDefault();
+          showBlockError('step-4', 'Spaces are not allowed in password.');
+          return;
+        }
+        if (pVal !== cVal) {
+          e.preventDefault();
+          showBlockError('step-4', 'Passwords do not match.');
+          return;
+        }
+        var passErr = document.getElementById('newPassword-error');
+        if (passErr) {
+          e.preventDefault();
+          return;
+        }
+        if (pVal.length < 8) {
+          e.preventDefault();
+          showBlockError('step-4', 'Password must be at least 8 characters.');
+          return;
+        }
+      });
     }
 
     /* Show success modal if redirected after password reset */
