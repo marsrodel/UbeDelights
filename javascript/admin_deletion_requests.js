@@ -151,6 +151,9 @@
 // ============================================================
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+var pendingDrAction = '';
+var pendingDrRequestId = '';
+
 function openApproveDr(id) {
     var req = deletionRequests.find(function(r) { return String(r.id) === String(id); });
     if (!req) return;
@@ -187,14 +190,8 @@ function reviewDeletionRequest(requestId, action) {
             var res;
             try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
             if (res.success) {
-                closeModal(action === 'approve' ? 'approveDrModal' : 'rejectDrModal');
-                var toast = document.getElementById('toast');
-                if (toast) {
-                    toast.textContent = res.message || 'Request updated.';
-                    toast.className = 'toast show';
-                    setTimeout(function() { toast.classList.remove('show'); }, 3000);
-                }
-                location.reload();
+                document.getElementById('drSuccessMessage').textContent = res.message || 'Request updated successfully.';
+                document.getElementById('drSuccessModal').classList.add('active');
             } else {
                 alert(res.message || 'Action failed.');
             }
@@ -204,6 +201,22 @@ function reviewDeletionRequest(requestId, action) {
     };
     xhr.onerror = function() { alert('Network error. Please try again.'); };
     xhr.send(fd);
+}
+
+// Password lockout
+var drPasswordAttempts = 0;
+var drPasswordMaxAttempts = 3;
+var drPasswordLocked = false;
+
+function resetDrPasswordLockout() {
+    drPasswordAttempts = 0;
+    drPasswordLocked = false;
+    var input = document.getElementById('drPasswordInput');
+    var error = document.getElementById('drPasswordError');
+    var btn = document.getElementById('drPasswordConfirmBtn');
+    if (input) { input.disabled = false; input.value = ''; input.style.cursor = ''; }
+    if (error) error.textContent = '';
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -218,15 +231,112 @@ document.addEventListener('DOMContentLoaded', function() {
         if (rejectBtn) { openRejectDr(rejectBtn.getAttribute('data-id')); return; }
     });
 
+    // Approve confirm → open password modal
     document.getElementById('approveDrConfirmBtn').addEventListener('click', function() {
         var id = document.getElementById('approveDrId').value;
-        if (id) reviewDeletionRequest(id, 'approve');
+        if (!id) return;
+        closeModal('approveDrModal');
+        pendingDrAction = 'approve';
+        pendingDrRequestId = id;
+        document.getElementById('drPasswordTitle').textContent = 'Enter your password to delete this account.';
+        document.getElementById('drPasswordAction').value = 'approve';
+        document.getElementById('drPasswordRequestId').value = id;
+        resetDrPasswordLockout();
+        document.getElementById('drPasswordModal').classList.add('active');
     });
 
+    // Reject confirm → open password modal
     document.getElementById('rejectDrConfirmBtn').addEventListener('click', function() {
         var id = document.getElementById('rejectDrId').value;
-        if (id) reviewDeletionRequest(id, 'reject');
+        if (!id) return;
+        closeModal('rejectDrModal');
+        pendingDrAction = 'reject';
+        pendingDrRequestId = id;
+        document.getElementById('drPasswordTitle').textContent = 'Enter your password to reject this deletion request.';
+        document.getElementById('drPasswordAction').value = 'reject';
+        document.getElementById('drPasswordRequestId').value = id;
+        resetDrPasswordLockout();
+        document.getElementById('drPasswordModal').classList.add('active');
     });
+
+    // Password confirm → verify password → process action
+    var drPasswordConfirmBtn = document.getElementById('drPasswordConfirmBtn');
+    var drPasswordInput = document.getElementById('drPasswordInput');
+    var drPasswordError = document.getElementById('drPasswordError');
+
+    if (drPasswordConfirmBtn) {
+        drPasswordConfirmBtn.addEventListener('click', function() {
+            if (drPasswordLocked) {
+                drPasswordError.textContent = 'Too many failed attempts. Action is locked.';
+                return;
+            }
+
+            var pwd = drPasswordInput.value.trim();
+            if (!pwd) {
+                drPasswordError.textContent = 'Password is required.';
+                return;
+            }
+
+            drPasswordConfirmBtn.disabled = true;
+            drPasswordConfirmBtn.style.opacity = '0.5';
+            drPasswordConfirmBtn.style.cursor = 'not-allowed';
+
+            var fd = new FormData();
+            fd.append('password', pwd);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '../../server/verify_admin_password.php', true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var res;
+                    try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+
+                    if (res.success) {
+                        var action = document.getElementById('drPasswordAction').value;
+                        var requestId = document.getElementById('drPasswordRequestId').value;
+                        closeModal('drPasswordModal');
+                        reviewDeletionRequest(requestId, action);
+                    } else {
+                        drPasswordAttempts++;
+                        if (drPasswordAttempts >= drPasswordMaxAttempts) {
+                            drPasswordLocked = true;
+                            drPasswordError.textContent = 'Too many failed attempts. Action is locked.';
+                            drPasswordInput.disabled = true;
+                            drPasswordInput.style.cursor = 'not-allowed';
+                        } else {
+                            drPasswordError.textContent = 'Incorrect Password. Attempt ' + drPasswordAttempts + ' of ' + drPasswordMaxAttempts + '.';
+                            drPasswordInput.value = '';
+                            drPasswordInput.focus();
+                        }
+                        drPasswordConfirmBtn.disabled = false;
+                        drPasswordConfirmBtn.style.opacity = '';
+                        drPasswordConfirmBtn.style.cursor = '';
+                    }
+                } else {
+                    drPasswordError.textContent = 'Server error. Please try again.';
+                    drPasswordConfirmBtn.disabled = false;
+                    drPasswordConfirmBtn.style.opacity = '';
+                    drPasswordConfirmBtn.style.cursor = '';
+                }
+            };
+            xhr.onerror = function() {
+                drPasswordError.textContent = 'Network error. Please try again.';
+                drPasswordConfirmBtn.disabled = false;
+                drPasswordConfirmBtn.style.opacity = '';
+                drPasswordConfirmBtn.style.cursor = '';
+            };
+            xhr.send(fd);
+        });
+    }
+
+    // Success modal OK → reload
+    var drSuccessOkBtn = document.getElementById('drSuccessOkBtn');
+    if (drSuccessOkBtn) {
+        drSuccessOkBtn.addEventListener('click', function() {
+            closeModal('drSuccessModal');
+            location.reload();
+        });
+    }
 });
 
 document.querySelectorAll('.modal-overlay').forEach(function(overlay) {

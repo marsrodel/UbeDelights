@@ -18,7 +18,8 @@ if ($connect) {
             JOIN users t ON t.user_id = dr.target_id_number
             LEFT JOIN users r ON r.user_id = dr.reviewed_by
             LEFT JOIN users rb ON rb.user_id = dr.requested_by
-            ORDER BY FIELD(dr.status, 'pending', 'rejected', 'approved'), dr.created_at DESC";
+            WHERE dr.status = 'pending'
+            ORDER BY dr.created_at DESC";
     $result = mysqli_query($connect, $sql);
     if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
@@ -122,7 +123,7 @@ if ($connect) {
                 <button class="modal-close" onclick="closeModal('approveDrModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body" style="padding:0 24px 24px;">
-                <p style="color:var(--text-secondary); font-size:0.95rem;">Approving this request will <strong>block</strong> the target account. The user will no longer be able to log in.</p>
+                <p style="color:var(--text-secondary); font-size:0.95rem;">Approving this request will <strong>permanently delete</strong> the target account and all associated data. This action cannot be undone.</p>
                 <p id="approveDrUserName" style="color:var(--text-secondary); font-size:0.95rem; margin-top:8px;">Target: <strong></strong></p>
                 <input type="hidden" id="approveDrId">
             </div>
@@ -148,6 +149,45 @@ if ($connect) {
             <div class="modal-footer" style="border-top:none;">
                 <button class="btn-outline" onclick="closeModal('rejectDrModal')">Cancel</button>
                 <button class="btn-primary" id="rejectDrConfirmBtn" style="background:var(--danger, #e17055);"><i class="fa-solid fa-xmark"></i> Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Confirmation Modal -->
+    <div class="modal-overlay" id="drPasswordModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header">
+                <h2 id="drPasswordTitle">Enter your password to confirm.</h2>
+                <button class="modal-close" onclick="closeModal('drPasswordModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form class="modal-form">
+                <p style="color:var(--text-secondary); font-size:0.82rem;">Enter your account password to confirm this action.</p>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="drPasswordInput" placeholder="Enter password">
+                </div>
+                <p id="drPasswordError" class="inline-error"></p>
+                <input type="hidden" id="drPasswordAction">
+                <input type="hidden" id="drPasswordRequestId">
+            </form>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeModal('drPasswordModal')">Cancel</button>
+                <button class="btn-primary" id="drPasswordConfirmBtn"><i class="fa-solid fa-check"></i> Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="drSuccessModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header" style="border-bottom:none;">
+                <h2>Success</h2>
+            </div>
+            <div class="modal-body" style="padding:0 24px;">
+                <p id="drSuccessMessage" style="color:var(--text-secondary); font-size:0.9rem;"></p>
+            </div>
+            <div class="modal-footer" style="border-top:none; justify-content:flex-end;">
+                <button class="btn-primary" id="drSuccessOkBtn">OK</button>
             </div>
         </div>
     </div>

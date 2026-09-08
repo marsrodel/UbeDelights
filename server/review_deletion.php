@@ -56,14 +56,22 @@ if (!$update) {
 
 if ($action === 'approve') {
     $targetId = mysqli_real_escape_string($connect, $request['target_id_number']);
-    mysqli_query($connect, "UPDATE users SET status = 'blocked' WHERE user_id = '$targetId'");
+
+    mysqli_query($connect, "DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM orders WHERE user_id = '$targetId')");
+    mysqli_query($connect, "DELETE FROM orders WHERE user_id = '$targetId'");
+    mysqli_query($connect, "DELETE FROM password_reset_otp WHERE idNumber = '$targetId'");
+    mysqli_query($connect, "DELETE FROM login_otp WHERE idNumber = '$targetId'");
+    mysqli_query($connect, "DELETE FROM admin_privileges WHERE idNumber = '$targetId'");
+    mysqli_query($connect, "UPDATE deletion_requests SET target_id_number = NULL WHERE target_id_number = '$targetId'");
+    mysqli_query($connect, "DELETE FROM users WHERE user_id = '$targetId'");
 }
 
 $logMessage = "{$_SESSION['auth_username']} {$newStatus}d deletion request for {$request['target_username']} (ID: {$request['target_id_number']})";
 log_activity('DELETION_REVIEW', $logMessage, 'Deletion Requests', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
 
 $label = $action === 'approve' ? 'approved' : 'rejected';
-echo json_encode(['success' => true, 'message' => "Deletion request {$label}. The account has been blocked."]);
+$msg = $action === 'approve' ? "Deletion request approved. The account has been deleted." : "Deletion request rejected. The account has been dismissed.";
+echo json_encode(['success' => true, 'message' => $msg]);
 
 mysqli_close($connect);
 ?>
