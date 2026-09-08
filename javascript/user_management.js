@@ -2650,7 +2650,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
             }
             if (iAmSuperAdmin) {
-                h += '<button class="um-dropdown-item danger" data-action="request-deletion" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Delete</button>';
+                h += '<button class="um-dropdown-item danger" data-action="delete-user" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Delete</button>';
             } else {
                 if (user.hasPendingDeletion) {
                     h += '<button class="um-dropdown-item" disabled style="opacity:0.5;cursor:not-allowed;color:var(--text-secondary);"><i class="fa-solid fa-clock"></i> Pending Deletion</button>';
@@ -3076,6 +3076,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('requestDeletionModal').classList.add('active');
             });
 
+            usersTableBody.addEventListener('click', function(e) {
+                var item = e.target.closest('[data-action="delete-user"]');
+                if (!item) return;
+                e.stopPropagation();
+                var userId = item.getAttribute('data-id');
+                document.getElementById('blockUserId').value = userId;
+                document.getElementById('blockAction').value = 'delete-user';
+                document.getElementById('blockModalTitle').textContent = 'Confirm Delete';
+                document.getElementById('blockModalMessage').textContent = 'Permanently delete this account? This action cannot be undone.';
+                document.getElementById('blockConfirmBtn').textContent = 'Delete';
+                document.getElementById('blockModal').classList.add('active');
+            });
+
             var deletionReasonEl = document.getElementById('deletionReason');
             if (deletionReasonEl) {
                 deletionReasonEl.addEventListener('input', function() {
@@ -3184,9 +3197,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 closeModal('blockModal');
                 document.getElementById('blockPasswordUserId').value = userId;
                 document.getElementById('blockPasswordAction').value = action;
-                document.getElementById('blockPasswordTitle').textContent = action === 'block'
-                    ? 'Enter your password to block this user.'
-                    : 'Enter your password to unblock this user.';
+                if (action === 'delete-user') {
+                    document.getElementById('blockPasswordTitle').textContent = 'Enter your password to delete this account.';
+                } else if (action === 'block') {
+                    document.getElementById('blockPasswordTitle').textContent = 'Enter your password to block this user.';
+                } else {
+                    document.getElementById('blockPasswordTitle').textContent = 'Enter your password to unblock this user.';
+                }
                 resetBlockPasswordLockout();
                 document.getElementById('blockPasswordModal').classList.add('active');
             });
@@ -3233,6 +3250,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                     submitBlockUnblock(targetUserId, action);
                                 } else if (action === 'delete-request') {
                                     submitDeletionRequest(targetUserId);
+                                } else if (action === 'delete-user') {
+                                    submitDirectDelete(targetUserId);
                                 } else if (action === 'reset-password') {
                                     submitResetPassword(targetUserId);
                                 } else if (action === 'create-account') {
@@ -3392,6 +3411,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 xhr.onerror = function() {
                     alert('Network error. Please try again.');
                 };
+                xhr.send(fd);
+            }
+
+            function submitDirectDelete(targetUserId) {
+                var fd = new FormData();
+                fd.append('user_id', targetUserId);
+                fd.append('action', 'delete_user');
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../server/user_management.php', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var res;
+                        try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+                        if (res.success) {
+                            showSuccessModal(res.message || 'Account deleted successfully.', function() {
+                                location.reload();
+                            });
+                        } else {
+                            alert(res.message || 'Delete failed.');
+                        }
+                    } else {
+                        alert('Server error. Please try again.');
+                    }
+                };
+                xhr.onerror = function() { alert('Network error. Please try again.'); };
                 xhr.send(fd);
             }
 

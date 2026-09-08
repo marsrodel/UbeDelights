@@ -422,6 +422,14 @@ try {
                 throw new Exception('You cannot delete your own account');
             }
 
+            // Cleanup related data
+            mysqli_query($connect, "DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM orders WHERE user_id = '$userId')");
+            mysqli_query($connect, "DELETE FROM orders WHERE user_id = '$userId'");
+            mysqli_query($connect, "DELETE FROM password_reset_otp WHERE idNumber = '$userId'");
+            mysqli_query($connect, "DELETE FROM login_otp WHERE idNumber = '$userId'");
+            mysqli_query($connect, "DELETE FROM admin_privileges WHERE idNumber = '$userId'");
+            mysqli_query($connect, "UPDATE deletion_requests SET target_id_number = NULL WHERE target_id_number = '$userId'");
+
             // Delete the user
             $del_stmt = $connect->prepare("DELETE FROM users WHERE user_id = ?");
             $del_stmt->bind_param("s", $userId);
