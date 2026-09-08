@@ -2644,6 +2644,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isCustomer || (iAmSuperAdmin && !isSuperAdmin)) {
                 h += '<button class="um-dropdown-item" data-action="reset-password" data-id="'+esc(user.id)+'"><i class="fa-solid fa-key"></i> Reset Password</button>';
             }
+            if (iAmSuperAdmin && (user.role === 'admin' || user.role === 'super_admin')) {
+                h += '<button class="um-dropdown-item" data-action="roles-privileges" data-id="'+esc(user.id)+'"><i class="fa-solid fa-user-shield"></i> Roles & Privileges</button>';
+            }
             if (user.status === 'blocked') {
                 h += '<button class="um-dropdown-item" data-action="unblock" data-id="'+esc(user.id)+'"><i class="fa-solid fa-unlock"></i> Unblock</button>';
             } else {
