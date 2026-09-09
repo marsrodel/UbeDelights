@@ -43,6 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Incomplete accounts: send OTP and redirect to complete account flow
     if ($user['status'] === 'incomplete') {
+        if (!password_verify($password, $user['password_hash'])) {
+            log_activity('failed_login', 'Wrong password attempt', 'Authentication', (string)$user['user_id'], $user['username']);
+            $u = urlencode($login);
+            header("Location: ./login.php?error=pass&u=$u");
+            exit();
+        }
         $userId = (string)$user['user_id'];
         $_SESSION['auth_user_id'] = $userId;
         $_SESSION['auth_username'] = $user['username'];
@@ -78,19 +84,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    if (!$user['is_active']) {
-        log_activity('login_blocked', 'Inactive user attempted login', 'Authentication', (string)$user['user_id'], $user['username']);
-        header('Location: ./login.php?error=inactive');
-        exit();
-    }
-
     $userId = (string)$user['user_id'];
 
-    // 2) Verify password (lockout and attempt counting are handled in JavaScript)
+    // 2) Verify password FIRST (lockout and attempt counting are handled in JavaScript)
     if (!password_verify($password, $user['password_hash'])) {
         log_activity('failed_login', 'Wrong password attempt', 'Authentication', $userId, $user['username']);
         $u = urlencode($login);
         header("Location: ./login.php?error=pass&u=$u");
+        exit();
+    }
+
+    // 3) Password correct — check account status
+    if ($user['status'] === 'pending') {
+        log_activity('login_blocked', 'Pending user attempted login', 'Authentication', $userId, $user['username']);
+        header('Location: ./login.php?error=pending');
+        exit();
+    }
+
+    if (!$user['is_active']) {
+        log_activity('login_blocked', 'Inactive user attempted login', 'Authentication', $userId, $user['username']);
+        header('Location: ./login.php?error=inactive');
         exit();
     }
 
@@ -191,6 +204,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <footer class="footer">
         <p>&copy; 2026 Ube Delights. All rights reserved.</p>
     </footer>
+    <!-- Pending Account Modal -->
+    <div id="pending-modal-overlay" class="pending-modal-overlay">
+        <div class="pending-modal">
+            <div class="pending-modal-icon">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+            <h2>Account Pending</h2>
+            <p>Your account is awaiting admin confirmation. Please wait for approval before logging in.</p>
+            <button id="pending-modal-ok" class="pending-modal-btn">OK</button>
+        </div>
+    </div>
+
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/login.js"></script>
     <script src="../javascript/routing.js"></script>

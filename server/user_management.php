@@ -390,7 +390,7 @@ try {
                 throw new Exception('User is not pending approval');
             }
 
-            $stmt = $connect->prepare("UPDATE users SET status = 'rejected', is_active = 0 WHERE user_id = ?");
+            $stmt = $connect->prepare("DELETE FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
                 log_activity('REJECT_USER', "{$_SESSION['auth_username']} rejected {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);

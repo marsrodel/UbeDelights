@@ -289,10 +289,23 @@ document.addEventListener('DOMContentLoaded', function(){
         lockoutTimer.textContent = 'Incorrect username or password.';
       }
       break;
+    case 'pending':
+      // Show pending confirmation modal
+      var overlay = document.getElementById('pending-modal-overlay');
+      if (overlay) {
+        overlay.classList.add('active');
+        document.getElementById('pending-modal-ok').addEventListener('click', function() {
+          overlay.classList.remove('active');
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+        });
+      }
+      return;
     case 'inactive':
       // Inactive-account message stays as a field-level error on username
       showErrorMessage('username', 'Your account is inactive.');
-      break;
+      return;
     case 'incomplete':
       // Incomplete account — redirect to complete account flow
       window.location.href = './complete_account.php?step=1';
