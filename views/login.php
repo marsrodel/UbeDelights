@@ -39,6 +39,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ./login.php?error=user');
         exit();
     }
+
+    // Incomplete accounts: send OTP and redirect to complete account flow
+    if ($user['status'] === 'incomplete') {
+        $userId = (string)$user['user_id'];
+        $_SESSION['auth_user_id'] = $userId;
+        $_SESSION['auth_username'] = $user['username'];
+        $_SESSION['auth_role'] = $user['role'];
+        $_SESSION['auth_status'] = 'incomplete';
+
+        require_once __DIR__ . '/../server/mail_helper.php';
+
+        // Generate OTP
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $otpHash = password_hash($otp, PASSWORD_BCRYPT);
+        $expiry = date('Y-m-d H:i:s', time() + 300);
+
+        // Invalidate old OTPs
+        mysqli_query($connect, "DELETE FROM password_reset_otp WHERE idNumber = '" . mysqli_real_escape_string($connect, $userId) . "' AND used = 0");
+
+        // Store new OTP
+        mysqli_query($connect, "INSERT INTO password_reset_otp (idNumber, otp_hash, expires_at, used) VALUES ('" . mysqli_real_escape_string($connect, $userId) . "', '" . mysqli_real_escape_string($connect, $otpHash) . "', '$expiry', 0)");
+
+        // Send OTP email
+        $subject = 'Ube Delights - Account Verification';
+        $emailBody = '<div style="font-family:Arial,sans-serif;max-width:480px;">'
+            . '<h2>Account Verification</h2>'
+            . '<p>Hello ' . htmlspecialchars($user['username']) . ',</p>'
+            . '<p>Your one-time password (OTP) for completing your Ube Delights account setup is:</p>'
+            . '<p style="font-size:28px;font-weight:bold;letter-spacing:4px;">' . $otp . '</p>'
+            . '<p>This code expires in <strong>5 minutes</strong>. Do not share it with anyone.</p>'
+            . '</div>';
+        mail_send_message($user['email'], $subject, $emailBody, $otp);
+
+        header('Location: ./complete_account.php?step=1');
+        exit();
+    }
+
     if (!$user['is_active']) {
         log_activity('login_blocked', 'Inactive user attempted login', 'Authentication', (string)$user['user_id'], $user['username']);
         header('Location: ./login.php?error=inactive');

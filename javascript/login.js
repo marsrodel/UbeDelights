@@ -293,6 +293,10 @@ document.addEventListener('DOMContentLoaded', function(){
       // Inactive-account message stays as a field-level error on username
       showErrorMessage('username', 'Your account is inactive.');
       break;
+    case 'incomplete':
+      // Incomplete account — redirect to complete account flow
+      window.location.href = './complete_account.php?step=1';
+      break;
   }
 
   // Track consecutive errors (any non-locked error counts as a failed attempt)

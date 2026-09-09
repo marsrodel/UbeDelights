@@ -2106,44 +2106,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Server-side password reuse check (debounced)
-    var passDupTimeoutId;
-    function checkPasswordExists(password) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '../server/check_password.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                try {
-                    var resp = JSON.parse(xhr.responseText || '{}');
-                    if (resp && resp.exists === true) {
-                        showErrorMessage('pass', 'This password is already used. Please choose a different password.');
-                    } else {
-                        // If the current error is the duplicate error, clear it.
-                        var errEl = document.getElementById('pass-error');
-                        if (errEl && /already used/i.test(errEl.textContent || '')) {
-                            clearErrorMessage('pass');
-                        }
-                    }
-                } catch (e) {
-                    // Ignore parse errors
-                }
-            }
-        };
-        xhr.send('password=' + encodeURIComponent(password));
-    }
-
     if (passEl) {
         passEl.addEventListener('input', function(){
             updatePasswordStrength();
             updatePasswordMatch();
             validatePasswordMismatchError();
-            // Run duplicate check only when not Weak and length >= 8
-            clearTimeout(passDupTimeoutId);
-            var v = this.value || '';
-            if (getPasswordStrength(v) !== 'Weak' && v.length >= 8 && !hasSpace(v)) {
-                passDupTimeoutId = setTimeout(function(){ checkPasswordExists(v); }, 500);
-            }
         });
         // Initialize on load in case of autofill
         updatePasswordStrength();
