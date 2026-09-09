@@ -1245,6 +1245,46 @@ body.admin-body {
 }
 
 /* ==========================================
+   ROLES & PRIVILEGES MODAL
+   ========================================== */
+.rp-privilege-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.rp-privilege-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.rp-privilege-item label {
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    margin: 0;
+    font-weight: 400;
+}
+
+.rp-superadmin-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rp-superadmin-list li {
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+}
+
+/* ==========================================
    RESPONSIVE
    ========================================== */
 @media (max-width: 1200px) {

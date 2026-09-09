@@ -437,6 +437,69 @@ if ($connect) {
         </div>
     </div>
 
+    <!-- Roles & Privileges Modal -->
+    <div class="modal-overlay" id="rolesPrivilegesModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:480px;">
+            <div class="modal-header">
+                <h2>Role & Privileges</h2>
+                <button class="modal-close" onclick="closeModal('rolesPrivilegesModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="padding: 0 24px;">
+                <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:16px;">
+                    Set the account's role, then choose what it is allowed to do.<br>Requires your security key.
+                </p>
+                <input type="hidden" id="rpUserId">
+
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label style="font-weight:600; color:var(--text-secondary); font-size:0.82rem;">Role</label>
+                    <select id="rpRole">
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super Admin</option>
+                    </select>
+                </div>
+
+                <p id="rpHelperText" style="color:var(--text-muted); font-size:0.82rem; margin-bottom:12px;">
+                    Admins only get what you tick below.
+                </p>
+
+                <div id="rpAdminPrivileges">
+                    <label style="font-weight:600; color:var(--text-secondary); font-size:0.82rem; display:block; margin-bottom:8px;">Privileges</label>
+                    <div class="rp-privilege-item">
+                        <input type="checkbox" id="rpManageRegistrations">
+                        <label for="rpManageRegistrations">Manage registrations (approve, reject)</label>
+                    </div>
+                    <div class="rp-privilege-item">
+                        <input type="checkbox" id="rpUpdateAccounts">
+                        <label for="rpUpdateAccounts">Update account info (admin & customer)</label>
+                    </div>
+                    <div class="rp-privilege-item">
+                        <input type="checkbox" id="rpRequestDeletion">
+                        <label for="rpRequestDeletion">Request account deletion (sent to super admin for approval)</label>
+                    </div>
+                    <div class="rp-privilege-item">
+                        <input type="checkbox" id="rpBlockUnblock">
+                        <label for="rpBlockUnblock">Block/Unblock accounts</label>
+                    </div>
+                </div>
+
+                <div id="rpSuperAdminPrivileges" style="display:none;">
+                    <label style="font-weight:600; color:var(--text-secondary); font-size:0.82rem; display:block; margin-bottom:8px;">Privileges</label>
+                    <ul class="rp-superadmin-list">
+                        <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Create Account</li>
+                        <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Manage Registrations</li>
+                        <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Manage Account Info</li>
+                        <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Block/Unblock</li>
+                        <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Delete</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeModal('rolesPrivilegesModal')">Cancel</button>
+                <button class="btn-primary" id="rpSaveBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script src="../../javascript/admin-routing.js?v=2.0"></script>

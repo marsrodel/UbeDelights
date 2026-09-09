@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 04, 2026 at 05:13 PM
+-- Generation Time: Sep 09, 2026 at 01:39 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,6 +44,140 @@ CREATE TABLE `activity_logs` (
   `os` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `activity_logs`
+--
+
+INSERT INTO `activity_logs` (`id`, `idNumber`, `username`, `fullName`, `role`, `module`, `action`, `details`, `ip_address`, `created_at`, `severity`, `browser`, `device`, `os`) VALUES
+(1, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'login', 'matamat_123 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 09:25:02', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(2, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Orders', 'ORDER_STATUS', 'maraon_101 changed order #11 status to \'confirmed\' | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 09:26:10', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(3, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Orders', 'ORDER_STATUS', 'maraon_101 changed order #11 status to \'delivered\' | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 09:26:11', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(4, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 09:30:18', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(5, '2026-0005', 'babies_123', 'Mela June Hubog', 'customer', 'User Management', 'BLOCK_USER', 'maraon_101 blocked babies_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 09:35:48', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(6, '2026-0003', 'christian_123', 'Christian Ocarez Datig', 'customer', 'User Management', 'APPROVE_USER', 'maraon_101 approved christian_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 09:46:03', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(7, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'UNBLOCK_USER', 'maraon_101 unblocked babies_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 10:01:33', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(8, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'UPDATE_USER', 'maraon_101 updated user maraon_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 10:15:12', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(9, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'BLOCK_USER', 'maraon_101 blocked christian_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 10:21:17', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(10, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 10:30:22', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(11, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'RESET_PASSWORD', 'maraon_101 reset password for babies_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 10:36:03', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(12, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'BLOCK_USER', 'maraon_101 blocked juan.delacruz | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 10:40:17', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(13, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'UPDATE_USER', 'maraon_101 updated user babies_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 10:46:28', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(14, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'RESET_PASSWORD', 'maraon_101 reset password for babies_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 10:57:14', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(15, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'DELETION_REQUEST', 'maraon_101 requested deletion of babies_123 (ID: 2026-0005) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 11:10:00', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(16, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 12:54:51', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(17, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'login', 'matamat_123 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 12:55:51', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(18, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 12:56:03', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(19, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'login', 'matamat_123 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 13:04:19', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(20, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 13:04:28', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(21, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 13:07:01', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(22, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 13:07:04', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(23, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'login', 'matamat_123 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 13:07:23', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(24, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 13:46:14', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(25, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'UNBLOCK_USER', 'maraon_101 unblocked christian_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 13:56:06', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(26, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 14:01:17', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(27, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 14:01:27', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(28, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 14:52:41', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(29, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 14:53:05', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(30, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'RESET_PASSWORD', 'maraon_101 reset password for maraon_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 14:55:35', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(31, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 15:01:32', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(32, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 15:03:48', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(33, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 15:05:01', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(34, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 15:06:55', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(35, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 15:07:02', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(36, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 15:19:11', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(37, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 15:19:23', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(38, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 16:05:46', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(39, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 16:05:54', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(40, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 16:36:34', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(41, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-06 16:36:59', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(42, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 02:18:57', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(43, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked juan.delacruz | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 02:19:29', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(44, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UPDATE_USER', 'maraon_123 updated user babies_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 02:26:03', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(45, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for rodeljames_101 (ID: 2026-0007) with role customer | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 03:34:50', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(46, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for rodeljames_101 (ID: 2026-0007) with role customer | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 03:51:13', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(47, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for rodeljames_101 (ID: 2026-0007) with role customer | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 03:55:26', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(48, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'APPROVE_USER', 'maraon_123 approved juan.delacruz | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 03:58:23', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(49, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 04:50:54', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(50, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 04:55:12', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(51, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'REJECT_USER', 'maraon_101 rejected matamat_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 05:05:24', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(52, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'APPROVE_USER', 'maraon_101 approved matamat_123 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 05:06:55', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(53, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 05:08:43', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(54, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 05:08:50', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(55, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 05:46:42', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(56, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 05:47:44', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(57, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 05:47:46', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(58, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 07:27:59', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(59, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 07:32:11', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(60, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 07:32:13', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(61, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 07:32:18', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(62, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 07:32:27', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(63, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 07:32:33', 'WARNING', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(64, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-07 07:32:36', 'WARNING', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(65, NULL, 'marsrodel', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: marsrodel | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 01:50:09', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(66, NULL, 'marsrodel', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: marsrodel | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 01:50:11', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(67, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 01:52:34', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(68, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 01:53:54', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(69, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 01:54:09', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(70, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Deletion Requests', 'DELETION_REVIEW', 'maraon_123 approvedd deletion request for christian_123 (ID: 2026-0003) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 01:54:24', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(71, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Deletion Requests', 'DELETION_REVIEW', 'maraon_123 rejectedd deletion request for babies_123 (ID: 2026-0005) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:35:58', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(72, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:36:24', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(73, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'UNBLOCK_USER', 'maraon_101 unblocked christian_123 | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:36:37', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(74, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'DELETION_REQUEST', 'maraon_101 requested deletion of christian_123 (ID: 2026-0003) | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:36:51', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(75, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Deletion Requests', 'DELETION_REVIEW', 'maraon_123 rejectedd deletion request for christian_123 (ID: 2026-0003) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:37:22', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(76, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'DELETION_REQUEST', 'maraon_101 requested deletion of christian_123 (ID: 2026-0003) | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:38:10', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(77, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Deletion Requests', 'DELETION_REVIEW', 'maraon_123 approvedd deletion request for christian_123 (ID: 2026-0003) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:38:42', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(78, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'DELETION_REQUEST', 'maraon_101 requested deletion of christian_123 (ID: 2026-0003) | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:51:01', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(79, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Deletion Requests', 'DELETION_REVIEW', 'maraon_123 approvedd deletion request for christian_123 (ID: 2026-0003) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:51:22', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(80, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'DELETION_REQUEST', 'maraon_101 requested deletion of rodeljames_101 (ID: 2026-0007) | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:52:45', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(81, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Deletion Requests', 'DELETION_REVIEW', 'maraon_123 rejectedd deletion request for rodeljames_101 (ID: 2026-0007) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 02:52:57', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(82, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 03:03:29', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(83, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'DELETE_USER', 'maraon_123 deleted rodeljames_101 (ID: 2026-0007) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-08 03:12:22', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(84, NULL, 'asdas', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: asdas | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 03:40:23', 'WARNING', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(85, NULL, 'asdas', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: asdas | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 03:40:39', 'WARNING', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(86, NULL, 'asdas', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: asdas | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 03:40:40', 'WARNING', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(87, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 04:01:23', 'WARNING', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(88, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 04:02:42', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(89, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for rodel_123 (ID: 2026-0007) with role customer | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 04:03:22', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(90, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 04:03:40', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(91, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 04:36:19', 'WARNING', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(92, '2026-0007', 'rodel_123', '', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 05:37:04', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(93, '2026-0007', 'rodel_123', '', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 05:48:39', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(94, '2026-0007', 'rodel_123', '', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 05:49:26', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(95, '2026-0007', 'rodel_123', '', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 07:58:10', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(96, '2026-0007', 'rodel_123', '', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 08:33:24', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(97, '2026-0007', 'rodel_123', '', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 09:26:43', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(98, '2026-0007', 'rodel_123', '', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 09:40:03', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(99, '2026-0007', 'rodel_123', '', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:15:41', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(100, '2026-0007', 'rodel_123', 'Educator  Maraon', 'customer', 'Authentication', 'login', 'rodel_123 completed account setup and logged in | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:17:08', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(101, '2026-0007', 'rodel_123', 'Educator  Maraon', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:19:32', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(102, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:19:42', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(103, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'DELETE_USER', 'maraon_123 deleted shakeys_2 (ID: 2026-0006) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:20:08', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(104, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for shake_123 (ID: 2026-0008) with role customer | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:21:12', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(105, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:21:22', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(106, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:22:51', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(107, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:22:53', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(108, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:23:05', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(109, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:24:19', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(110, '2026-0008', 'shake_123', '', 'customer', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:24:29', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(111, '2026-0008', 'shake_123', '', 'customer', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:24:56', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(112, '2026-0008', 'shake_123', '', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:25:14', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(113, '2026-0009', 'hacker_101', 'Apple  Bitcs', 'customer', 'Authentication', 'login', 'hacker_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:27:06', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(114, '2026-0008', 'shake_123', '', 'customer', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:36:05', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(115, '2026-0009', 'hacker_101', 'Apple  Bitcs', 'customer', 'Authentication', 'login_blocked', 'Pending user attempted login | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:36:53', 'ERROR', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(116, '2026-0009', 'hacker_101', 'Apple  Bitcs', 'customer', 'Authentication', 'login_blocked', 'Pending user attempted login | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:37:13', 'ERROR', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(117, '2026-0009', 'hacker_101', 'Apple  Bitcs', 'customer', 'Authentication', 'login_blocked', 'Pending user attempted login | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:37:18', 'ERROR', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(118, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:46:06', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(119, '2026-0009', 'hacker_101', 'Apple  Bitcs', 'customer', 'Authentication', 'login_blocked', 'Pending user attempted login | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:46:32', 'ERROR', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(120, '2026-0009', 'hacker_101', 'Apple  Bitcs', 'customer', 'Authentication', 'login_blocked', 'Pending user attempted login | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:46:35', 'ERROR', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(121, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'BLOCK_USER', 'maraon_101 blocked rodel_123 | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:47:07', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(122, '2026-0007', 'rodel_123', 'Educator  Maraon', 'customer', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:47:21', 'ERROR', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(123, '2026-0007', 'rodel_123', 'Educator  Maraon', 'customer', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:47:25', 'ERROR', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(124, '2026-0007', 'rodel_123', 'Educator  Maraon', 'customer', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:47:26', 'ERROR', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(125, '2026-0007', 'rodel_123', 'Educator  Maraon', 'customer', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:47:27', 'ERROR', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(126, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'REJECT_USER', 'maraon_101 rejected hacker_101 | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:48:31', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(127, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'REJECT_USER', 'maraon_101 rejected hacker_101 | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:54:49', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(128, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:56:28', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows');
+
 -- --------------------------------------------------------
 
 --
@@ -55,6 +189,7 @@ CREATE TABLE `admin_privileges` (
   `can_manage_registrations` tinyint(1) NOT NULL DEFAULT 0,
   `can_update_accounts` tinyint(1) NOT NULL DEFAULT 0,
   `can_request_deletion` tinyint(1) NOT NULL DEFAULT 0,
+  `can_block` tinyint(1) NOT NULL DEFAULT 0,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -74,6 +209,16 @@ CREATE TABLE `deletion_requests` (
   `reviewed_at` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `deletion_requests`
+--
+
+INSERT INTO `deletion_requests` (`id`, `target_id_number`, `requested_by`, `reason`, `status`, `reviewed_by`, `reviewed_at`, `created_at`) VALUES
+(3, '', '2026-0002', 'Failing', 'rejected', '2026-0004', '2026-09-08 04:37:22', '2026-09-08 02:36:51'),
+(4, '', '2026-0002', 'Apple', 'approved', '2026-0004', '2026-09-08 04:38:42', '2026-09-08 02:38:10'),
+(5, '', '2026-0002', 'Amnp', 'approved', '2026-0004', '2026-09-08 04:51:22', '2026-09-08 02:51:01'),
+(6, '', '2026-0002', 'jey', 'rejected', '2026-0004', '2026-09-08 04:52:57', '2026-09-08 02:52:45');
 
 -- --------------------------------------------------------
 
@@ -146,7 +291,8 @@ INSERT INTO `orders` (`order_id`, `user_id`, `customer_name`, `customer_email`, 
 (7, '2026-0001', 'Rodel Mae Qala', 'mat@gmail.com', '09811537767', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', '8605', 1350.00, 0.00, 1350.00, 'delivered', 'Yey', '2026-09-02 08:01:45', '2026-09-02 08:01:55'),
 (8, '2026-0001', 'Rodel Mae Qala', 'mat@gmail.com', '09811537767', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', '8605', 1045.00, 0.00, 1045.00, 'cancelled', 'huhu', '2026-09-02 08:02:44', '2026-09-02 08:02:55'),
 (9, '2026-0001', 'Rodel Mae Qala', 'mat@gmail.com', '09811537767', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', '8605', 1045.00, 0.00, 1045.00, 'delivered', 'sd', '2026-09-02 08:03:07', '2026-09-02 08:03:33'),
-(10, '2026-0001', 'Rodel Mae Qala', 'mat@gmail.com', '09811537767', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', '8605', 1045.00, 0.00, 1045.00, 'delivered', '', '2026-09-02 11:19:43', '2026-09-03 15:10:54');
+(10, '2026-0001', 'Rodel Mae Qala', 'mat@gmail.com', '09811537767', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', '8605', 1045.00, 0.00, 1045.00, 'delivered', '', '2026-09-02 11:19:43', '2026-09-03 15:10:54'),
+(11, '2026-0001', 'Rodel Qala', 'mat@gmail.com', '09811537767', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', '8605', 115.00, 99.00, 214.00, 'delivered', '', '2026-09-06 09:25:12', '2026-09-06 09:26:11');
 
 -- --------------------------------------------------------
 
@@ -207,7 +353,9 @@ INSERT INTO `order_items` (`item_id`, `order_id`, `product_id`, `product_name`, 
 (36, 10, 6, 'Ube Crinkles', 1, 15.00, 15.00),
 (37, 10, 5, 'Ube Halo-Halo', 1, 100.00, 100.00),
 (38, 10, 3, 'Ube Pandesal', 1, 5.00, 5.00),
-(39, 10, 7, 'Ube Latte', 1, 75.00, 75.00);
+(39, 10, 7, 'Ube Latte', 1, 75.00, 75.00),
+(40, 11, 6, 'Ube Crinkles', 1, 15.00, 15.00),
+(41, 11, 5, 'Ube Halo-Halo', 1, 100.00, 100.00);
 
 -- --------------------------------------------------------
 
@@ -224,6 +372,44 @@ CREATE TABLE `password_reset_otp` (
   `attempts` tinyint(4) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `password_reset_otp`
+--
+
+INSERT INTO `password_reset_otp` (`id`, `idNumber`, `otp_hash`, `expires_at`, `used`, `attempts`, `created_at`) VALUES
+(8, '2026-0004', '$2y$10$DR3douLR/OiTt2UEvqvtueCSFEWdCZZhT7UnIhATDlDzzi8yv9rSy', '2026-09-07 09:44:34', 1, 1, '2026-09-07 07:39:34'),
+(9, '2026-0004', '$2y$10$wAydK9Ko777SVNCdJkmvNufiLFtfdD74z8SfwMOmx03k38pjJ78AK', '2026-09-08 03:55:21', 1, 1, '2026-09-08 01:50:22'),
+(10, '2026-0001', '$2y$10$DvxmbOshb8jQ2hSUWgKMnugggYEX8Hl24i3R088TTw97r9PN3glce', '2026-09-09 05:45:58', 0, 0, '2026-09-09 03:40:58'),
+(11, '2026-0007', '$2y$10$ySR0TeHTCh5DwNYL1gELIulyE/zdQ8W7MMW4zoqpzJ0eg.z0jrg/C', '2026-09-09 06:08:53', 1, 1, '2026-09-09 04:03:53'),
+(12, '2026-0007', '$2y$10$8tEbHbSBHGoCpk4MeqIzN.vWJoF0O8cFvQYxt4WhXLGIIHZ47yq9W', '2026-09-09 06:11:20', 1, 2, '2026-09-09 04:06:20'),
+(13, '2026-0007', '$2y$10$/0JU2aD6O8VdSUNxT6dj9OAfNyfsGgcM6UjkwqjTLSO2S4sZDFB.O', '2026-09-09 06:31:10', 1, 1, '2026-09-09 04:26:10'),
+(14, '2026-0007', '$2y$10$wlQoh3nJXnoQljz/odeD2OJG4WpBl4BBjVSp84AQgI12alBU86vDe', '2026-09-09 06:40:41', 1, 0, '2026-09-09 04:35:41'),
+(16, '2026-0007', '$2y$10$6U1O9Wv4l2i.p297Tm6qo.we2mYmX8i..DyRa8voetJ4KPOpcLFfO', '2026-09-09 06:41:26', 1, 1, '2026-09-09 04:36:26'),
+(18, '2026-0007', '$2y$10$bzCuCLbbbTJiT6dFc2UzrOYA01VnOYEKBFr.SvCXOuAal9JD8cN1y', '2026-09-09 06:52:06', 1, 1, '2026-09-09 04:47:06'),
+(19, '2026-0007', '$2y$10$DMnnkHoMv7KwNx9D9XG.Gu5knGG0gz9zwsKi0dfkiw8Mh1AATKvL.', '2026-09-09 06:56:32', 1, 1, '2026-09-09 04:51:32'),
+(20, '2026-0007', '$2y$10$ZR98nzTRPmiLSlnTlgZPg.3gTB6wYnVMqoWglFbypOoul16.2J2kO', '2026-09-09 07:01:20', 1, 1, '2026-09-09 04:56:20'),
+(21, '2026-0007', '$2y$10$jV8sa.qTyoa8BMhuTZU/i.q1HDiCSc8nAaKDimpEzT6EtyWvazXKq', '2026-09-09 07:08:22', 1, 1, '2026-09-09 05:03:22'),
+(22, '2026-0007', '$2y$10$jRiahp.3x0R3led2YC.Pd.P/YnsxdiHzpvPHj9T1wgpj7jWJaBW7G', '2026-09-09 07:15:25', 1, 0, '2026-09-09 05:10:25'),
+(24, '2026-0007', '$2y$10$vDSeQzMiKcPUtIZqBg9CHOFDkm36GKzk4upxTLHF.YUgun4gIEXp6', '2026-09-09 07:16:06', 1, 1, '2026-09-09 05:11:06'),
+(25, '2026-0007', '$2y$10$JVO/Mj18RQCrHwLU8p3NF.MOUf0F4QTJmLPRdLBnBfYqzSj/.3dDO', '2026-09-09 07:19:17', 1, 1, '2026-09-09 05:14:17'),
+(28, '2026-0007', '$2y$10$LRFUdt0WNGLQxUbTuK56GeYxtJtBaicK5WXF/YF2imSv/0leqLU4q', '2026-09-09 07:24:56', 1, 1, '2026-09-09 05:19:56'),
+(30, '2026-0007', '$2y$10$LzR9gESSUMK0Zt8KRWflfu4wW0cx/7tQgHhCYtAbGBKLWw.FCVvDO', '2026-09-09 07:42:15', 1, 1, '2026-09-09 05:37:15'),
+(31, '2026-0007', '$2y$10$23RpEdAgxVXG/KY5AkaQfejKEDN4LMGAMMtmFijfGcTwcR9NYKIGC', '2026-09-09 07:43:58', 1, 1, '2026-09-09 05:38:58'),
+(34, '2026-0007', '$2y$10$51uHi1bh.gOGQ9plpObAz.b9ekkc8zBJnZC6PYlvLMGH25ZRvf.lO', '2026-09-09 07:54:41', 1, 1, '2026-09-09 05:49:41'),
+(35, '2026-0007', '$2y$10$6l6tXr4QEE9UEvOECotAQ.BMKi/75qQySZBNot72KnpQHYWRlQGSi', '2026-09-09 09:55:04', 1, 1, '2026-09-09 07:50:04'),
+(36, '2026-0007', '$2y$10$qqWhgUs2WgnLG1Rt0Rk9KuTIaDZPGfHCAxSUmlk5RONEq2V8EFiU6', '2026-09-09 10:03:26', 1, 1, '2026-09-09 07:58:26'),
+(37, '2026-0007', '$2y$10$p.ZSdUmVaxVkAqNgrmhEYeoDlaSoIb/GKk25X8ZBpKgRvhfpNlOn2', '2026-09-09 10:16:06', 1, 0, '2026-09-09 08:11:06'),
+(38, '2026-0007', '$2y$10$fWml0vhBkvtM7CDO5H7u0OgMfRwpISXxBodEmklDWQu77iTbWI7De', '2026-09-09 10:16:23', 1, 1, '2026-09-09 08:11:23'),
+(39, '2026-0007', '$2y$10$da9.KYjfbuKGxj.RfuIG/./mggbasgsPiQcUOth7TF5KEUDSkkZzS', '2026-09-09 10:20:59', 1, 1, '2026-09-09 08:15:59'),
+(40, '2026-0007', '$2y$10$0ZXWtQuqNXdyLw0KzK/FleRIkQjZQwQMZJgAcaDpF/MUzp3eBR26G', '2026-09-09 10:38:36', 1, 1, '2026-09-09 08:33:36'),
+(41, '2026-0007', '$2y$10$lg1CzHiQGuF5lbotKLk6MOHI9GStdKK/rbkbxy.jXDHsA6wf.757i', '2026-09-09 11:17:52', 1, 1, '2026-09-09 09:12:52'),
+(42, '2026-0007', '$2y$10$Qm6YagMuIfW31C6cyzoeB.ZX9UrBAa1eIZgdYQDCovMpldC3KzGee', '2026-09-09 11:31:54', 1, 1, '2026-09-09 09:26:54'),
+(43, '2026-0007', '$2y$10$r8XVKl.SS89Ca0xAZWV75.kK.3Nadaj1rzMFOhz3af8Q/bTM1ND/W', '2026-09-09 11:45:23', 1, 1, '2026-09-09 09:40:23'),
+(44, '2026-0007', '$2y$10$/H0k.X7MZQpAY0xBPFbTMeEwtZp.gkX0XfIVa7Y1qcFeXP5aRXk2m', '2026-09-09 11:48:48', 1, 1, '2026-09-09 09:43:48'),
+(45, '2026-0007', '$2y$10$093KTdYWuntrOiE/26.xkeqn4cYDsQCwfzy3VitZw5al5NE/Zsxay', '2026-09-09 11:52:09', 1, 1, '2026-09-09 09:47:09'),
+(46, '2026-0007', '$2y$10$pjr.VZhT/nje8LeiAQLdLe7QzQ4bAjbBSW1Wepv0sNHPMOx5zNJKK', '2026-09-09 12:20:55', 1, 1, '2026-09-09 10:15:55'),
+(48, '2026-0008', '$2y$10$sw/9T4qYxpZGvL2jSgj5R.rd1dDJvDa3vmkb7Iis4WA9NOQvUHKAK', '2026-09-09 12:30:06', 0, 0, '2026-09-09 10:25:06');
 
 -- --------------------------------------------------------
 
@@ -294,7 +480,7 @@ CREATE TABLE `users` (
   `role` enum('super_admin','admin','customer') NOT NULL DEFAULT 'customer',
   `otp_code` varchar(255) DEFAULT NULL,
   `otp_expiry` timestamp NULL DEFAULT NULL,
-  `status` enum('active','blocked','pending','incomplete') DEFAULT 'pending',
+  `status` enum('active','blocked','pending','incomplete','rejected') DEFAULT 'pending',
   `is_logged_in` tinyint(1) DEFAULT 0,
   `ip_address` varchar(45) DEFAULT NULL,
   `device_used` varchar(255) DEFAULT NULL
@@ -305,13 +491,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `first_name`, `middle_name`, `last_name`, `extension_name`, `date_of_birth`, `age`, `sex`, `street`, `barangay`, `city_municipality`, `province`, `country`, `zip_code`, `username`, `email`, `password_hash`, `q1`, `a1`, `q2`, `a2`, `q3`, `a3`, `created_at`, `updated_at`, `is_active`, `profile_picture`, `role`, `otp_code`, `otp_expiry`, `status`, `is_logged_in`, `ip_address`, `device_used`) VALUES
-('2024-0001', 'Juan', 'Santos', 'Dela Cruz', 'Jr.', '1995-06-15', 29, 'Male', '123 Main Street', 'Barangay 1', 'Manila', 'Metro Manila', 'Philippines', '1000', 'juan.delacruz', 'juan.delacruz@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'What is your favorite color?', '$2y$10$hashA', 'What is your mother\'s maiden name?', '$2y$10$hashB', 'What city were you born in?', '$2y$10$hashC', '2026-08-16 10:39:21', '2026-08-16 10:39:21', 1, '', 'customer', NULL, NULL, 'pending', 0, NULL, NULL),
-('2026-0001', 'Rodel Mae', 'Karate', 'Qala', '', '2005-06-06', 21, 'Male', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', 'Philip', '8605', 'matamat_123', 'mat@gmail.com', '$2y$10$xvWQzCPnghWU6pUJdJgEve8lua.aM.B1D69vkZ8TTBXPb3dVmGnk2', 'Who is your best friend in Elementary?', '$2y$10$kQhkyXJGY6rUlaV4zrXTPOMs50RfCzSFOrxDdNUQzkdHIkt8N5JEC', 'What is the name of your favorite pet?', '$2y$10$3rgKLaNZPOMc.TCEbB4iGu.OyLpOfwxBDXx/IkQTuKrkcUVYWiQzO', 'Who is your favorite teacher in high school?', '$2y$10$UfV22H8Z1HZ7vCkyxk8XB.l9abg1l7TSrB07J8WCrH00j113SFwjS', '2026-08-20 03:55:02', '2026-08-26 04:43:39', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
-('2026-0002', 'Mary Rose', 'Rosmar', 'Lima', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_101', 'marsrodel@gmail.com', '$2y$10$duX08Va5b8aUY5iHOVZCHuRPjDAaCNNCCdSfJkP6BAGCqYWPANRFS', 'Who is your best friend in Elementary?', '$2y$10$Pak2WjknMbhzA.ltbUfls.gi9BVzSfoiOIRoywFZx98jkkvhRVf8W', 'What is the name of your favorite pet?', '$2y$10$PjYuHjWco71roMWZZDy8/.gAzwIGvvLwAmM70/NgAg5exMA4p8G7m', 'Who is your favorite teacher in high school?', '$2y$10$ADnZK6wcr1HY4we0w9QgOexIwCQeej..LZFLo.0rH.SascBRMiHIG', '2026-08-26 05:01:36', '2026-08-26 05:03:45', 1, '', 'admin', NULL, NULL, 'active', 0, NULL, NULL),
-('2026-0003', 'Christian', 'Ocarez', 'Datig', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'christian_123', 'bshakeys2@gmail.com', '$2y$10$hGQ3nkCBaPjVsJ1LXtNW.O7hzb8YpwDxFjneyQzuppandTxL50.pq', '', '', '', '', '', '', '2026-09-03 15:29:39', '2026-09-03 15:29:39', 0, '', 'customer', NULL, NULL, 'incomplete', 0, NULL, NULL),
-('2026-0004', 'Rodel James', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_123', 'maraon101@gmail.com', '$2y$10$MjqEWv4gYwYeQ1u4oXu.DegsW6d1POBnpuCWblMj6NcEdt2p08yVW', 'What was the name of your first pet?', '$2y$10$jMcYrdYABJzblyyPkYEq1ehIhzA.k110nU6OyADyUbUET5Uj.760i', 'What is your favorite flower?', '$2y$10$xgFkdHVsFpdinf3ABwUEU.rT8r5orbIxUtjgPDzoWe9WK5dawoByG', 'What is your oldest sibling\'s first name?', '$2y$10$ghu8ckXp53/V7IHFAzzwZerrnUH6kwG2JyuEjJ9xloizmUD9S0eFW', '2026-09-04 14:20:03', '2026-09-04 14:20:03', 1, '', 'customer', NULL, NULL, 'pending', 0, NULL, NULL),
-('2026-0005', 'Mela', 'June', 'Hubog', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8605', 'babies_123', 'baby@gmail.com', '$2y$10$SXY725NFy5WIsLte9jh60eauLbm1FPjhgzyKnJmGeUg8K5yg.RLgW', 'What was the name of your first pet?', '$2y$10$Eidv/394sTYMziAeZJgAt.c1ffAoEwRzWxRRmWIgN1hzkHWcLKVki', 'What is your favorite flower?', '$2y$10$4k/1rs7Cniq2SVNZ5OuG6e4mGPB80gNr3lepncSduYjeHlq1azWC6', 'What is your oldest sibling\'s first name?', '$2y$10$lc3D0OSP0sjka6p5KlRKHOK7b43O0f7b7TCGQWWD36goaoYJVwyeS', '2026-09-04 14:22:31', '2026-09-04 14:22:31', 1, '', 'customer', NULL, NULL, 'pending', 0, NULL, NULL),
-('2026-0006', 'Rodel James', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'shakeys_2', 'bshakeys12@gmail.com', '$2y$10$2KZJnsF85eK8TZLQlXpzy.Fds.SYl9ZeP9xwgIM3uPNb2mHQQ07Y2', 'What was the name of your first pet?', '$2y$10$PRjK1iu53Ykz3pPGYKOwYOtocA/EZ1tXESAOeZAcNKYr9cF7g.E1C', 'What is your favorite flower?', '$2y$10$8eXRRjkwmjgW/Sk4YEczNOLSFDKkeUO4SjLBwOf8TDO9tMEMb9ytK', 'What is your oldest sibling\'s first name?', '$2y$10$OIqTnGZDyvKfwEBnRrXdjeR3bb4QGhwZn0tKdO4kY8bupY.N0YIoi', '2026-09-04 14:39:03', '2026-09-04 14:39:03', 1, '', 'customer', NULL, NULL, 'pending', 0, NULL, NULL);
+('2024-0001', 'Juan', 'Santos', 'Dela Cruz', 'Jr.', '1995-06-15', 29, 'Male', '123 Main Street', 'Barangay 1', 'Manila', 'Metro Manila', 'Philippines', '1000', 'juan.delacruz', 'juan.delacruz@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'What is your favorite color?', '$2y$10$hashA', 'What is your mother\'s maiden name?', '$2y$10$hashB', 'What city were you born in?', '$2y$10$hashC', '2026-08-16 10:39:21', '2026-09-07 03:58:23', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
+('2026-0001', 'Rodel', 'Karate', 'Qala', '', '2005-06-06', 21, 'Male', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', 'Philip', '8605', 'matamat_123', 'mat@gmail.com', '$2y$10$xvWQzCPnghWU6pUJdJgEve8lua.aM.B1D69vkZ8TTBXPb3dVmGnk2', 'Who is your best friend in Elementary?', '$2y$10$kQhkyXJGY6rUlaV4zrXTPOMs50RfCzSFOrxDdNUQzkdHIkt8N5JEC', 'What is the name of your favorite pet?', '$2y$10$3rgKLaNZPOMc.TCEbB4iGu.OyLpOfwxBDXx/IkQTuKrkcUVYWiQzO', 'Who is your favorite teacher in high school?', '$2y$10$UfV22H8Z1HZ7vCkyxk8XB.l9abg1l7TSrB07J8WCrH00j113SFwjS', '2026-08-20 03:55:02', '2026-09-07 05:06:55', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
+('2026-0002', 'Mary Rose', 'Rosmar', 'Lima', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_101', 'marsrodel@gmail.com', '$2y$10$qbjF4IMlME33xkPuAFL4gOeM8RKxPmArIiYw.RXu7BV0/7lltmfVS', 'Who is your best friend in Elementary?', '$2y$10$Pak2WjknMbhzA.ltbUfls.gi9BVzSfoiOIRoywFZx98jkkvhRVf8W', 'What is the name of your favorite pet?', '$2y$10$PjYuHjWco71roMWZZDy8/.gAzwIGvvLwAmM70/NgAg5exMA4p8G7m', 'Who is your favorite teacher in high school?', '$2y$10$ADnZK6wcr1HY4we0w9QgOexIwCQeej..LZFLo.0rH.SascBRMiHIG', '2026-08-26 05:01:36', '2026-09-06 07:10:35', 1, '', 'admin', NULL, NULL, 'active', 0, NULL, NULL),
+('2026-0004', 'Rodel Jame', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_123', 'maraon101@gmail.com', '$2y$10$prCKoJ89wTD9M1TgUqUjyOLSGUtxuAoYwqpGRdRZZz0hVXXKsexTW', 'What was the name of your first pet?', '$2y$10$jMcYrdYABJzblyyPkYEq1ehIhzA.k110nU6OyADyUbUET5Uj.760i', 'What is your favorite flower?', '$2y$10$xgFkdHVsFpdinf3ABwUEU.rT8r5orbIxUtjgPDzoWe9WK5dawoByG', 'What is your oldest sibling\'s first name?', '$2y$10$ghu8ckXp53/V7IHFAzzwZerrnUH6kwG2JyuEjJ9xloizmUD9S0eFW', '2026-09-04 14:20:03', '2026-09-08 01:52:26', 1, '', 'super_admin', NULL, NULL, 'active', 0, NULL, NULL),
+('2026-0005', 'Melani', 'June', 'Hubog', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8606', 'babies_123', 'baby@gmail.com', '$2y$10$cBEW.p9G1sFGLplPFeYgLOjmMJ6IgicSHDFn/aOFgTCiMZh8UAucC', 'What was the name of your first pet?', '$2y$10$Eidv/394sTYMziAeZJgAt.c1ffAoEwRzWxRRmWIgN1hzkHWcLKVki', 'What is your favorite flower?', '$2y$10$4k/1rs7Cniq2SVNZ5OuG6e4mGPB80gNr3lepncSduYjeHlq1azWC6', 'What is your oldest sibling\'s first name?', '$2y$10$lc3D0OSP0sjka6p5KlRKHOK7b43O0f7b7TCGQWWD36goaoYJVwyeS', '2026-09-04 14:22:31', '2026-09-07 02:26:03', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
+('2026-0007', 'Educator', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'rodel_123', 'rodeljames.maraon@csucc.edu.ph', '$2y$10$C75QD1WXxKZEVjAuX2kAqeDKPWY90TdDPHLotp4pdLG73eY.7x.WK', 'What was the name of your first pet?', '$2y$10$GXNIKm6e/dpM01a6ZR9tlekgVT0EV0IXD.Cuhxoa2wW2F4rpQcQjW', 'What is your favorite flower?', '$2y$10$PPm2rLOpASnQgGlx3yYFBuMF73CNRL3xehD53I6231o97bFCL905u', 'What is your oldest sibling\'s first name?', '$2y$10$qk0LJptodi.0lzBQfhCobOfzpKAWmMtrgn9QY09LZy.Ofss1Kv.66', '2026-09-09 04:03:22', '2026-09-09 10:47:07', 0, '', 'customer', NULL, NULL, 'blocked', 0, NULL, NULL),
+('2026-0008', '', NULL, '', NULL, '0000-00-00', 0, '', '', '', '', '', '', '', 'shake_123', 'bshakeys2@gmail.com', '$2y$10$ldBu3MAu6WhuyCtg31c63OtFucQPhNr7wxIb0zDbMbkHUxIY77ecC', '', '', '', '', '', '', '2026-09-09 10:21:12', '2026-09-09 10:21:12', 0, '', 'customer', NULL, NULL, 'incomplete', 0, NULL, NULL);
 
 --
 -- Triggers `users`
@@ -429,13 +615,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=129;
 
 --
 -- AUTO_INCREMENT for table `deletion_requests`
 --
 ALTER TABLE `deletion_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `login_otp`
@@ -453,19 +639,19 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `password_reset_otp`
 --
 ALTER TABLE `password_reset_otp`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `products`

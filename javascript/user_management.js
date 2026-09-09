@@ -2634,6 +2634,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return h;
         }
 
+        if (user.status === 'incomplete') {
+            h += '<div class="um-dropdown-wrap">';
+            h += '<button class="um-action-btn btn-more" title="More Actions"><i class="fa-solid fa-ellipsis-vertical"></i></button>';
+            h += '<div class="um-dropdown">';
+            h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
+            h += '<button class="um-dropdown-item danger" data-action="delete-user" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Delete</button>';
+            h += '</div></div>';
+            return h;
+        }
+
         if (isOwn) {
             h += '<button class="um-action-btn btn-edit" data-action="edit" data-id="'+esc(user.id)+'" title="Edit"><i class="fa-solid fa-pen"></i></button>';
         } else {
@@ -2821,6 +2831,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         render();
+
+        function toggleRpView() {
+            var role = document.getElementById('rpRole').value;
+            var isAdmin = (role === 'admin');
+            document.getElementById('rpAdminPrivileges').style.display = isAdmin ? '' : 'none';
+            document.getElementById('rpSuperAdminPrivileges').style.display = isAdmin ? 'none' : '';
+            document.getElementById('rpHelperText').style.display = isAdmin ? '' : 'none';
+        }
+
+        var rpRoleSelect = document.getElementById('rpRole');
+        if (rpRoleSelect) {
+            rpRoleSelect.addEventListener('change', toggleRpView);
+        }
+
+        var rpSaveBtn = document.getElementById('rpSaveBtn');
+        if (rpSaveBtn) {
+            rpSaveBtn.addEventListener('click', function() {
+                closeModal('rolesPrivilegesModal');
+                document.getElementById('blockPasswordUserId').value = document.getElementById('rpUserId').value;
+                document.getElementById('blockPasswordAction').value = 'roles-privileges';
+                document.getElementById('blockPasswordTitle').textContent = 'Enter your password to save role & privileges.';
+                resetBlockPasswordLockout();
+                document.getElementById('blockPasswordModal').classList.add('active');
+            });
+        }
 
         var usersTableBody = document.getElementById('usersTableBody');
         if (usersTableBody) {
@@ -3192,6 +3227,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('blockModalMessage').textContent = 'Unblock this user? They will be able to log in again.';
                 document.getElementById('blockConfirmBtn').textContent = 'Yes';
                 document.getElementById('blockModal').classList.add('active');
+            });
+
+            usersTableBody.addEventListener('click', function(e) {
+                var item = e.target.closest('[data-action="roles-privileges"]');
+                if (!item) return;
+                e.stopPropagation();
+                var userId = item.getAttribute('data-id');
+                var allData = typeof allUsers !== 'undefined' ? allUsers : [];
+                var user = allData.find(function(u) { return u.id === userId; });
+                if (!user) return;
+                document.getElementById('rpUserId').value = user.id;
+                document.getElementById('rpRole').value = user.role === 'super_admin' ? 'super_admin' : 'admin';
+                toggleRpView();
+                document.getElementById('rolesPrivilegesModal').classList.add('active');
             });
 
             document.getElementById('blockConfirmBtn').addEventListener('click', function() {
