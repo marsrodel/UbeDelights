@@ -365,6 +365,19 @@
         refreshDisables();
     }
 
+    function getPasswordStrength(p) {
+        var s = (p || '').replace(/\s+/g, '');
+        if (!s) return '';
+        var types = 0;
+        if (/[a-z]/.test(s)) types++;
+        if (/[A-Z]/.test(s)) types++;
+        if (/[0-9]/.test(s)) types++;
+        if (/[^A-Za-z0-9]/.test(s)) types++;
+        if (s.length < 8 || types < 2) return 'Weak';
+        if (s.length >= 12 && types >= 4) return 'Strong';
+        return 'Medium';
+    }
+
     function initPasswordValidation() {
         var passEl = document.getElementById('pass');
         var repassEl = document.getElementById('repass');
@@ -561,7 +574,6 @@
             }
         }
 
-        if (!valid && firstEmpty) firstEmpty.focus();
         return valid;
     }
 
@@ -763,11 +775,26 @@
         }
 
         // SQ answer validation
+        // Clear dropdown errors on selection
+        ['q1', 'q2', 'q3'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', function() { clearErrorMessage(id); });
+            }
+        });
+
+        // Real-time answer validation on typing (skip "required" — only validate when has content)
         ['a1', 'a2', 'a3'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) {
-                el.addEventListener('blur', function() { validateAnswer(id); });
-                el.addEventListener('input', function() { clearErrorMessage(id); });
+                el.addEventListener('input', function() {
+                    var val = (this.value || '').trim();
+                    if (val === '') { clearErrorMessage(id); return; }
+                    if (val.length < 3) { showErrorMessage(id, 'Must be at least 3 characters'); return; }
+                    if (val.length > 50) { showErrorMessage(id, 'Must not exceed 50 characters'); return; }
+                    if (/^[.\s]/.test(val)) { showErrorMessage(id, "Don't start with a space or dot"); return; }
+                    clearErrorMessage(id);
+                });
             }
         });
 

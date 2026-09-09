@@ -29,6 +29,15 @@ input[disabled], input[readonly], select[disabled],
     cursor: var(--red-not-allowed-cursor) !important;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 /* ════════════════════════════════════════════
    NAVBAR
    ════════════════════════════════════════════ */

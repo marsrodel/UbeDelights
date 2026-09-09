@@ -1,4 +1,5 @@
 <?php
+mysqli_report(MYSQLI_REPORT_OFF);
 // Simple login: prepared statements + password_verify + basic lockout
 include '../server/db.php';
 require_once __DIR__ . '/../server/user_logger.php';
@@ -54,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $otpHash = password_hash($otp, PASSWORD_BCRYPT);
         $expiry = date('Y-m-d H:i:s', time() + 300);
+        $_SESSION['otp_expiry'] = time() + 300;
 
         // Invalidate old OTPs
         mysqli_query($connect, "DELETE FROM password_reset_otp WHERE idNumber = '" . mysqli_real_escape_string($connect, $userId) . "' AND used = 0");

@@ -1,6 +1,9 @@
 <?php
+ob_start();
+mysqli_report(MYSQLI_REPORT_OFF);
 include __DIR__ . '/db.php';
 include __DIR__ . '/mail_helper.php';
+include __DIR__ . '/user_logger.php';
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 header('Content-Type: application/json');
@@ -74,7 +77,7 @@ switch ($action) {
         mysqli_query($connect, "UPDATE password_reset_otp SET used = 1 WHERE idNumber = '" . mysqli_real_escape_string($connect, $userId) . "' AND used = 0");
 
         // Fetch user email
-        $userRes = mysqli_query($connect, "SELECT email FROM users WHERE user_id = '" . mysqli_real_escape_string($connect, $userId) . "' LIMIT 1");
+        $userRes = mysqli_query($connect, "SELECT email, username FROM users WHERE user_id = '" . mysqli_real_escape_string($connect, $userId) . "' LIMIT 1");
         $userData = $userRes ? mysqli_fetch_assoc($userRes) : null;
 
         if (!$userData) {
@@ -226,7 +229,7 @@ switch ($action) {
         $ctry = $personal['country'];
         $zip = $personal['zipcode'];
 
-        mysqli_stmt_bind_param($stmt, 'sssssisssssssissssss',
+        mysqli_stmt_bind_param($stmt, 'sssssisssssssssssssss',
             $fn, $mn, $ln, $en, $dob, $age, $sex,
             $st, $brgy, $city, $prov, $ctry, $zip,
             $passwordHash, $q1, $h1, $q2, $h2, $q3, $h3, $userId
@@ -244,6 +247,11 @@ switch ($action) {
         $userRes = mysqli_query($connect, "SELECT user_id, username, first_name, last_name, role, status FROM users WHERE user_id = '" . mysqli_real_escape_string($connect, $userId) . "' LIMIT 1");
         $userData = $userRes ? mysqli_fetch_assoc($userRes) : null;
 
+        if (!$userData) {
+            echo json_encode(['success' => false, 'message' => 'Failed to load updated account data.']);
+            exit();
+        }
+
         // Clear incomplete session data
         unset($_SESSION['otp_verified'], $_SESSION['incomplete_personal'], $_SESSION['otp_expiry']);
 
@@ -255,7 +263,11 @@ switch ($action) {
         $_SESSION['auth_first_name'] = $userData['first_name'] ?? '';
         $_SESSION['auth_last_name'] = $userData['last_name'] ?? '';
 
-        log_activity('login', $userData['username'] . ' completed account setup and logged in', 'Authentication', $userId, $userData['username']);
+        try {
+            log_activity('login', $userData['username'] . ' completed account setup and logged in', 'Authentication', $userId, $userData['username']);
+        } catch (\Throwable $e) {
+            // logging failure should not break user flow
+        }
 
         // Determine redirect based on role
         $redirect = in_array($userData['role'], ['admin', 'super_admin']) ? './admin/dashboard.php' : './index.php';
@@ -267,4 +279,4 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Invalid action.']);
         break;
 }
-?>
+ob_end_flush();

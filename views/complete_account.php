@@ -300,5 +300,6 @@ $otpExpiryTs = $otpExpiry;
     <script src="../javascript/routing.js"></script>
     <script src="../javascript/complete_account.js"></script>
     <script src="../javascript/inspect.js"></script>
+
 </body>
 </html>
