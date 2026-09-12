@@ -10,8 +10,7 @@ function calculateAge() {
     // If empty, clear age and show required error
     if (!bday || bday.trim() === '') {
         ageInput.value = '';
-        showErrorMessage('age', 'Date of birth is required');
-        // Allow user to continue filling other fields if birthdate is cleared
+        clearErrorMessage('age');
         toggleOtherInputsDisabledForAge(false);
         return;
     }
