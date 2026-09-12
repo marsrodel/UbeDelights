@@ -183,8 +183,8 @@ body.admin-body {
 }
 
 .admin-avatar {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: var(--primary-gradient);
     color: #ffffff;
@@ -192,17 +192,18 @@ body.admin-body {
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     flex-shrink: 0;
 }
 
 .admin-chip-info {
     min-width: 0;
+    max-width: 140px;
 }
 
 .admin-chip-info strong {
     display: block;
-    font-size: 0.88rem;
+    font-size: 0.8rem;
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
@@ -210,7 +211,7 @@ body.admin-body {
 }
 
 .admin-chip-info small {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: var(--accent);
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -382,6 +383,41 @@ body.admin-body {
 .stat-label {
     font-size: 0.85rem;
     color: var(--text-muted);
+}
+
+/* ==========================================
+   CHART GRID
+   ========================================== */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.chart-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.chart-card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 16px 0;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    max-height: 260px;
+}
+
+@media (max-width: 900px) {
+    .chart-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ==========================================

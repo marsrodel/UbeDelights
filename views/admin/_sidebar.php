@@ -19,10 +19,19 @@ if ($isSuperAdmin && $connect) {
         </div>
 
         <div class="sidebar-profile">
+            <?php
+            $sidebarFullName = $_SESSION['auth_username'] ?? '';
+            if ($connect) {
+                $rName = mysqli_query($connect, "SELECT CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name, IFNULL(CONCAT(' ', extension_name), '')) AS full_name FROM users WHERE user_id = '" . mysqli_real_escape_string($connect, $_SESSION['auth_user_id']) . "' LIMIT 1");
+                if ($rName && $rName->num_rows > 0) {
+                    $sidebarFullName = trim(mysqli_fetch_assoc($rName)['full_name']);
+                }
+            }
+            ?>
             <div class="admin-chip">
                 <div class="admin-avatar"><?php echo strtoupper(substr($_SESSION['auth_first_name'] ?? 'A', 0, 1) . substr($_SESSION['auth_last_name'] ?? 'U', 0, 1)); ?></div>
                 <div class="admin-chip-info">
-                    <strong><?php echo htmlspecialchars($_SESSION['auth_username'] ?? ''); ?></strong>
+                    <strong><?php echo htmlspecialchars($sidebarFullName); ?></strong>
                     <small><?php echo $isSuperAdmin ? 'SUPER ADMIN' : 'ADMIN'; ?></small>
                 </div>
             </div>
