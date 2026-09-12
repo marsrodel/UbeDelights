@@ -49,12 +49,13 @@
         var html = '';
         rows.forEach(function(r) {
             html += '<tr data-dr-id="' + esc(r.id) + '">';
-            html += '<td><strong>' + esc(r.targetName) + '</strong><br><span class="cell-muted" style="font-size:0.82rem;">' + esc(r.targetId) + ' · ' + roleLabel(r.targetRole) + ' · ' + esc(r.targetUsername) + '</span></td>';
+            html += '<td><strong>' + esc(r.targetName) + '</strong></td>';
             html += '<td class="cell-muted" title="' + esc(r.reason) + '">' + truncate(r.reason, 40) + '</td>';
             html += '<td>' + esc(r.requestedBy) + '</td>';
             html += '<td class="cell-muted">' + formatDate(r.createdAt) + '</td>';
             html += '<td>' + statusBadge(r.status) + '</td>';
             html += '<td class="actions-cell">';
+            html += '<button class="pending-action-btn btn-view" onclick="viewDeletionRequest(\'' + esc(r.id) + '\')" title="View Details"><i class="fa-solid fa-eye"></i></button> ';
             if (r.status === 'pending') {
                 html += '<button class="pending-action-btn btn-approve" data-action="approve-dr" data-id="' + esc(r.id) + '" title="Approve"><i class="fa-solid fa-check"></i></button> ';
                 html += '<button class="pending-action-btn btn-reject" data-action="reject-dr" data-id="' + esc(r.id) + '" title="Reject"><i class="fa-solid fa-xmark"></i></button>';
@@ -176,6 +177,62 @@ function closeModal(modalId) {
         modal.classList.remove('active');
         document.body.style.overflow = '';
     }
+}
+
+function viewDeletionRequest(requestId) {
+    var req = deletionRequests.find(function(r) { return String(r.id) === String(requestId); });
+    if (!req) return;
+    var body = document.getElementById('viewDrBody');
+    if (!body) return;
+    var dob = (req.targetDob && req.targetDob !== '0000-00-00') ? new Date(req.targetDob).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+    var roleLabel = req.targetRole === 'super_admin' ? 'Super Admin' : req.targetRole === 'admin' ? 'Admin' : 'Customer';
+    var statusLabel = req.status.charAt(0).toUpperCase() + req.status.slice(1);
+    body.innerHTML =
+        '<div class="um-view-form">' +
+            '<div class="section-block">' +
+                '<div class="section-title">Personal Information</div>' +
+                '<div class="fields-row cols-4">' +
+                    '<div class="form-group"><label>ID Number</label><input type="text" value="' + esc(req.targetId) + '" readonly></div>' +
+                    '<div class="form-group"><label>First Name</label><input type="text" value="' + esc(req.targetFirstName || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Middle Name</label><input type="text" value="' + esc(req.targetMiddleName || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Last Name</label><input type="text" value="' + esc(req.targetLastName || '') + '" readonly></div>' +
+                '</div>' +
+                '<div class="fields-row cols-4">' +
+                    '<div class="form-group"><label>Extension Name</label><input type="text" value="' + esc(req.targetExtension || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Date of Birth</label><input type="text" value="' + esc(dob) + '" readonly></div>' +
+                    '<div class="form-group"><label>Age</label><input type="text" value="' + esc(req.targetAge != null ? String(req.targetAge) : '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Sex</label><input type="text" value="' + esc(req.targetSex || '') + '" readonly></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="section-block">' +
+                '<div class="section-title">Account Information</div>' +
+                '<div class="fields-row cols-4">' +
+                    '<div class="form-group"><label>Email</label><input type="text" value="' + esc(req.targetEmail || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Username</label><input type="text" value="' + esc(req.targetUsername) + '" readonly></div>' +
+                    '<div class="form-group"><label>Role</label><input type="text" value="' + esc(roleLabel) + '" readonly></div>' +
+                    '<div class="form-group"><label>Status</label><input type="text" value="' + esc(statusLabel) + '" readonly></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="section-block">' +
+                '<div class="section-title">Address Information</div>' +
+                '<div class="fields-row cols-3">' +
+                    '<div class="form-group"><label>Purok/Street</label><input type="text" value="' + esc(req.targetStreet || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Barangay</label><input type="text" value="' + esc(req.targetBarangay || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>City/Municipality</label><input type="text" value="' + esc(req.targetCity || '') + '" readonly></div>' +
+                '</div>' +
+                '<div class="fields-row cols-3">' +
+                    '<div class="form-group"><label>Province</label><input type="text" value="' + esc(req.targetProvince || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Country</label><input type="text" value="' + esc(req.targetCountry || '') + '" readonly></div>' +
+                    '<div class="form-group"><label>Zip Code</label><input type="text" value="' + esc(req.targetZipcode || '') + '" readonly></div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    document.getElementById('viewDrModal').classList.add('active');
+}
+
+function closeViewDrModal() {
+    document.getElementById('viewDrModal').classList.remove('active');
+    document.body.style.overflow = '';
 }
 
 function reviewDeletionRequest(requestId, action) {
@@ -337,6 +394,12 @@ document.addEventListener('DOMContentLoaded', function() {
             location.reload();
         });
     }
+
+    // View modal close
+    var viewDrClose = document.getElementById('viewDrModalClose');
+    var viewDrCloseBtn = document.getElementById('viewDrModalCloseBtn');
+    if (viewDrClose) viewDrClose.addEventListener('click', closeViewDrModal);
+    if (viewDrCloseBtn) viewDrCloseBtn.addEventListener('click', closeViewDrModal);
 });
 
 document.querySelectorAll('.modal-overlay').forEach(function(overlay) {

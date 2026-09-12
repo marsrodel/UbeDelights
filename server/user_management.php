@@ -14,6 +14,26 @@ header('Content-Type: application/json');
 
 $response = ['success' => false, 'message' => ''];
 
+function hasPrivilege($connect, $action) {
+    if (($_SESSION['auth_role'] ?? '') === 'super_admin') return true;
+    $map = [
+        'approve' => 'can_manage_registrations',
+        'reject' => 'can_manage_registrations',
+        'update_user' => 'can_update_accounts',
+        'block' => 'can_block',
+        'unblock' => 'can_block',
+        'delete-user' => 'can_request_deletion',
+        'delete-request' => 'can_request_deletion',
+        'reset-password' => 'can_reset_password',
+    ];
+    $col = $map[$action] ?? null;
+    if (!$col) return true;
+    $uid = $_SESSION['auth_user_id'];
+    $r = mysqli_query($connect, "SELECT `$col` FROM admin_privileges WHERE idNumber = '" . mysqli_real_escape_string($connect, $uid) . "'");
+    $row = $r ? mysqli_fetch_assoc($r) : null;
+    return $row ? (bool)$row[$col] : false;
+}
+
 try {
     $action = $_POST['action'] ?? '';
     $userId = $_POST['user_id'] ?? '';
@@ -218,13 +238,17 @@ try {
                 }
             }
 
-            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'incomplete', 0, ?, ?, ?, ?, ?, ?)");
-            $ins->bind_param("sssssssissssssssss",
+            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)");
+            $initialStatus = ($role === 'super_admin') ? 'blocked' : 'incomplete';
+            $ins->bind_param("sssssssisssssssssss",
                 $idNo, $username, $firstName, $middleName, $lastName, $extension,
-                $birthday, $age, $sex, $email, $hashed, $role,
+                $birthday, $age, $sex, $email, $hashed, $role, $initialStatus,
                 $purok, $barangay, $municipality, $province, $country, $zipCode
             );
             if ($ins->execute()) {
+                if ($role === 'admin') {
+                    mysqli_query($connect, "INSERT INTO admin_privileges (idNumber, can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password) VALUES ('" . mysqli_real_escape_string($connect, $idNo) . "', 1, 1, 1, 1, 1)");
+                }
                 log_activity('CREATE_USER', "{$_SESSION['auth_username']} created user $username (ID: $idNo)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => 'User created successfully', 'user_id' => $idNo];
             } else {
@@ -233,6 +257,9 @@ try {
             break;
 
         case 'update_user':
+            if (!hasPrivilege($connect, 'update_user')) {
+                throw new Exception('You are not authorized to update account info');
+            }
             $username = trim($_POST['username'] ?? '');
             $firstName = trim($_POST['firstName'] ?? '');
             $middleName = trim($_POST['middleName'] ?? '');
@@ -303,6 +330,9 @@ try {
             break;
 
         case 'block':
+            if (!hasPrivilege($connect, 'block')) {
+                throw new Exception('You are not authorized to block users');
+            }
             $stmt = $connect->prepare("SELECT username, role, status FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             $stmt->execute();
@@ -329,6 +359,9 @@ try {
             break;
 
         case 'unblock':
+            if (!hasPrivilege($connect, 'unblock')) {
+                throw new Exception('You are not authorized to unblock users');
+            }
             $stmt = $connect->prepare("SELECT username, role, status FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             $stmt->execute();
@@ -355,6 +388,9 @@ try {
             break;
 
         case 'approve':
+            if (!hasPrivilege($connect, 'approve')) {
+                throw new Exception('You are not authorized to approve registrations');
+            }
             $stmt = $connect->prepare("SELECT username, status FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             $stmt->execute();
@@ -378,6 +414,9 @@ try {
             break;
 
         case 'reject':
+            if (!hasPrivilege($connect, 'reject')) {
+                throw new Exception('You are not authorized to reject registrations');
+            }
             $stmt = $connect->prepare("SELECT username, status FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             $stmt->execute();
@@ -525,16 +564,76 @@ try {
             $defaultPassword = 'UbeDelights_123';
             $hashed = password_hash($defaultPassword, PASSWORD_DEFAULT);
 
-            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, '', NULL, '', NULL, '0000-00-00', 0, '', ?, ?, ?, 'incomplete', 0, '', '', '', '', '', '')");
-            $ins->bind_param("sssss",
-                $idNo, $username, $email, $hashed, $role
+            $initialStatus = ($role === 'super_admin') ? 'blocked' : 'incomplete';
+            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, '', NULL, '', NULL, '0000-00-00', 0, '', ?, ?, ?, ?, 0, '', '', '', '', '', '')");
+            $ins->bind_param("ssssss",
+                $idNo, $username, $email, $hashed, $role, $initialStatus
             );
             if ($ins->execute()) {
+                if ($role === 'admin') {
+                    mysqli_query($connect, "INSERT INTO admin_privileges (idNumber, can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password) VALUES ('" . mysqli_real_escape_string($connect, $idNo) . "', 1, 1, 1, 1, 1)");
+                }
                 log_activity('CREATE_ACCOUNT', "{$_SESSION['auth_username']} created account for $username (ID: $idNo) with role $role", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => 'Account created successfully', 'user_id' => $idNo];
             } else {
                 throw new Exception('Failed to create account');
             }
+            break;
+
+        case 'get_privileges':
+            $targetId = $_GET['user_id'] ?? $userId;
+            if (empty($targetId)) throw new Exception('User ID is required');
+            $targetId = (string)$targetId;
+            $r = mysqli_query($connect, "SELECT can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password FROM admin_privileges WHERE idNumber = '" . mysqli_real_escape_string($connect, $targetId) . "'");
+            $privs = $r ? mysqli_fetch_assoc($r) : null;
+            if (!$privs) {
+                $privs = ['can_manage_registrations' => 0, 'can_update_accounts' => 0, 'can_request_deletion' => 0, 'can_block' => 0, 'can_reset_password' => 0];
+            }
+            $response = ['success' => true, 'privileges' => $privs];
+            break;
+
+        case 'save_roles_privileges':
+            if ($currentRole !== 'super_admin') {
+                throw new Exception('Only super admins can modify roles and privileges');
+            }
+            $targetId = (string)($_POST['target_user_id'] ?? '');
+            $newRole = $_POST['role'] ?? '';
+            if (empty($targetId) || !in_array($newRole, ['admin', 'super_admin'])) {
+                throw new Exception('Invalid request');
+            }
+
+            $r = mysqli_query($connect, "SELECT username, role FROM users WHERE user_id = '" . mysqli_real_escape_string($connect, $targetId) . "'");
+            $target_user = $r ? mysqli_fetch_assoc($r) : null;
+            if (!$target_user) throw new Exception('User not found');
+
+            $canManageReg = isset($_POST['can_manage_registrations']) ? 1 : 0;
+            $canUpdateAcc = isset($_POST['can_update_accounts']) ? 1 : 0;
+            $canReqDel = isset($_POST['can_request_deletion']) ? 1 : 0;
+            $canBlock = isset($_POST['can_block']) ? 1 : 0;
+            $canResetPwd = isset($_POST['can_reset_password']) ? 1 : 0;
+
+            $oldRole = $target_user['role'];
+            $statusSql = '';
+            if ($oldRole === 'admin' && $newRole === 'super_admin') {
+                $statusSql = ", status = 'blocked'";
+            } elseif ($oldRole === 'super_admin' && $newRole === 'admin') {
+                $statusSql = ", status = 'blocked'";
+            }
+            mysqli_query($connect, "UPDATE users SET role = '" . mysqli_real_escape_string($connect, $newRole) . "'" . $statusSql . " WHERE user_id = '" . mysqli_real_escape_string($connect, $targetId) . "'");
+
+            $existing = mysqli_query($connect, "SELECT idNumber FROM admin_privileges WHERE idNumber = '" . mysqli_real_escape_string($connect, $targetId) . "'");
+            if ($existing && $existing->num_rows > 0) {
+                $stmt = $connect->prepare("UPDATE admin_privileges SET can_manage_registrations = ?, can_update_accounts = ?, can_request_deletion = ?, can_block = ?, can_reset_password = ? WHERE idNumber = ?");
+                $stmt->bind_param("iiiiis", $canManageReg, $canUpdateAcc, $canReqDel, $canBlock, $canResetPwd, $targetId);
+                $stmt->execute();
+            } else {
+                $stmt = $connect->prepare("INSERT INTO admin_privileges (idNumber, can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("siiiis", $targetId, $canManageReg, $canUpdateAcc, $canReqDel, $canBlock, $canResetPwd);
+                $stmt->execute();
+            }
+
+            log_activity('SAVE_PRIVILEGES', "{$_SESSION['auth_username']} updated role & privileges for {$target_user['username']} (role: $newRole)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
+            $response = ['success' => true, 'message' => 'Role & privileges saved successfully'];
             break;
 
         default:

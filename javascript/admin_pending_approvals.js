@@ -34,6 +34,8 @@
         if (emptyState) emptyState.style.display = 'none';
         var html = '';
         rows.forEach(function(u) {
+            var canApproveReject = (typeof myPrivileges !== 'undefined' && (myPrivileges.can_manage_registrations == 1 || (typeof currentUserRole !== 'undefined' && currentUserRole === 'super_admin')));
+            var dis = canApproveReject ? '' : ' disabled title="Not Authorized"';
             html += '<tr data-user-id="' + esc(u.id) + '">';
             html += '<td class="cell-id">' + esc(u.id) + '</td>';
             html += '<td>' + esc(u.username) + '</td>';
@@ -41,8 +43,8 @@
             html += '<td class="cell-muted">' + esc(u.email) + '</td>';
             html += '<td class="actions-cell">';
             html += '<button class="pending-action-btn btn-view" onclick="viewPendingUser(\'' + esc(u.id) + '\')" title="View Details"><i class="fa-solid fa-eye"></i></button>';
-            html += '<button class="pending-action-btn btn-approve" onclick="approvePendingUser(\'' + esc(u.id) + '\')" title="Approve"><i class="fa-solid fa-check"></i></button>';
-            html += '<button class="pending-action-btn btn-reject" onclick="rejectPendingUser(\'' + esc(u.id) + '\')" title="Reject"><i class="fa-solid fa-xmark"></i></button>';
+            html += '<button class="pending-action-btn btn-approve" onclick="approvePendingUser(\'' + esc(u.id) + '\')" title="Approve"' + dis + '><i class="fa-solid fa-check"></i></button>';
+            html += '<button class="pending-action-btn btn-reject" onclick="rejectPendingUser(\'' + esc(u.id) + '\')" title="Reject"' + dis + '><i class="fa-solid fa-xmark"></i></button>';
             html += '</td></tr>';
         });
         tbody.innerHTML = html;
@@ -211,6 +213,7 @@ function closeViewPendingModal() {
 }
 
 function approvePendingUser(userId) {
+    if (typeof myPrivileges !== 'undefined' && myPrivileges.can_manage_registrations != 1 && currentUserRole !== 'super_admin') return;
     var user = pendingUsers.find(function(u) { return u.id === userId; });
     if (!user) return;
     document.getElementById('approvalModalTitle').textContent = 'Approve Registration';
@@ -223,6 +226,7 @@ function approvePendingUser(userId) {
 }
 
 function rejectPendingUser(userId) {
+    if (typeof myPrivileges !== 'undefined' && myPrivileges.can_manage_registrations != 1 && currentUserRole !== 'super_admin') return;
     var user = pendingUsers.find(function(u) { return u.id === userId; });
     if (!user) return;
     document.getElementById('approvalModalTitle').textContent = 'Reject Registration';

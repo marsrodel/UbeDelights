@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 09, 2026 at 01:39 PM
+-- Generation Time: Sep 12, 2026 at 07:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -176,7 +176,21 @@ INSERT INTO `activity_logs` (`id`, `idNumber`, `username`, `fullName`, `role`, `
 (125, '2026-0007', 'rodel_123', 'Educator  Maraon', 'customer', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:47:27', 'ERROR', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
 (126, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'REJECT_USER', 'maraon_101 rejected hacker_101 | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:48:31', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
 (127, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'REJECT_USER', 'maraon_101 rejected hacker_101 | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:54:49', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
-(128, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:56:28', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows');
+(128, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-09 10:56:28', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(129, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 04:22:19', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(130, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 04:23:17', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(131, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 04:23:27', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(132, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:02:00', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(133, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:02:25', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(134, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:02:56', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(135, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:04:08', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(136, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:04:46', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(137, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:05:37', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(138, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:15:13', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(139, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for edrian_123 (ID: 2026-0009) with role admin | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:23:01', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(140, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: super_admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:23:36', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(141, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:24:08', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(142, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:24:19', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows');
 
 -- --------------------------------------------------------
 
@@ -190,8 +204,17 @@ CREATE TABLE `admin_privileges` (
   `can_update_accounts` tinyint(1) NOT NULL DEFAULT 0,
   `can_request_deletion` tinyint(1) NOT NULL DEFAULT 0,
   `can_block` tinyint(1) NOT NULL DEFAULT 0,
+  `can_reset_password` tinyint(1) NOT NULL DEFAULT 0,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_privileges`
+--
+
+INSERT INTO `admin_privileges` (`idNumber`, `can_manage_registrations`, `can_update_accounts`, `can_request_deletion`, `can_block`, `can_reset_password`, `updated_at`) VALUES
+('2026-0002', 1, 1, 1, 1, 1, '2026-09-12 05:24:08'),
+('2026-0009', 1, 1, 1, 1, 1, '2026-09-12 05:23:01');
 
 -- --------------------------------------------------------
 
@@ -493,11 +516,12 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `first_name`, `middle_name`, `last_name`, `extension_name`, `date_of_birth`, `age`, `sex`, `street`, `barangay`, `city_municipality`, `province`, `country`, `zip_code`, `username`, `email`, `password_hash`, `q1`, `a1`, `q2`, `a2`, `q3`, `a3`, `created_at`, `updated_at`, `is_active`, `profile_picture`, `role`, `otp_code`, `otp_expiry`, `status`, `is_logged_in`, `ip_address`, `device_used`) VALUES
 ('2024-0001', 'Juan', 'Santos', 'Dela Cruz', 'Jr.', '1995-06-15', 29, 'Male', '123 Main Street', 'Barangay 1', 'Manila', 'Metro Manila', 'Philippines', '1000', 'juan.delacruz', 'juan.delacruz@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'What is your favorite color?', '$2y$10$hashA', 'What is your mother\'s maiden name?', '$2y$10$hashB', 'What city were you born in?', '$2y$10$hashC', '2026-08-16 10:39:21', '2026-09-07 03:58:23', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
 ('2026-0001', 'Rodel', 'Karate', 'Qala', '', '2005-06-06', 21, 'Male', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', 'Philip', '8605', 'matamat_123', 'mat@gmail.com', '$2y$10$xvWQzCPnghWU6pUJdJgEve8lua.aM.B1D69vkZ8TTBXPb3dVmGnk2', 'Who is your best friend in Elementary?', '$2y$10$kQhkyXJGY6rUlaV4zrXTPOMs50RfCzSFOrxDdNUQzkdHIkt8N5JEC', 'What is the name of your favorite pet?', '$2y$10$3rgKLaNZPOMc.TCEbB4iGu.OyLpOfwxBDXx/IkQTuKrkcUVYWiQzO', 'Who is your favorite teacher in high school?', '$2y$10$UfV22H8Z1HZ7vCkyxk8XB.l9abg1l7TSrB07J8WCrH00j113SFwjS', '2026-08-20 03:55:02', '2026-09-07 05:06:55', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
-('2026-0002', 'Mary Rose', 'Rosmar', 'Lima', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_101', 'marsrodel@gmail.com', '$2y$10$qbjF4IMlME33xkPuAFL4gOeM8RKxPmArIiYw.RXu7BV0/7lltmfVS', 'Who is your best friend in Elementary?', '$2y$10$Pak2WjknMbhzA.ltbUfls.gi9BVzSfoiOIRoywFZx98jkkvhRVf8W', 'What is the name of your favorite pet?', '$2y$10$PjYuHjWco71roMWZZDy8/.gAzwIGvvLwAmM70/NgAg5exMA4p8G7m', 'Who is your favorite teacher in high school?', '$2y$10$ADnZK6wcr1HY4we0w9QgOexIwCQeej..LZFLo.0rH.SascBRMiHIG', '2026-08-26 05:01:36', '2026-09-06 07:10:35', 1, '', 'admin', NULL, NULL, 'active', 0, NULL, NULL),
+('2026-0002', 'Mary Rose', 'Rosmar', 'Lima', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_101', 'marsrodel@gmail.com', '$2y$10$qbjF4IMlME33xkPuAFL4gOeM8RKxPmArIiYw.RXu7BV0/7lltmfVS', 'Who is your best friend in Elementary?', '$2y$10$Pak2WjknMbhzA.ltbUfls.gi9BVzSfoiOIRoywFZx98jkkvhRVf8W', 'What is the name of your favorite pet?', '$2y$10$PjYuHjWco71roMWZZDy8/.gAzwIGvvLwAmM70/NgAg5exMA4p8G7m', 'Who is your favorite teacher in high school?', '$2y$10$ADnZK6wcr1HY4we0w9QgOexIwCQeej..LZFLo.0rH.SascBRMiHIG', '2026-08-26 05:01:36', '2026-09-12 05:24:08', 1, '', 'admin', NULL, NULL, 'active', 0, NULL, NULL),
 ('2026-0004', 'Rodel Jame', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_123', 'maraon101@gmail.com', '$2y$10$prCKoJ89wTD9M1TgUqUjyOLSGUtxuAoYwqpGRdRZZz0hVXXKsexTW', 'What was the name of your first pet?', '$2y$10$jMcYrdYABJzblyyPkYEq1ehIhzA.k110nU6OyADyUbUET5Uj.760i', 'What is your favorite flower?', '$2y$10$xgFkdHVsFpdinf3ABwUEU.rT8r5orbIxUtjgPDzoWe9WK5dawoByG', 'What is your oldest sibling\'s first name?', '$2y$10$ghu8ckXp53/V7IHFAzzwZerrnUH6kwG2JyuEjJ9xloizmUD9S0eFW', '2026-09-04 14:20:03', '2026-09-08 01:52:26', 1, '', 'super_admin', NULL, NULL, 'active', 0, NULL, NULL),
 ('2026-0005', 'Melani', 'June', 'Hubog', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8606', 'babies_123', 'baby@gmail.com', '$2y$10$cBEW.p9G1sFGLplPFeYgLOjmMJ6IgicSHDFn/aOFgTCiMZh8UAucC', 'What was the name of your first pet?', '$2y$10$Eidv/394sTYMziAeZJgAt.c1ffAoEwRzWxRRmWIgN1hzkHWcLKVki', 'What is your favorite flower?', '$2y$10$4k/1rs7Cniq2SVNZ5OuG6e4mGPB80gNr3lepncSduYjeHlq1azWC6', 'What is your oldest sibling\'s first name?', '$2y$10$lc3D0OSP0sjka6p5KlRKHOK7b43O0f7b7TCGQWWD36goaoYJVwyeS', '2026-09-04 14:22:31', '2026-09-07 02:26:03', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
-('2026-0007', 'Educator', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'rodel_123', 'rodeljames.maraon@csucc.edu.ph', '$2y$10$C75QD1WXxKZEVjAuX2kAqeDKPWY90TdDPHLotp4pdLG73eY.7x.WK', 'What was the name of your first pet?', '$2y$10$GXNIKm6e/dpM01a6ZR9tlekgVT0EV0IXD.Cuhxoa2wW2F4rpQcQjW', 'What is your favorite flower?', '$2y$10$PPm2rLOpASnQgGlx3yYFBuMF73CNRL3xehD53I6231o97bFCL905u', 'What is your oldest sibling\'s first name?', '$2y$10$qk0LJptodi.0lzBQfhCobOfzpKAWmMtrgn9QY09LZy.Ofss1Kv.66', '2026-09-09 04:03:22', '2026-09-09 10:47:07', 0, '', 'customer', NULL, NULL, 'blocked', 0, NULL, NULL),
-('2026-0008', '', NULL, '', NULL, '0000-00-00', 0, '', '', '', '', '', '', '', 'shake_123', 'bshakeys2@gmail.com', '$2y$10$ldBu3MAu6WhuyCtg31c63OtFucQPhNr7wxIb0zDbMbkHUxIY77ecC', '', '', '', '', '', '', '2026-09-09 10:21:12', '2026-09-09 10:21:12', 0, '', 'customer', NULL, NULL, 'incomplete', 0, NULL, NULL);
+('2026-0007', 'Educator', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'rodel_123', 'rodeljames.maraon@csucc.edu.ph', '$2y$10$C75QD1WXxKZEVjAuX2kAqeDKPWY90TdDPHLotp4pdLG73eY.7x.WK', 'What was the name of your first pet?', '$2y$10$GXNIKm6e/dpM01a6ZR9tlekgVT0EV0IXD.Cuhxoa2wW2F4rpQcQjW', 'What is your favorite flower?', '$2y$10$PPm2rLOpASnQgGlx3yYFBuMF73CNRL3xehD53I6231o97bFCL905u', 'What is your oldest sibling\'s first name?', '$2y$10$qk0LJptodi.0lzBQfhCobOfzpKAWmMtrgn9QY09LZy.Ofss1Kv.66', '2026-09-09 04:03:22', '2026-09-12 05:03:45', 0, '', 'customer', NULL, NULL, 'pending', 0, NULL, NULL),
+('2026-0008', '', NULL, '', NULL, '0000-00-00', 0, '', '', '', '', '', '', '', 'shake_123', 'bshakeys2@gmail.com', '$2y$10$ldBu3MAu6WhuyCtg31c63OtFucQPhNr7wxIb0zDbMbkHUxIY77ecC', '', '', '', '', '', '', '2026-09-09 10:21:12', '2026-09-09 10:21:12', 0, '', 'customer', NULL, NULL, 'incomplete', 0, NULL, NULL),
+('2026-0009', '', NULL, '', NULL, '0000-00-00', 0, '', '', '', '', '', '', '', 'edrian_123', 'edrian.prones@csucc.edu.ph', '$2y$10$DHI.Jo/XK2NstL8DxogmJOFvCQq0UpfR7PBPpe9XNHMgthV0B5LCG', '', '', '', '', '', '', '2026-09-12 05:23:01', '2026-09-12 05:23:01', 0, '', 'admin', NULL, NULL, 'incomplete', 0, NULL, NULL);
 
 --
 -- Triggers `users`
@@ -615,7 +639,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=129;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=143;
 
 --
 -- AUTO_INCREMENT for table `deletion_requests`

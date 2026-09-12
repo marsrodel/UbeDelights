@@ -52,6 +52,14 @@ if ($connect) {
     $r2 = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'pending'");
     if ($r2) $pendingCount = mysqli_fetch_assoc($r2)['cnt'];
 }
+
+$myPrivileges = ['can_manage_registrations' => 0, 'can_update_accounts' => 0, 'can_request_deletion' => 0, 'can_block' => 0, 'can_reset_password' => 0];
+if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
+    $rp = mysqli_query($connect, "SELECT can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password FROM admin_privileges WHERE idNumber = '" . mysqli_real_escape_string($connect, $_SESSION['auth_user_id']) . "'");
+    if ($rp && $rp->num_rows > 0) {
+        $myPrivileges = mysqli_fetch_assoc($rp);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -480,6 +488,10 @@ if ($connect) {
                         <input type="checkbox" id="rpBlockUnblock">
                         <label for="rpBlockUnblock">Block/Unblock accounts</label>
                     </div>
+                    <div class="rp-privilege-item">
+                        <input type="checkbox" id="rpResetPassword">
+                        <label for="rpResetPassword">Reset user passwords</label>
+                    </div>
                 </div>
 
                 <div id="rpSuperAdminPrivileges" style="display:none;">
@@ -489,6 +501,7 @@ if ($connect) {
                         <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Manage Registrations</li>
                         <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Manage Account Info</li>
                         <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Block/Unblock</li>
+                        <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Reset Password</li>
                         <li><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Can Delete</li>
                     </ul>
                 </div>
@@ -504,7 +517,7 @@ if ($connect) {
 
     <script src="../../javascript/admin-routing.js?v=2.0"></script>
     <script src="../../javascript/admin_security.js?v=4.0"></script>
-    <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>;</script>
+    <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>;</script>
     <script src="../../javascript/user_management.js?v=4.0"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
 </body>

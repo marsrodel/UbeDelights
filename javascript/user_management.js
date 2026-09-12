@@ -2647,20 +2647,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isOwn) {
             h += '<button class="um-action-btn btn-edit" data-action="edit" data-id="'+esc(user.id)+'" title="Edit"><i class="fa-solid fa-pen"></i></button>';
         } else {
+            var canEdit = (myPrivileges.can_update_accounts == 1 || iAmSuperAdmin);
+            var canBlock = (myPrivileges.can_block == 1 || iAmSuperAdmin);
+            var canDeleteReq = (myPrivileges.can_request_deletion == 1 || iAmSuperAdmin);
+            var canResetPwd = (myPrivileges.can_reset_password == 1 || iAmSuperAdmin);
+
             h += '<div class="um-dropdown-wrap">';
             h += '<button class="um-action-btn btn-more" title="More Actions"><i class="fa-solid fa-ellipsis-vertical"></i></button>';
             h += '<div class="um-dropdown">';
-            h += '<button class="um-dropdown-item" data-action="edit" data-id="'+esc(user.id)+'"><i class="fa-solid fa-pen"></i> Edit</button>';
+            if (!isSuperAdmin || isOwn) {
+                h += '<button class="um-dropdown-item" data-action="edit" data-id="'+esc(user.id)+'"' + (canEdit ? '' : ' disabled title="Not Authorized"') + '><i class="fa-solid fa-pen"></i> Edit</button>';
+            }
             if (isCustomer || (iAmSuperAdmin && !isSuperAdmin)) {
-                h += '<button class="um-dropdown-item" data-action="reset-password" data-id="'+esc(user.id)+'"><i class="fa-solid fa-key"></i> Reset Password</button>';
+                h += '<button class="um-dropdown-item" data-action="reset-password" data-id="'+esc(user.id)+'"' + (canResetPwd ? '' : ' disabled title="Not Authorized"') + '><i class="fa-solid fa-key"></i> Reset Password</button>';
             }
             if (iAmSuperAdmin && (user.role === 'admin' || user.role === 'super_admin')) {
                 h += '<button class="um-dropdown-item" data-action="roles-privileges" data-id="'+esc(user.id)+'"><i class="fa-solid fa-user-shield"></i> Roles & Privileges</button>';
             }
             if (user.status === 'blocked') {
-                h += '<button class="um-dropdown-item" data-action="unblock" data-id="'+esc(user.id)+'"><i class="fa-solid fa-unlock"></i> Unblock</button>';
+                h += '<button class="um-dropdown-item" data-action="unblock" data-id="'+esc(user.id)+'"' + (canBlock ? '' : ' disabled title="Not Authorized"') + '><i class="fa-solid fa-unlock"></i> Unblock</button>';
             } else {
-                h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
+                h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"' + (canBlock ? '' : ' disabled title="Not Authorized"') + '><i class="fa-solid fa-ban"></i> Block</button>';
             }
             if (iAmSuperAdmin) {
                 h += '<button class="um-dropdown-item danger" data-action="delete-user" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Delete</button>';
@@ -2668,7 +2675,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (user.hasPendingDeletion) {
                     h += '<button class="um-dropdown-item" disabled style="opacity:0.5;cursor:not-allowed;color:var(--text-secondary);"><i class="fa-solid fa-clock"></i> Pending Deletion</button>';
                 } else {
-                    h += '<button class="um-dropdown-item danger" data-action="request-deletion" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Request Deletion</button>';
+                    h += '<button class="um-dropdown-item danger" data-action="request-deletion" data-id="'+esc(user.id)+'"' + (canDeleteReq ? '' : ' disabled title="Not Authorized"') + '><i class="fa-solid fa-trash"></i> Request Deletion</button>';
                 }
             }
             h += '</div></div>';
@@ -2922,7 +2929,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             usersTableBody.addEventListener('click', function(e) {
                 var item = e.target.closest('[data-action="reset-password"]');
-                if (!item) return;
+                if (!item || item.disabled) return;
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
                 document.getElementById('resetPasswordUserId').value = userId;
@@ -3105,7 +3112,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             usersTableBody.addEventListener('click', function(e) {
                 var item = e.target.closest('[data-action="request-deletion"]');
-                if (!item) return;
+                if (!item || item.disabled) return;
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
                 document.getElementById('deletionUserId').value = userId;
@@ -3173,7 +3180,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             usersTableBody.addEventListener('click', function(e) {
                 var item = e.target.closest('[data-action="edit"]');
-                if (!item) return;
+                if (!item || item.disabled) return;
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
                 var allData = typeof allUsers !== 'undefined' ? allUsers : [];
@@ -3205,7 +3212,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             usersTableBody.addEventListener('click', function(e) {
                 var item = e.target.closest('[data-action="block"]');
-                if (!item) return;
+                if (!item || item.disabled) return;
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
                 document.getElementById('blockUserId').value = userId;
@@ -3218,7 +3225,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             usersTableBody.addEventListener('click', function(e) {
                 var item = e.target.closest('[data-action="unblock"]');
-                if (!item) return;
+                if (!item || item.disabled) return;
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
                 document.getElementById('blockUserId').value = userId;
@@ -3239,8 +3246,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!user) return;
                 document.getElementById('rpUserId').value = user.id;
                 document.getElementById('rpRole').value = user.role === 'super_admin' ? 'super_admin' : 'admin';
-                toggleRpView();
-                document.getElementById('rolesPrivilegesModal').classList.add('active');
+
+                var fd = new FormData();
+                fd.append('action', 'get_privileges');
+                fd.append('user_id', userId);
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../server/user_management.php', true);
+                xhr.onload = function() {
+                    var privs = { can_manage_registrations: 0, can_update_accounts: 0, can_request_deletion: 0, can_block: 0 };
+                    if (xhr.status === 200) {
+                        try {
+                            var res = JSON.parse(xhr.responseText);
+                            if (res.success && res.privileges) privs = res.privileges;
+                        } catch(e) {}
+                    }
+                    document.getElementById('rpManageRegistrations').checked = privs.can_manage_registrations == 1;
+                    document.getElementById('rpUpdateAccounts').checked = privs.can_update_accounts == 1;
+                    document.getElementById('rpRequestDeletion').checked = privs.can_request_deletion == 1;
+                    document.getElementById('rpBlockUnblock').checked = privs.can_block == 1;
+                    document.getElementById('rpResetPassword').checked = privs.can_reset_password == 1;
+                    toggleRpView();
+                    document.getElementById('rolesPrivilegesModal').classList.add('active');
+                };
+                xhr.send(fd);
             });
 
             document.getElementById('blockConfirmBtn').addEventListener('click', function() {
@@ -3308,6 +3336,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                     submitResetPassword(targetUserId);
                                 } else if (action === 'create-account') {
                                     submitCreateAccount();
+                                } else if (action === 'roles-privileges') {
+                                    submitRolesPrivileges(targetUserId);
                                 }
                             } else {
                                 blockPasswordAttempts++;
@@ -3379,6 +3409,39 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     } else {
                         alert('Server error. Please try again.');
+                    }
+                };
+                xhr.onerror = function() { alert('Network error. Please try again.'); };
+                xhr.send(fd);
+            }
+
+            function submitRolesPrivileges(targetUserId) {
+                var fd = new FormData();
+                fd.append('action', 'save_roles_privileges');
+                fd.append('target_user_id', targetUserId);
+                fd.append('role', document.getElementById('rpRole').value);
+                if (document.getElementById('rpManageRegistrations').checked) fd.append('can_manage_registrations', '1');
+                if (document.getElementById('rpUpdateAccounts').checked) fd.append('can_update_accounts', '1');
+                if (document.getElementById('rpRequestDeletion').checked) fd.append('can_request_deletion', '1');
+                if (document.getElementById('rpBlockUnblock').checked) fd.append('can_block', '1');
+                if (document.getElementById('rpResetPassword').checked) fd.append('can_reset_password', '1');
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../server/user_management.php', true);
+                xhr.onload = function() {
+                    var res;
+                    try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+                    if (res.success) {
+                        closeModal('rolesPrivilegesModal');
+                        document.getElementById('successModalTitle').textContent = 'Success';
+                        document.getElementById('successModalMessage').textContent = res.message || 'Role & privileges saved successfully!';
+                        document.getElementById('successModal').classList.add('active');
+                        document.getElementById('successModalOkBtn').onclick = function() {
+                            closeModal('successModal');
+                            location.reload();
+                        };
+                    } else {
+                        alert(res.message || 'Failed to save.');
                     }
                 };
                 xhr.onerror = function() { alert('Network error. Please try again.'); };

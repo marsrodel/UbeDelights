@@ -26,6 +26,15 @@ if ($targetId === '') {
     exit();
 }
 
+if ($role === 'admin') {
+    $r = mysqli_query($connect, "SELECT can_request_deletion FROM admin_privileges WHERE idNumber = '" . mysqli_real_escape_string($connect, $userId) . "'");
+    $priv = $r ? mysqli_fetch_assoc($r) : null;
+    if (!$priv || !$priv['can_request_deletion']) {
+        echo json_encode(['success' => false, 'message' => 'You are not authorized to request account deletion.']);
+        exit();
+    }
+}
+
 if ($reason === '') {
     echo json_encode(['success' => false, 'message' => 'A reason is required.']);
     exit();

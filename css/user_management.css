@@ -140,6 +140,12 @@
 #viewPendingModal .modal-body { padding: 12px 20px 8px; overflow: visible; }
 #viewPendingModal .modal-footer { padding: 10px 20px; }
 #viewPendingModal .modal-close { width: 30px; height: 30px; font-size: 0.9rem; }
+#viewDrModal .modal { max-width: 950px; max-height: none; }
+#viewDrModal .modal-header { padding: 12px 20px; }
+#viewDrModal .modal-header h2 { font-size: 1rem; }
+#viewDrModal .modal-body { padding: 12px 20px 8px; overflow: visible; }
+#viewDrModal .modal-footer { padding: 10px 20px; }
+#viewDrModal .modal-close { width: 30px; height: 30px; font-size: 0.9rem; }
 .um-view-form .section-block { margin-bottom: 10px; }
 .um-view-form .section-title {
     font-size: 0.75rem; font-weight: 700; color: var(--accent);

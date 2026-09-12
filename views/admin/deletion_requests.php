@@ -12,6 +12,10 @@ if ($connect) {
                    t.username AS target_username, t.first_name AS target_first_name,
                    t.middle_name AS target_middle_name, t.last_name AS target_last_name,
                    t.extension_name AS target_extension_name, t.role AS target_role,
+                   t.email AS target_email, t.date_of_birth AS target_dob, t.age AS target_age,
+                   t.sex AS target_sex, t.street AS target_street, t.barangay AS target_barangay,
+                   t.city_municipality AS target_city, t.province AS target_province,
+                   t.country AS target_country, t.zip_code AS target_zipcode,
                    r.username AS reviewer_username,
                    CONCAT(rb.first_name, ' ', IFNULL(rb.middle_name, ''), ' ', rb.last_name) AS requester_name
             FROM deletion_requests dr
@@ -33,8 +37,22 @@ if ($connect) {
                 'id'              => $row['id'],
                 'targetId'        => $row['target_id_number'],
                 'targetName'      => $targetName,
+                'targetFirstName' => $row['target_first_name'],
+                'targetMiddleName'=> $row['target_middle_name'] ?? '',
+                'targetLastName'  => $row['target_last_name'],
+                'targetExtension' => $row['target_extension_name'] ?? '',
                 'targetUsername'   => $row['target_username'],
                 'targetRole'      => $row['target_role'],
+                'targetEmail'     => $row['target_email'],
+                'targetDob'       => $row['target_dob'],
+                'targetAge'       => $row['target_age'],
+                'targetSex'       => $row['target_sex'],
+                'targetStreet'    => $row['target_street'],
+                'targetBarangay'  => $row['target_barangay'],
+                'targetCity'      => $row['target_city'],
+                'targetProvince'  => $row['target_province'],
+                'targetCountry'   => $row['target_country'],
+                'targetZipcode'   => $row['target_zipcode'],
                 'requestedBy'     => trim($row['requester_name']),
                 'reason'          => $row['reason'],
                 'status'          => $row['status'],
@@ -63,6 +81,7 @@ if ($connect) {
     <title>Deletion Requests - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
+    <link rel="stylesheet" href="../../css/user_management.css?v=2.0">
 </head>
 <body class="admin-body">
 <?php $activePage = 'deletion_requests'; include '_sidebar.php'; ?>
@@ -113,6 +132,25 @@ if ($connect) {
                 <p>No deletion requests match your current filters.</p>
             </div>
         </main>
+    </div>
+
+    <!-- View Deletion Request Modal -->
+    <div class="modal-overlay" id="viewDrModal" role="dialog" aria-modal="true" aria-labelledby="viewDrModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="viewDrModalTitle">Request Details</h2>
+                <button class="modal-close" id="viewDrModalClose" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="viewDrBody">
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: var(--accent);"></i>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Loading user data...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" id="viewDrModalCloseBtn">Close</button>
+            </div>
+        </div>
     </div>
 
     <!-- Approve Confirmation Modal -->

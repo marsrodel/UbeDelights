@@ -44,6 +44,14 @@ if ($connect) {
     $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'pending'");
     if ($r) $orderCount = mysqli_fetch_assoc($r)['cnt'];
 }
+
+$myPrivileges = ['can_manage_registrations' => 0, 'can_update_accounts' => 0, 'can_request_deletion' => 0, 'can_block' => 0, 'can_reset_password' => 0];
+if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
+    $rp = mysqli_query($connect, "SELECT can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password FROM admin_privileges WHERE idNumber = '" . mysqli_real_escape_string($connect, $_SESSION['auth_user_id']) . "'");
+    if ($rp && $rp->num_rows > 0) {
+        $myPrivileges = mysqli_fetch_assoc($rp);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -182,7 +190,7 @@ if ($connect) {
 
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
-    <script>var pendingUsers = <?php echo json_encode($pendingUsers); ?>;</script>
+    <script>var pendingUsers = <?php echo json_encode($pendingUsers); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? ''); ?>;</script>
     <script src="../../javascript/admin_pending_approvals.js"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>

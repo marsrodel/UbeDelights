@@ -1284,6 +1284,19 @@ body.admin-body {
     color: var(--text-primary);
 }
 
+/* Disabled privilege button (not authorized) */
+.um-dropdown-item[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+    pointer-events: auto !important;
+}
+
+.pending-action-btn[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+    pointer-events: auto !important;
+}
+
 /* ==========================================
    RESPONSIVE
    ========================================== */
