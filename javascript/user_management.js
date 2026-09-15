@@ -2315,6 +2315,21 @@ document.addEventListener('DOMContentLoaded', function() {
 (function() {
     'use strict';
 
+    function getPasswordStrength(p) {
+        var s = (p || '').replace(/\s+/g, '');
+        if (!s) return '';
+        var types = 0;
+        if (/[a-z]/.test(s)) types++;
+        if (/[A-Z]/.test(s)) types++;
+        if (/[0-9]/.test(s)) types++;
+        if (/[^A-Za-z0-9]/.test(s)) types++;
+        if (s.length < 8 || types < 2) return 'Weak';
+        if (s.length >= 12 && types >= 4) return 'Strong';
+        return 'Medium';
+    }
+
+    function hasSpace(str) { return /\s/.test(str || ''); }
+
     var state = { page: 1, perPage: 10, filters: { search: '', role: '', status: '' } };
     var editOriginalEmail = '';
     var editOriginalUsername = '';
@@ -2342,6 +2357,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==========================================
     var addUserSubmitBtn = document.getElementById('addUserSubmitBtn');
     var createAccountConfirmBtn = document.getElementById('createAccountConfirmBtn');
+    var pendingCreateAccountPassword = '';
 
     function getRoleLabel(role) {
         if (role === 'super_admin') return 'Super Admin';
@@ -2350,11 +2366,75 @@ document.addEventListener('DOMContentLoaded', function() {
         return 'User';
     }
 
+    var defaultPassEl = document.getElementById('defaultPass');
+    var defaultPassStrengthSpan = document.getElementById('defaultPassStrength');
+
+    function updateDefaultPassStrength() {
+        if (!defaultPassStrengthSpan) return;
+        var val = (defaultPassEl && defaultPassEl.value) || '';
+        var strength = getPasswordStrength(val);
+        if (!strength) {
+            defaultPassStrengthSpan.textContent = '';
+            defaultPassStrengthSpan.style.color = '';
+            if (hasSpace(val)) {
+                showErrorMessage('defaultPass', 'Spaces are not allowed in password.');
+                return;
+            }
+            clearErrorMessage('defaultPass');
+            return;
+        }
+        defaultPassStrengthSpan.textContent = strength + ' Password';
+        defaultPassStrengthSpan.style.color = strength === 'Strong' ? '#16a34a' : (strength === 'Medium' ? '#f59e0b' : '#dc2626');
+        defaultPassStrengthSpan.style.fontSize = '11px';
+        if (hasSpace(val)) { showErrorMessage('defaultPass', 'Spaces are not allowed in password.'); return; }
+        if (val.length < 8) { showErrorMessage('defaultPass', 'Password must be at least 8 characters long.'); return; }
+        if (val.length > 50) { showErrorMessage('defaultPass', 'Password cannot exceed 50 characters.'); return; }
+        if (!/[A-Z]/.test(val)) { showErrorMessage('defaultPass', 'Password must contain at least 1 uppercase letter.'); return; }
+        if (!/[a-z]/.test(val)) { showErrorMessage('defaultPass', 'Password must contain at least 1 lowercase letter.'); return; }
+        if (!/[0-9]/.test(val)) { showErrorMessage('defaultPass', 'Password must contain at least 1 number.'); return; }
+        if (!/[^A-Za-z0-9]/.test(val)) { showErrorMessage('defaultPass', 'Password must contain at least 1 special character.'); return; }
+        clearErrorMessage('defaultPass');
+    }
+
+    if (defaultPassEl) {
+        defaultPassEl.addEventListener('input', updateDefaultPassStrength);
+    }
+
+    var eyeiconCreate = document.getElementById('eyeicon-create');
+    if (eyeiconCreate && defaultPassEl) {
+        eyeiconCreate.onclick = function() {
+            if (defaultPassEl.type === 'password') {
+                defaultPassEl.type = 'text';
+                eyeiconCreate.classList.remove('fa-eye-slash');
+                eyeiconCreate.classList.add('fa-eye');
+            } else {
+                defaultPassEl.type = 'password';
+                eyeiconCreate.classList.remove('fa-eye');
+                eyeiconCreate.classList.add('fa-eye-slash');
+            }
+        };
+    }
+
+    var addUserModal = document.getElementById('addUserModal');
+    if (addUserModal) {
+        var addUserObserver = new MutationObserver(function() {
+            if (!addUserModal.classList.contains('active')) {
+                if (defaultPassEl) defaultPassEl.value = '';
+                if (defaultPassEl) defaultPassEl.type = 'password';
+                if (defaultPassStrengthSpan) { defaultPassStrengthSpan.textContent = ''; defaultPassStrengthSpan.style.color = ''; }
+                clearErrorMessage('defaultPass');
+                if (eyeiconCreate) { eyeiconCreate.classList.remove('fa-eye'); eyeiconCreate.classList.add('fa-eye-slash'); }
+            }
+        });
+        addUserObserver.observe(addUserModal, { attributes: true, attributeFilter: ['class'] });
+    }
+
     function validateCreateAccountFields() {
         var fields = [
             { id: 'id', label: 'ID Number' },
             { id: 'email', label: 'Email' },
             { id: 'user', label: 'Username' },
+            { id: 'defaultPass', label: 'Default Password' },
             { id: 'role', label: 'Role' }
         ];
         for (var i = 0; i < fields.length; i++) {
@@ -2374,6 +2454,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         }
+        var passEl2 = document.getElementById('defaultPass');
+        if (passEl2) {
+            var pVal = passEl2.value.trim();
+            if (pVal.length < 8) {
+                window.adminToast('Password must be at least 8 characters', 'error');
+                passEl2.focus();
+                return false;
+            }
+            var pErr = document.getElementById('defaultPass-error');
+            if (pErr) {
+                window.adminToast('Please fix the password errors', 'error');
+                passEl2.focus();
+                return false;
+            }
+        }
         return true;
     }
 
@@ -2381,6 +2476,7 @@ document.addEventListener('DOMContentLoaded', function() {
         addUserSubmitBtn.addEventListener('click', function(e) {
             e.preventDefault();
             if (!validateCreateAccountFields()) return;
+            pendingCreateAccountPassword = (document.getElementById('defaultPass').value || '').trim();
             var role = document.getElementById('role').value;
             var confirmMsg = document.getElementById('createAccountConfirmMessage');
             if (confirmMsg) confirmMsg.textContent = 'Create this account as ' + getRoleLabel(role) + '?';
@@ -2405,12 +2501,14 @@ document.addEventListener('DOMContentLoaded', function() {
         var idNo = (document.getElementById('id').value || '').trim();
         var email = (document.getElementById('email').value || '').trim();
         var username = (document.getElementById('user').value || '').trim();
+        var defaultPass = pendingCreateAccountPassword;
         var role = document.getElementById('role').value;
 
         var params = 'action=create_account'
             + '&idNo=' + encodeURIComponent(idNo)
             + '&email=' + encodeURIComponent(email)
             + '&username=' + encodeURIComponent(username)
+            + '&defaultPass=' + encodeURIComponent(defaultPass)
             + '&role=' + encodeURIComponent(role);
 
         var xhr = new XMLHttpRequest();
@@ -2424,7 +2522,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         var addModal = document.getElementById('addUserModal');
                         if (addModal) { addModal.classList.remove('active'); document.body.style.overflow = ''; }
                         document.getElementById('successModalTitle').textContent = 'Account Created';
-                        document.getElementById('successModalMessage').textContent = 'User account created. Default password: UbeDelights_123 Share it with them \u2014 they must set their own during first login.';
+                        document.getElementById('successModalMessage').textContent = 'Default password set. Share it with the user \u2014 they must change it during first login.';
                         document.getElementById('successModal').classList.add('active');
                         var okBtn = document.getElementById('successModalOkBtn');
                         if (okBtn) {
@@ -2439,6 +2537,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } catch(ex) {
                     window.adminToast('An error occurred while creating account', 'error');
                 }
+                pendingCreateAccountPassword = '';
             }
         };
         xhr.send(params);
@@ -2462,6 +2561,13 @@ document.addEventListener('DOMContentLoaded', function() {
         successOkBtn.addEventListener('click', function() {
             closeModal('successModal');
             if (successModalOkCallback) { successModalOkCallback(); successModalOkCallback = null; }
+        });
+    }
+
+    var transferOkBtn = document.getElementById('transferModalOkBtn');
+    if (transferOkBtn) {
+        transferOkBtn.addEventListener('click', function() {
+            window.location.href = '../../server/logout.php';
         });
     }
 
@@ -2634,11 +2740,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return h;
         }
 
-        if (user.status === 'incomplete') {
+        if (user.status === 'incomplete' || user.isIncomplete) {
             h += '<div class="um-dropdown-wrap">';
             h += '<button class="um-action-btn btn-more" title="More Actions"><i class="fa-solid fa-ellipsis-vertical"></i></button>';
             h += '<div class="um-dropdown">';
-            h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
+            if (user.status === 'blocked') {
+                h += '<button class="um-dropdown-item" data-action="unblock" data-id="'+esc(user.id)+'"><i class="fa-solid fa-unlock"></i> Unblock</button>';
+            } else {
+                h += '<button class="um-dropdown-item" data-action="block" data-id="'+esc(user.id)+'"><i class="fa-solid fa-ban"></i> Block</button>';
+            }
             h += '<button class="um-dropdown-item danger" data-action="delete-user" data-id="'+esc(user.id)+'"><i class="fa-solid fa-trash"></i> Delete</button>';
             h += '</div></div>';
             return h;
@@ -2940,21 +3050,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('resetPasswordModal').classList.add('active');
             });
 
-            function getPasswordStrength(p) {
-                var s = (p || '').replace(/\s+/g, '');
-                if (!s) return '';
-                var types = 0;
-                if (/[a-z]/.test(s)) types++;
-                if (/[A-Z]/.test(s)) types++;
-                if (/[0-9]/.test(s)) types++;
-                if (/[^A-Za-z0-9]/.test(s)) types++;
-                if (s.length < 8 || types < 2) return 'Weak';
-                if (s.length >= 12 && types >= 4) return 'Strong';
-                return 'Medium';
-            }
-
-            function hasSpace(str) { return /\s/.test(str || ''); }
-
             var resetPassEl = document.getElementById('resetNewPassword');
             var resetRepassEl = document.getElementById('resetConfirmPassword');
             var resetPassStrengthSpan = document.getElementById('resetPassStrength');
@@ -3228,10 +3323,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!item || item.disabled) return;
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
+                var allData = typeof allUsers !== 'undefined' ? allUsers : [];
+                var targetUser = allData.find(function(u) { return u.id === userId; });
+
                 document.getElementById('blockUserId').value = userId;
                 document.getElementById('blockAction').value = 'unblock';
-                document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
-                document.getElementById('blockModalMessage').textContent = 'Unblock this user? They will be able to log in again.';
+
+                if (targetUser && targetUser.role === 'super_admin') {
+                    document.getElementById('blockModalTitle').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b; margin-right:6px;"></i> Super Admin Transfer';
+                    document.getElementById('blockModalMessage').textContent = 'Unblocking this super admin will transfer access to them. Your account will be blocked and you will be signed out. Continue?';
+                } else {
+                    document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
+                    document.getElementById('blockModalMessage').textContent = 'Unblock this user? They will be able to log in again.';
+                }
                 document.getElementById('blockConfirmBtn').textContent = 'Yes';
                 document.getElementById('blockModal').classList.add('active');
             });
@@ -3460,8 +3564,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         var res;
                         try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
                         if (res.success) {
-                            var msg = action === 'block' ? 'User blocked successfully.' : 'User unblocked successfully.';
-                            showSuccessModal(msg, function() { location.reload(); });
+                            if (res.transfer) {
+                                document.getElementById('transferModal').classList.add('active');
+                            } else {
+                                var msg = action === 'block' ? 'User blocked successfully.' : 'User unblocked successfully.';
+                                showSuccessModal(msg, function() { location.reload(); });
+                            }
                         } else {
                             alert(res.message || 'Action not available yet.');
                         }

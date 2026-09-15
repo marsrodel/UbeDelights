@@ -3,7 +3,7 @@
 $users = [];
 if ($connect) {
     $sql = "SELECT user_id, username, first_name, middle_name, last_name, extension_name,
-                   email, role, status, date_of_birth, age, sex,
+                   email, role, status, is_incomplete, date_of_birth, age, sex,
                    street, barangay, city_municipality, province, country, zip_code,
                    (SELECT COUNT(*) FROM deletion_requests dr WHERE dr.target_id_number = users.user_id AND dr.status = 'pending') AS has_pending_deletion
             FROM users WHERE status != 'pending'" .
@@ -29,6 +29,7 @@ if ($connect) {
                 'email'    => $row['email'],
                 'role'     => $row['role'],
                 'status'   => $row['status'] ?? 'pending',
+                'isIncomplete' => (int)($row['is_incomplete'] ?? 0),
                 'dob'      => $row['date_of_birth'],
                 'age'      => $row['age'],
                 'sex'      => $row['sex'],
@@ -388,6 +389,13 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
                                         <input type="text" id="user">
                                     </div>
                                     <div class="form-box">
+                                        <label for="defaultPass">Default Password <span class="required">*</span> <span id="defaultPassStrength" class="field-hint"></span></label>
+                                        <div class="password-wrapper">
+                                            <input type="password" id="defaultPass" placeholder="Min. 8 characters">
+                                            <i class="fa-solid fa-eye-slash" id="eyeicon-create"></i>
+                                        </div>
+                                    </div>
+                                    <div class="form-box">
                                         <label for="role">Role <span class="required">*</span></label>
                                         <select id="role">
                                             <option value="">-- Select a role --</option>
@@ -399,7 +407,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
                                         </select>
                                     </div>
                                 </div>
-                                <p class="form-hint-text"><i class="fa-solid fa-circle-info" style="color:var(--accent); margin-right:4px;"></i>The account starts on the shared default password and must change it during first login.</p>
+                                <p class="form-hint-text"><i class="fa-solid fa-circle-info" style="color:var(--accent); margin-right:4px;"></i>The new account will use this password for first login. The user must change it after logging in.</p>
                             </div>
                         </div>
                     </form>
@@ -441,6 +449,22 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
             </div>
             <div class="modal-footer" style="border-top:none; justify-content:flex-end;">
                 <button class="btn-primary" id="successModalOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Super Admin Transfer Modal -->
+    <div class="modal-overlay" id="transferModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:420px; text-align:center;">
+            <div class="modal-body" style="padding:30px 24px;">
+                <div style="font-size:2.5rem; color:var(--accent); margin-bottom:12px;">
+                    <i class="fa-solid fa-right-left"></i>
+                </div>
+                <h3 style="margin-bottom:8px;">Super Admin Transferred</h3>
+                <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px;">
+                    Super admin access has been transferred to the unblocked account. You will now be signed out.
+                </p>
+                <button class="btn-primary" id="transferModalOkBtn" style="min-width:120px; margin:0 auto;">OK</button>
             </div>
         </div>
     </div>
@@ -518,7 +542,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
     <script src="../../javascript/admin-routing.js?v=2.0"></script>
     <script src="../../javascript/admin_security.js?v=4.0"></script>
     <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>;</script>
-    <script src="../../javascript/user_management.js?v=4.0"></script>
+    <script src="../../javascript/user_management.js?v=4.2"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
 </body>
 </html>

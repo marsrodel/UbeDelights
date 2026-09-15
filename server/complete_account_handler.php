@@ -211,7 +211,7 @@ switch ($action) {
             street = ?, barangay = ?, city_municipality = ?, province = ?, country = ?, zip_code = ?,
             password_hash = ?,
             q1 = ?, a1 = ?, q2 = ?, a2 = ?, q3 = ?, a3 = ?,
-            status = 'active', is_active = 1
+            status = 'active', is_active = 1, is_incomplete = 0
             WHERE user_id = ?";
 
         $stmt = mysqli_prepare($connect, $sql);

@@ -238,11 +238,12 @@ try {
                 }
             }
 
-            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)");
             $initialStatus = ($role === 'super_admin') ? 'blocked' : 'incomplete';
-            $ins->bind_param("sssssssisssssssssss",
+            $isIncomplete = ($initialStatus === 'incomplete') ? 1 : 0;
+            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, is_incomplete, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)");
+            $ins->bind_param("sssssssissssssssssss",
                 $idNo, $username, $firstName, $middleName, $lastName, $extension,
-                $birthday, $age, $sex, $email, $hashed, $role, $initialStatus,
+                $birthday, $age, $sex, $email, $hashed, $role, $initialStatus, $isIncomplete,
                 $purok, $barangay, $municipality, $province, $country, $zipCode
             );
             if ($ins->execute()) {
@@ -362,7 +363,7 @@ try {
             if (!hasPrivilege($connect, 'unblock')) {
                 throw new Exception('You are not authorized to unblock users');
             }
-            $stmt = $connect->prepare("SELECT username, role, status FROM users WHERE user_id = ?");
+            $stmt = $connect->prepare("SELECT username, role, status, is_incomplete FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             $stmt->execute();
             $target_user = $stmt->get_result()->fetch_assoc();
@@ -377,11 +378,27 @@ try {
                 throw new Exception('User is not blocked');
             }
 
-            $stmt = $connect->prepare("UPDATE users SET status = 'active', is_active = 1 WHERE user_id = ?");
-            $stmt->bind_param("s", $userId);
+            if ($target_user['is_incomplete']) {
+                $stmt = $connect->prepare("UPDATE users SET status = 'incomplete', is_active = 0 WHERE user_id = ?");
+                $stmt->bind_param("s", $userId);
+            } else {
+                $stmt = $connect->prepare("UPDATE users SET status = 'active', is_active = 1 WHERE user_id = ?");
+                $stmt->bind_param("s", $userId);
+            }
             if ($stmt->execute()) {
                 log_activity('UNBLOCK_USER', "{$_SESSION['auth_username']} unblocked {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
-                $response = ['success' => true, 'message' => 'User unblocked successfully'];
+
+                $transfer = false;
+                if ($target_user['role'] === 'super_admin' && $currentRole === 'super_admin') {
+                    $blockStmt = $connect->prepare("UPDATE users SET status = 'blocked', is_active = 0 WHERE user_id = ? AND role = 'super_admin' AND status = 'active'");
+                    $blockStmt->bind_param("s", $currentUserId);
+                    $blockStmt->execute();
+                    $blockStmt->close();
+                    $transfer = true;
+                    log_activity('SUPER_ADMIN_TRANSFER', "{$_SESSION['auth_username']} unblocked {$target_user['username']} (super admin transfer)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
+                }
+
+                $response = ['success' => true, 'message' => 'User unblocked successfully', 'transfer' => $transfer];
             } else {
                 throw new Exception('Failed to unblock user');
             }
@@ -561,13 +578,20 @@ try {
                 throw new Exception(implode("\n", $errors));
             }
 
-            $defaultPassword = 'UbeDelights_123';
+            $defaultPassword = trim($_POST['defaultPass'] ?? '');
+            if (empty($defaultPassword)) {
+                throw new Exception('Default password is required');
+            }
+            if (strlen($defaultPassword) < 8) {
+                throw new Exception('Password must be at least 8 characters');
+            }
             $hashed = password_hash($defaultPassword, PASSWORD_DEFAULT);
 
             $initialStatus = ($role === 'super_admin') ? 'blocked' : 'incomplete';
-            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, '', NULL, '', NULL, '0000-00-00', 0, '', ?, ?, ?, ?, 0, '', '', '', '', '', '')");
-            $ins->bind_param("ssssss",
-                $idNo, $username, $email, $hashed, $role, $initialStatus
+            $isIncomplete = ($initialStatus === 'incomplete') ? 1 : 0;
+            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, is_incomplete, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, '', NULL, '', NULL, '0000-00-00', 0, '', ?, ?, ?, ?, 0, ?, '', '', '', '', '', '')");
+            $ins->bind_param("sssssss",
+                $idNo, $username, $email, $hashed, $role, $initialStatus, $isIncomplete
             );
             if ($ins->execute()) {
                 if ($role === 'admin') {

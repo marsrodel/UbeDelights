@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Incomplete accounts: send OTP and redirect to complete account flow
-    if ($user['status'] === 'incomplete') {
+    if ($user['status'] === 'incomplete' || $user['is_incomplete'] == 1) {
         if (!password_verify($password, $user['password_hash'])) {
             log_activity('failed_login', 'Wrong password attempt', 'Authentication', (string)$user['user_id'], $user['username']);
             $u = urlencode($login);
