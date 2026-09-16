@@ -3,6 +3,7 @@ mysqli_report(MYSQLI_REPORT_OFF);
 // Simple login: prepared statements + password_verify + basic lockout
 include '../server/db.php';
 require_once __DIR__ . '/../server/user_logger.php';
+require_once __DIR__ . '/../server/mail_helper.php';
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // If already authenticated, send to dashboard
 if (isset($_SESSION['auth_user_id'])) {
@@ -22,6 +23,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = isset($_POST['password']) ? (string)$_POST['password'] : '';
     if ($login === '' || $password === '') {
         header('Location: ./login.php?error=empty');
+        exit();
+    }
+
+    // Check staging accounts (admin-created accounts awaiting first login activation)
+    $stagingSql = "SELECT * FROM staging_accounts WHERE (BINARY username = ? OR email = ?) LIMIT 1";
+    $stagingStmt = mysqli_prepare($connect, $stagingSql);
+    mysqli_stmt_bind_param($stagingStmt, 'ss', $login, $login);
+    mysqli_stmt_execute($stagingStmt);
+    $stagingRes = mysqli_stmt_get_result($stagingStmt);
+    $stagingAccount = $stagingRes ? mysqli_fetch_assoc($stagingRes) : null;
+    mysqli_stmt_close($stagingStmt);
+
+    if ($stagingAccount) {
+        // Check if expired
+        if (strtotime($stagingAccount['expires_at']) <= time()) {
+            // Send expiration email
+            $expiryMailSubject = 'Ube Delights - Account Activation Expired';
+            $expiryMailBody = '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;">'
+                . '<h2 style="color:#dc2626;">Account Activation Expired</h2>'
+                . '<p>Hello, your Ube Delights account (<strong>' . htmlspecialchars($stagingAccount['username']) . '</strong>) was created on <strong>' . date('F j, Y', strtotime($stagingAccount['created_at'])) . '</strong> but was not activated within the 48-hour window.</p>'
+                . '<p>The account has been removed from the system.</p>'
+                . '<p>Please contact an administrator to have your account re-created.</p>'
+                . '<p style="color:#888;font-size:12px;">This is an automated message from Ube Delights.</p>'
+                . '</div>';
+            mail_send_message($stagingAccount['email'], $expiryMailSubject, $expiryMailBody);
+
+            // Delete expired staging account
+            $delStmt = mysqli_prepare($connect, "DELETE FROM staging_accounts WHERE id = ?");
+            mysqli_stmt_bind_param($delStmt, 'i', $stagingAccount['id']);
+            mysqli_stmt_execute($delStmt);
+            mysqli_stmt_close($delStmt);
+
+            log_activity('STAGING_EXPIRED', "Staging account for {$stagingAccount['username']} (ID: {$stagingAccount['user_id']}) expired and deleted", 'Authentication', null, $stagingAccount['username']);
+            header('Location: ./login.php?error=staging_expired');
+            exit();
+        }
+
+        // Not expired — verify password, then activate account
+        if (!password_verify($password, $stagingAccount['password_hash'])) {
+            log_activity('failed_login', 'Wrong password attempt (staging)', 'Authentication', $stagingAccount['user_id'], $stagingAccount['username']);
+            $u = urlencode($login);
+            header("Location: ./login.php?error=pass&u=$u");
+            exit();
+        }
+
+        // Activate: move from staging to users
+        $initialStatus = ($stagingAccount['role'] === 'super_admin') ? 'blocked' : 'incomplete';
+        $isIncomplete = 1;
+
+        $activateStmt = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, is_incomplete, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)");
+        $activateStmt->bind_param("sssssssissssssssssss",
+            $stagingAccount['user_id'], $stagingAccount['username'], $stagingAccount['first_name'],
+            $stagingAccount['middle_name'], $stagingAccount['last_name'], $stagingAccount['extension_name'],
+            $stagingAccount['date_of_birth'], $stagingAccount['age'], $stagingAccount['sex'],
+            $stagingAccount['email'], $stagingAccount['password_hash'], $stagingAccount['role'],
+            $initialStatus, $isIncomplete,
+            $stagingAccount['street'], $stagingAccount['barangay'], $stagingAccount['city_municipality'],
+            $stagingAccount['province'], $stagingAccount['country'], $stagingAccount['zip_code']
+        );
+        $activateStmt->execute();
+        $activateStmt->close();
+
+        // If role is admin, create privileges
+        if ($stagingAccount['role'] === 'admin') {
+            mysqli_query($connect, "INSERT INTO admin_privileges (idNumber, can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password) VALUES ('" . mysqli_real_escape_string($connect, $stagingAccount['user_id']) . "', 1, 1, 1, 1, 1)");
+        }
+
+        // Delete from staging
+        $delStmt2 = mysqli_prepare($connect, "DELETE FROM staging_accounts WHERE id = ?");
+        mysqli_stmt_bind_param($delStmt2, 'i', $stagingAccount['id']);
+        mysqli_stmt_execute($delStmt2);
+        mysqli_stmt_close($delStmt2);
+
+        log_activity('STAGING_ACTIVATED', "Staging account for {$stagingAccount['username']} (ID: {$stagingAccount['user_id']}) activated via first login", 'Authentication', $stagingAccount['user_id'], $stagingAccount['username']);
+
+        // Redirect to login to go through the normal incomplete/OTP flow
+        header('Location: ./login.php');
         exit();
     }
 
@@ -95,6 +173,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // 3) Password correct — check account status
+    if ($user['status'] === 'blocked') {
+        log_activity('login_blocked', 'Blocked user attempted login', 'Authentication', $userId, $user['username']);
+        header('Location: ./login.php?error=blocked');
+        exit();
+    }
+
     if ($user['status'] === 'pending') {
         log_activity('login_blocked', 'Pending user attempted login', 'Authentication', $userId, $user['username']);
         header('Location: ./login.php?error=pending');

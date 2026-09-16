@@ -306,6 +306,18 @@ document.addEventListener('DOMContentLoaded', function(){
       // Inactive-account message stays as a field-level error on username
       showErrorMessage('username', 'Your account is inactive.');
       return;
+    case 'blocked':
+      // Blocked account message stays as a field-level error on username
+      showErrorMessage('username', 'Your account is blocked. Contact a super admin.');
+      return;
+    case 'staging':
+      // Staging account pending activation
+      showErrorMessage('username', 'Your account is pending activation. Please check your email.');
+      return;
+    case 'staging_expired':
+      // Staging account has expired
+      showErrorMessage('username', 'Your activation link has expired. Please contact an administrator.');
+      return;
     case 'incomplete':
       // Incomplete account — redirect to complete account flow
       window.location.href = './complete_account.php?step=1';

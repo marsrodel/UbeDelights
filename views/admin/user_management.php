@@ -103,6 +103,9 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
                         </div>
                         <select class="filter-select" id="roleFilter">
                             <option value="">All Roles</option>
+                            <?php if ($_SESSION['auth_role'] === 'super_admin'): ?>
+                            <option value="super_admin">Super Admin</option>
+                            <?php endif; ?>
                             <option value="admin">Admin</option>
                             <option value="customer">Customer</option>
                         </select>
@@ -542,7 +545,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
     <script src="../../javascript/admin-routing.js?v=2.0"></script>
     <script src="../../javascript/admin_security.js?v=4.0"></script>
     <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>;</script>
-    <script src="../../javascript/user_management.js?v=4.2"></script>
+    <script src="../../javascript/user_management.js?v=4.3"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
 </body>
 </html>
