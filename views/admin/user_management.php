@@ -3,7 +3,7 @@
 $users = [];
 if ($connect) {
     $sql = "SELECT user_id, username, first_name, middle_name, last_name, extension_name,
-                   email, role, status, is_incomplete, date_of_birth, age, sex,
+                   email, role, status, is_incomplete, is_logged_in, date_of_birth, age, sex,
                    street, barangay, city_municipality, province, country, zip_code,
                    (SELECT COUNT(*) FROM deletion_requests dr WHERE dr.target_id_number = users.user_id AND dr.status = 'pending') AS has_pending_deletion
             FROM users WHERE status != 'pending'" .
@@ -29,6 +29,7 @@ if ($connect) {
                 'email'    => $row['email'],
                 'role'     => $row['role'],
                 'status'   => $row['status'] ?? 'pending',
+                'isLoggedIn' => (int)($row['is_logged_in'] ?? 0),
                 'isIncomplete' => (int)($row['is_incomplete'] ?? 0),
                 'dob'      => $row['date_of_birth'],
                 'age'      => $row['age'],

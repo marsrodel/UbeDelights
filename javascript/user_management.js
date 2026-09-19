@@ -2476,8 +2476,17 @@ document.addEventListener('DOMContentLoaded', function() {
         addUserSubmitBtn.addEventListener('click', function(e) {
             e.preventDefault();
             if (!validateCreateAccountFields()) return;
-            pendingCreateAccountPassword = (document.getElementById('defaultPass').value || '').trim();
             var role = document.getElementById('role').value;
+            if (role === 'super_admin') {
+                var activeSAs = allUsers.filter(function(u) {
+                    return u.role === 'super_admin' && u.status === 'active';
+                }).length;
+                if (activeSAs >= 2) {
+                    showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting an existing super admin to Admin via Roles & Privileges.');
+                    return;
+                }
+            }
+            pendingCreateAccountPassword = (document.getElementById('defaultPass').value || '').trim();
             var confirmMsg = document.getElementById('createAccountConfirmMessage');
             if (confirmMsg) confirmMsg.textContent = 'Create this account as ' + getRoleLabel(role) + '?';
             document.getElementById('createAccountConfirmModal').classList.add('active');
@@ -2547,7 +2556,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function roleBadge(r) { return '<span class="role-pill role-'+esc(r)+'">'+esc(r==='super_admin'?'Super Admin':r==='admin'?'Admin':'Customer')+'</span>'; }
 
-    function statusBadge(s) { return '<span class="status-pill status-'+esc(s)+'">'+esc(s.charAt(0).toUpperCase()+s.slice(1))+'</span>'; }
+    function statusBadge(s, u) {
+        if (u && u.role === 'super_admin' && u.status !== 'blocked' && !u.isLoggedIn) {
+            return '<span class="status-pill status-inactive">Inactive</span>';
+        }
+        return '<span class="status-pill status-'+esc(s)+'">'+esc(s.charAt(0).toUpperCase()+s.slice(1))+'</span>';
+    }
 
     var successModalOkCallback = null;
     function showSuccessModal(message, callback) {
@@ -2825,7 +2839,7 @@ document.addEventListener('DOMContentLoaded', function() {
             html += '<td class="cell-strong">'+esc(u.fullName)+'</td>';
             html += '<td class="cell-muted">'+esc(u.email)+'</td>';
             html += '<td>'+roleBadge(u.role)+'</td>';
-            html += '<td>'+statusBadge(u.status)+'</td>';
+            html += '<td>'+statusBadge(u.status, u)+'</td>';
             html += '<td class="actions-cell">'+actionButtons(u)+'</td>';
             html += '</tr>';
         });
@@ -2980,7 +2994,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!body) return;
                 var roleLabel = user.role === 'super_admin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : 'Customer';
                 var dob = (user.dob && user.dob !== '0000-00-00') ? new Date(user.dob).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
-                var statusLabel = user.status.charAt(0).toUpperCase() + user.status.slice(1);
+                var statusLabel = (user.role === 'super_admin' && user.status !== 'blocked' && !user.isLoggedIn) ? 'Inactive' : user.status.charAt(0).toUpperCase() + user.status.slice(1);
                 body.innerHTML =
                     '<div class="um-view-form">' +
                         '<div class="section-block">' +
@@ -3319,16 +3333,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 var allData = typeof allUsers !== 'undefined' ? allUsers : [];
                 var targetUser = allData.find(function(u) { return u.id === userId; });
 
-                document.getElementById('blockUserId').value = userId;
-                document.getElementById('blockAction').value = 'unblock';
-
                 if (targetUser && targetUser.role === 'super_admin') {
+                    var activeSAs = allData.filter(function(u) {
+                        return u.role === 'super_admin' && u.status === 'active';
+                    }).length;
+                    if (activeSAs >= 2) {
+                        showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.');
+                        return;
+                    }
                     document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
                     document.getElementById('blockModalMessage').textContent = 'Unblock this super admin? They will be able to log in.';
                 } else {
                     document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
                     document.getElementById('blockModalMessage').textContent = 'Unblock this user? They will be able to log in again.';
                 }
+                document.getElementById('blockUserId').value = userId;
+                document.getElementById('blockAction').value = 'unblock';
                 document.getElementById('blockConfirmBtn').textContent = 'Yes';
                 document.getElementById('blockModal').classList.add('active');
             });
@@ -3560,13 +3580,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             var msg = action === 'block' ? 'User blocked successfully.' : 'User unblocked successfully.';
                             showSuccessModal(msg, function() { location.reload(); });
                         } else {
-                            alert(res.message || 'Action not available yet.');
+                            showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.');
                         }
                     } else {
-                        alert('Server error. Please try again.');
+                        showSuccessModal('Server error. Please try again.');
                     }
                 };
-                xhr.onerror = function() { alert('Network error. Please try again.'); };
+                xhr.onerror = function() { showSuccessModal('Network error. Please try again.'); };
                 xhr.send(fd);
             }
 
