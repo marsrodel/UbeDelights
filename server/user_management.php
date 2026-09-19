@@ -241,19 +241,18 @@ try {
 
             $initialStatus = ($role === 'super_admin') ? 'blocked' : 'incomplete';
             $isIncomplete = 1;
-            $expiresAt = date('Y-m-d H:i:s', time() + (48 * 60 * 60));
-            $ins = $connect->prepare("INSERT INTO staging_accounts (user_id, username, email, password_hash, temp_password, role, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, street, barangay, city_municipality, province, country, zip_code, created_by, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $ins->bind_param("sssssssisssssssssssss",
-                $idNo, $username, $email, $hashed, $password, $role,
-                $firstName, $middleName, $lastName, $extension,
-                $birthday, $age, $sex,
-                $purok, $barangay, $municipality, $province, $country, $zipCode,
-                $currentUserId, $expiresAt
+            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, is_incomplete, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)");
+            $ins->bind_param("sssssssissssssssssss",
+                $idNo, $username, $firstName, $middleName, $lastName, $extension,
+                $birthday, $age, $sex, $email, $hashed, $role, $initialStatus, $isIncomplete,
+                $purok, $barangay, $municipality, $province, $country, $zipCode
             );
             if ($ins->execute()) {
-                log_activity('CREATE_USER', "{$_SESSION['auth_username']} created user $username (ID: $idNo) (staging)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
+                if ($role === 'admin') {
+                    mysqli_query($connect, "INSERT INTO admin_privileges (idNumber, can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password) VALUES ('" . mysqli_real_escape_string($connect, $idNo) . "', 1, 1, 1, 1, 1)");
+                }
+                log_activity('CREATE_USER', "{$_SESSION['auth_username']} created user $username (ID: $idNo)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
 
-                $expiryFormatted = date('F j, Y \a\t g:i A', strtotime($expiresAt));
                 $mailSubject = 'Ube Delights - Your Account Has Been Created';
                 $mailBody = '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;">'
                     . '<h2 style="color:#6B21A8;">Account Created</h2>'
@@ -264,9 +263,6 @@ try {
                     . '<tr><td style="padding:8px;font-weight:bold;border-bottom:1px solid #eee;">Username</td><td style="padding:8px;border-bottom:1px solid #eee;">' . htmlspecialchars($username) . '</td></tr>'
                     . '<tr><td style="padding:8px;font-weight:bold;">Temporary Password</td><td style="padding:8px;">' . htmlspecialchars($password) . '</td></tr>'
                     . '</table>'
-                    . '<div style="background:#FEF3C7;border-left:4px solid #F59E0B;padding:12px;margin:16px 0;border-radius:4px;">'
-                    . '<p style="color:#92400E;font-size:13px;margin:0;"><strong>⏰ Activation expires in 48 hours.</strong> Please log in before <strong>' . $expiryFormatted . '</strong> to activate your account. If the link expires, contact an administrator.</p>'
-                    . '</div>'
                     . '<p style="color:#dc2626;font-size:13px;">Please change your password after your first login.</p>'
                     . '<p style="color:#888;font-size:12px;">This is an automated message from Ube Delights.</p>'
                     . '</div>';
@@ -577,20 +573,20 @@ try {
             }
 
             if (!empty($username)) {
-                $c = $connect->prepare("SELECT user_id FROM users WHERE username = ?");
-                $c->bind_param("s", $username); $c->execute();
+                $c = $connect->prepare("SELECT user_id FROM users WHERE username = ? UNION SELECT user_id FROM staging_accounts WHERE username = ?");
+                $c->bind_param("ss", $username, $username); $c->execute();
                 if ($c->get_result()->num_rows > 0) $errors[] = 'Username already exists';
                 $c->close();
             }
             if (!empty($email)) {
-                $c = $connect->prepare("SELECT user_id FROM users WHERE email = ?");
-                $c->bind_param("s", $email); $c->execute();
+                $c = $connect->prepare("SELECT user_id FROM users WHERE email = ? UNION SELECT user_id FROM staging_accounts WHERE email = ?");
+                $c->bind_param("ss", $email, $email); $c->execute();
                 if ($c->get_result()->num_rows > 0) $errors[] = 'Email already exists';
                 $c->close();
             }
             if (!empty($idNo)) {
-                $c = $connect->prepare("SELECT user_id FROM users WHERE user_id = ?");
-                $c->bind_param("s", $idNo); $c->execute();
+                $c = $connect->prepare("SELECT user_id FROM users WHERE user_id = ? UNION SELECT user_id FROM staging_accounts WHERE user_id = ?");
+                $c->bind_param("ss", $idNo, $idNo); $c->execute();
                 if ($c->get_result()->num_rows > 0) $errors[] = 'ID Number already exists';
                 $c->close();
             }
@@ -608,15 +604,11 @@ try {
             }
             $hashed = password_hash($defaultPassword, PASSWORD_DEFAULT);
 
-            $expiresAt = date('Y-m-d H:i:s', time() + (48 * 60 * 60));
-            $ins = $connect->prepare("INSERT INTO staging_accounts (user_id, username, email, password_hash, temp_password, role, created_by, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $ins->bind_param("ssssssss",
-                $idNo, $username, $email, $hashed, $defaultPassword, $role, $currentUserId, $expiresAt
-            );
+            $ins = $connect->prepare("INSERT INTO staging_accounts (user_id, username, email, password_hash, role, expires_at) VALUES (?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 24 HOUR))");
+            $ins->bind_param("sssss", $idNo, $username, $email, $hashed, $role);
             if ($ins->execute()) {
-                log_activity('CREATE_ACCOUNT', "{$_SESSION['auth_username']} created account for $username (ID: $idNo) with role $role (staging)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
+                log_activity('CREATE_ACCOUNT', "{$_SESSION['auth_username']} created account for $username (ID: $idNo) with role $role (staged)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
 
-                $expiryFormatted = date('F j, Y \a\t g:i A', strtotime($expiresAt));
                 $mailSubject = 'Ube Delights - Your Account Has Been Created';
                 $mailBody = '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;">'
                     . '<h2 style="color:#6B21A8;">Account Created</h2>'
@@ -627,10 +619,8 @@ try {
                     . '<tr><td style="padding:8px;font-weight:bold;border-bottom:1px solid #eee;">Username</td><td style="padding:8px;border-bottom:1px solid #eee;">' . htmlspecialchars($username) . '</td></tr>'
                     . '<tr><td style="padding:8px;font-weight:bold;">Temporary Password</td><td style="padding:8px;">' . htmlspecialchars($defaultPassword) . '</td></tr>'
                     . '</table>'
-                    . '<div style="background:#FEF3C7;border-left:4px solid #F59E0B;padding:12px;margin:16px 0;border-radius:4px;">'
-                    . '<p style="color:#92400E;font-size:13px;margin:0;"><strong>⏰ Activation expires in 48 hours.</strong> Please log in before <strong>' . $expiryFormatted . '</strong> to activate your account. If the link expires, contact an administrator.</p>'
-                    . '</div>'
                     . '<p style="color:#dc2626;font-size:13px;">Please change your password after your first login.</p>'
+                    . '<p style="color:#dc2626;font-size:13px;"><strong>This invitation expires in 24 hours.</strong></p>'
                     . '<p style="color:#888;font-size:12px;">This is an automated message from Ube Delights.</p>'
                     . '</div>';
                 mail_send_message($email, $mailSubject, $mailBody);

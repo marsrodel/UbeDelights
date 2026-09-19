@@ -10,13 +10,22 @@ if (!isset($_SESSION['auth_user_id']) || ($_SESSION['auth_status'] ?? '') !== 'i
 
 $userId = $_SESSION['auth_user_id'];
 
-// Fetch user data for masked display
+// Fetch user data for masked display (check users first, then staging_accounts)
 $stmt = mysqli_prepare($connect, "SELECT user_id, email, username FROM users WHERE user_id = ? LIMIT 1");
 mysqli_stmt_bind_param($stmt, 's', $userId);
 mysqli_stmt_execute($stmt);
 $res = mysqli_stmt_get_result($stmt);
 $user = $res ? mysqli_fetch_assoc($res) : null;
 mysqli_stmt_close($stmt);
+
+if (!$user && !empty($_SESSION['auth_staging'])) {
+    $stmt = mysqli_prepare($connect, "SELECT user_id, email, username FROM staging_accounts WHERE user_id = ? LIMIT 1");
+    mysqli_stmt_bind_param($stmt, 's', $userId);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    $user = $res ? mysqli_fetch_assoc($res) : null;
+    mysqli_stmt_close($stmt);
+}
 
 if (!$user) {
     header('Location: ./login.php');

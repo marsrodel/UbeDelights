@@ -11,9 +11,11 @@ if (isset($_POST['email'])) {
         exit();
     }
 
-    $sql = "SELECT email FROM users WHERE email = ?";
+    $sql = "SELECT email FROM users WHERE email = ? 
+            UNION 
+            SELECT email FROM staging_accounts WHERE email = ?";
     $stmt = mysqli_prepare($connect, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_bind_param($stmt, "ss", $email, $email);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 

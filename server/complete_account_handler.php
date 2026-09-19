@@ -76,9 +76,14 @@ switch ($action) {
         // Invalidate old OTPs
         mysqli_query($connect, "UPDATE password_reset_otp SET used = 1 WHERE idNumber = '" . mysqli_real_escape_string($connect, $userId) . "' AND used = 0");
 
-        // Fetch user email
+        // Fetch user email (check users first, then staging_accounts)
         $userRes = mysqli_query($connect, "SELECT email, username FROM users WHERE user_id = '" . mysqli_real_escape_string($connect, $userId) . "' LIMIT 1");
         $userData = $userRes ? mysqli_fetch_assoc($userRes) : null;
+
+        if (!$userData) {
+            $userRes = mysqli_query($connect, "SELECT email, username FROM staging_accounts WHERE user_id = '" . mysqli_real_escape_string($connect, $userId) . "' LIMIT 1");
+            $userData = $userRes ? mysqli_fetch_assoc($userRes) : null;
+        }
 
         if (!$userData) {
             echo json_encode(['success' => false, 'message' => 'User not found.']);
@@ -204,43 +209,105 @@ switch ($action) {
         $h2 = password_hash($a2, PASSWORD_DEFAULT);
         $h3 = password_hash($a3, PASSWORD_DEFAULT);
 
-        // Update user record
-        $sql = "UPDATE users SET
-            first_name = ?, middle_name = ?, last_name = ?, extension_name = ?,
-            date_of_birth = ?, age = ?, sex = ?,
-            street = ?, barangay = ?, city_municipality = ?, province = ?, country = ?, zip_code = ?,
-            password_hash = ?,
-            q1 = ?, a1 = ?, q2 = ?, a2 = ?, q3 = ?, a3 = ?,
-            status = 'active', is_active = 1, is_incomplete = 0
-            WHERE user_id = ?";
+        // Check if this is a staging account migration
+        $isStaging = !empty($_SESSION['auth_staging']);
 
-        $stmt = mysqli_prepare($connect, $sql);
-        $fn = $personal['fname'];
-        $mn = $personal['mname'];
-        $ln = $personal['lname'];
-        $en = $personal['ename'];
-        $dob = $personal['bday'];
-        $age = (int)$personal['age'];
-        $sex = $personal['sex'];
-        $st = $personal['street'];
-        $brgy = $personal['brgy'];
-        $city = $personal['city'];
-        $prov = $personal['province'];
-        $ctry = $personal['country'];
-        $zip = $personal['zipcode'];
+        if ($isStaging) {
+            // Fetch staging data
+            $stagingRes = mysqli_query($connect, "SELECT username, email, password_hash, role FROM staging_accounts WHERE user_id = '" . mysqli_real_escape_string($connect, $userId) . "' LIMIT 1");
+            $stagingData = $stagingRes ? mysqli_fetch_assoc($stagingRes) : null;
 
-        mysqli_stmt_bind_param($stmt, 'sssssisssssssssssssss',
-            $fn, $mn, $ln, $en, $dob, $age, $sex,
-            $st, $brgy, $city, $prov, $ctry, $zip,
-            $passwordHash, $q1, $h1, $q2, $h2, $q3, $h3, $userId
-        );
+            if (!$stagingData) {
+                echo json_encode(['success' => false, 'message' => 'Staging account not found or expired.']);
+                exit();
+            }
 
-        $ok = mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
+            // Insert into users with personal info + staging credentials
+            $isSuperAdmin = ($stagingData['role'] === 'super_admin');
+            $stateLiteral = $isSuperAdmin ? "'blocked', 0" : "'active', 1";
+            $ins = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, is_incomplete, street, barangay, city_municipality, province, country, zip_code, q1, a1, q2, a2, q3, a3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, $stateLiteral, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $fn = $personal['fname'];
+            $mn = $personal['mname'];
+            $ln = $personal['lname'];
+            $en = $personal['ename'];
+            $dob = $personal['bday'];
+            $age = (int)$personal['age'];
+            $sex = $personal['sex'];
+            $st = $personal['street'];
+            $brgy = $personal['brgy'];
+            $city = $personal['city'];
+            $prov = $personal['province'];
+            $ctry = $personal['country'];
+            $zip = $personal['zipcode'];
 
-        if (!$ok) {
-            echo json_encode(['success' => false, 'message' => 'Failed to update account. Please try again.']);
-            exit();
+            $ins->bind_param('sssssssissssssssssssssss',
+                $userId, $stagingData['username'], $fn, $mn, $ln, $en, $dob, $age, $sex,
+                $stagingData['email'], $passwordHash, $stagingData['role'],
+                $st, $brgy, $city, $prov, $ctry, $zip,
+                $q1, $h1, $q2, $h2, $q3, $h3
+            );
+            $ok = $ins->execute();
+            $ins->close();
+
+            if (!$ok) {
+                echo json_encode(['success' => false, 'message' => 'Failed to create account from staging.']);
+                exit();
+            }
+
+            // Grant default privileges for admin accounts
+            if ($stagingData['role'] === 'admin') {
+                mysqli_query($connect, "INSERT INTO admin_privileges (idNumber, can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password) VALUES ('" . mysqli_real_escape_string($connect, $userId) . "', 1, 1, 1, 1, 1)");
+            }
+
+            // Delete staging record
+            mysqli_query($connect, "DELETE FROM staging_accounts WHERE user_id = '" . mysqli_real_escape_string($connect, $userId) . "'");
+
+            unset($_SESSION['auth_staging']);
+            $finalRole = $stagingData['role'];
+            $finalUsername = $stagingData['username'];
+        } else {
+            // Regular users table flow
+            $isSuperAdmin = (($_SESSION['auth_role'] ?? '') === 'super_admin');
+            $stateLiteral = $isSuperAdmin ? "status = 'blocked', is_active = 0" : "status = 'active', is_active = 1";
+            $sql = "UPDATE users SET
+                first_name = ?, middle_name = ?, last_name = ?, extension_name = ?,
+                date_of_birth = ?, age = ?, sex = ?,
+                street = ?, barangay = ?, city_municipality = ?, province = ?, country = ?, zip_code = ?,
+                password_hash = ?,
+                q1 = ?, a1 = ?, q2 = ?, a2 = ?, q3 = ?, a3 = ?,
+                $stateLiteral, is_incomplete = 0
+                WHERE user_id = ?";
+
+            $stmt = mysqli_prepare($connect, $sql);
+            $fn = $personal['fname'];
+            $mn = $personal['mname'];
+            $ln = $personal['lname'];
+            $en = $personal['ename'];
+            $dob = $personal['bday'];
+            $age = (int)$personal['age'];
+            $sex = $personal['sex'];
+            $st = $personal['street'];
+            $brgy = $personal['brgy'];
+            $city = $personal['city'];
+            $prov = $personal['province'];
+            $ctry = $personal['country'];
+            $zip = $personal['zipcode'];
+
+            mysqli_stmt_bind_param($stmt, 'sssssisssssssssssssss',
+                $fn, $mn, $ln, $en, $dob, $age, $sex,
+                $st, $brgy, $city, $prov, $ctry, $zip,
+                $passwordHash, $q1, $h1, $q2, $h2, $q3, $h3, $userId
+            );
+
+            $ok = mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+
+            if (!$ok) {
+                echo json_encode(['success' => false, 'message' => 'Failed to update account. Please try again.']);
+                exit();
+            }
+            $finalRole = null;
+            $finalUsername = null;
         }
 
         // Fetch updated user data for session
@@ -250,6 +317,33 @@ switch ($action) {
         if (!$userData) {
             echo json_encode(['success' => false, 'message' => 'Failed to load updated account data.']);
             exit();
+        }
+
+        // Super admins are not auto-logged in — keep them blocked until activated by an existing super admin
+        if ($userData['role'] === 'super_admin') {
+            unset(
+                $_SESSION['otp_verified'],
+                $_SESSION['incomplete_personal'],
+                $_SESSION['otp_expiry'],
+                $_SESSION['auth_staging'],
+                $_SESSION['auth_user_id'],
+                $_SESSION['auth_username'],
+                $_SESSION['auth_role'],
+                $_SESSION['auth_status'],
+                $_SESSION['auth_first_name'],
+                $_SESSION['auth_last_name']
+            );
+            try {
+                log_activity('CREATE_ACCOUNT', $userData['username'] . ' completed setup. Account is blocked until activated by a super admin.', 'Account Setup', $userId, $userData['username']);
+            } catch (\Throwable $e) {
+                // logging failure should not break user flow
+            }
+            echo json_encode([
+                'success' => true,
+                'message' => 'Your super admin account is now blocked. Please log in again and wait for a super admin to activate your account.',
+                'redirect' => './login.php'
+            ]);
+            break;
         }
 
         // Clear incomplete session data

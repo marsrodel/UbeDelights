@@ -12,10 +12,12 @@ if (isset($_POST['id'])) {
         exit();
     }
     
-    // Check if ID exists in database
-    $sql = "SELECT user_id FROM users WHERE user_id = ?";
+    // Check if ID exists in users or staging_accounts
+    $sql = "SELECT user_id FROM users WHERE user_id = ? 
+            UNION 
+            SELECT user_id FROM staging_accounts WHERE user_id = ?";
     $stmt = mysqli_prepare($connect, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $user_id);
+    mysqli_stmt_bind_param($stmt, "ss", $user_id, $user_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     

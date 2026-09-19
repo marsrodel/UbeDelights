@@ -14,7 +14,11 @@ $year = date('Y');
 $generated_user_id = $year . '-0001';
 $attempts = 0;
 while ($attempts < 5) { // safety loop for rare cases where multiple years are saturated
-    $q = "SELECT MAX(CAST(SUBSTRING_INDEX(user_id, '-', -1) AS UNSIGNED)) AS maxseq FROM users WHERE LEFT(user_id, 4) = '" . mysqli_real_escape_string($connect, $year) . "'";
+    $q = "SELECT MAX(seq) AS maxseq FROM (
+            SELECT MAX(CAST(SUBSTRING_INDEX(user_id, '-', -1) AS UNSIGNED)) AS seq FROM users WHERE LEFT(user_id, 4) = '" . mysqli_real_escape_string($connect, $year) . "'
+            UNION ALL
+            SELECT MAX(CAST(SUBSTRING_INDEX(user_id, '-', -1) AS UNSIGNED)) AS seq FROM staging_accounts WHERE LEFT(user_id, 4) = '" . mysqli_real_escape_string($connect, $year) . "'
+          ) AS combined";
     $res = mysqli_query($connect, $q);
     if ($res) {
         $row = mysqli_fetch_assoc($res);

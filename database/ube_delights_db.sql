@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 12, 2026 at 07:26 AM
+-- Generation Time: Sep 19, 2026 at 07:33 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -190,7 +190,190 @@ INSERT INTO `activity_logs` (`id`, `idNumber`, `username`, `fullName`, `role`, `
 (139, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for edrian_123 (ID: 2026-0009) with role admin | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:23:01', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
 (140, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: super_admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:23:36', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
 (141, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:24:08', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
-(142, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:24:19', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows');
+(142, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:24:19', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(143, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:29:25', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(144, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: super_admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:29:37', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(145, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:29:49', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(146, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for shania_123 (ID: 2026-0010) with role super_admin | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:38:50', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(147, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:43:26', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(148, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 05:43:37', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(149, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'User Management', 'DELETION_REQUEST', 'maraon_101 requested deletion of babies_123 (ID: 2026-0005) | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 06:05:20', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(150, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: super_admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 06:35:59', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(151, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 06:36:16', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(152, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked maraon_101 | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 06:36:25', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(153, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 09:06:21', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(154, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 09:06:27', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(155, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 09:06:37', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(156, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 09:06:43', 'INFO', 'Edge 152.0.0.0', 'Desktop', 'Windows'),
+(157, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 09:12:57', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(158, NULL, 'sds', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: sds | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 09:13:03', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(159, NULL, 'sds', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: sds | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 09:13:04', 'WARNING', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(160, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'login', 'matamat_123 logged in successfully | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 09:18:05', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(161, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 152.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-12 09:23:18', 'INFO', 'Chrome 152.0.0.0', 'Desktop', 'Windows'),
+(162, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 09:45:06', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(163, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: super_admin) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 09:47:51', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(164, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for shania_123 (role: admin) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 10:39:18', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(165, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 10:39:41', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(166, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked maraon_101 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 10:39:51', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(167, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: super_admin) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 10:40:05', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(168, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'super_admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:19:13', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(169, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:19:20', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(170, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:19:58', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(171, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:20:19', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(172, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:21:08', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(173, '2026-0010', 'shania_123', '', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:21:15', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(174, '2026-0010', 'shania_123', '', 'admin', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:21:33', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(175, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:21:48', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(176, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked shania_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:22:00', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(177, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:22:03', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(178, '2026-0010', 'shania_123', '', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:22:37', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(179, '2026-0010', 'shania_123', 'Shania  Bugahod', 'admin', 'Authentication', 'login', 'shania_123 completed account setup and logged in | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:26:41', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(180, '2026-0010', 'shania_123', 'Shania  Bugahod', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:26:51', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(181, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'super_admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 13:27:01', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows');
+INSERT INTO `activity_logs` (`id`, `idNumber`, `username`, `fullName`, `role`, `module`, `action`, `details`, `ip_address`, `created_at`, `severity`, `browser`, `device`, `os`) VALUES
+(182, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-13 14:26:25', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(183, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:20:20', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(184, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'super_admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:47:41', 'INFO', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(185, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:48:03', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(186, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked maraon_101 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:48:21', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(187, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:48:49', 'INFO', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(188, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:48:56', 'INFO', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(189, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'login', 'matamat_123 logged in successfully | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:49:02', 'INFO', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(190, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:49:27', 'INFO', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(191, '2026-0002', 'maraon_101', 'Mary Rose Rosmar Lima', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:49:33', 'INFO', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(192, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'BLOCK_USER', 'maraon_123 blocked edrian_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:56:47', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(193, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked edrian_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:57:10', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(194, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'BLOCK_USER', 'maraon_123 blocked edrian_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 05:57:44', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(195, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'BLOCK_USER', 'maraon_123 blocked babies_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 06:28:31', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(196, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked babies_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 06:28:38', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(197, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 06:49:33', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(198, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for maraon_101 (role: admin) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 06:49:57', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(199, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 07:06:15', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(200, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 07:06:47', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(201, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for dwaine_123 (ID: 2026-0011) with role customer | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 08:13:42', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(202, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'BLOCK_USER', 'maraon_123 blocked babies_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 08:18:28', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(203, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'DELETE_USER', 'maraon_123 deleted dwaine_123 (ID: 2026-0011) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:08:08', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(204, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked edrian_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:08:43', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(205, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'DELETE_USER', 'maraon_123 deleted maraon_101 (ID: 2026-0002) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:09:01', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(206, '2026-0002', 'maraon_101', NULL, NULL, 'Authentication', 'logout', 'User logged out | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:09:23', 'INFO', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(207, NULL, 'maraon_101', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: maraon_101 | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:09:30', 'WARNING', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(208, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for maraon_101 (ID: 2026-0011) with role admin | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:09:59', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(209, '2026-0011', 'maraon_101', 'Rodel Jamesed Madmin', 'admin', 'Authentication', 'login', 'maraon_101 completed account setup and logged in | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:12:14', 'INFO', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(210, '2026-0011', 'maraon_101', 'Rodel Jamesed Madmin', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Edge 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:12:32', 'INFO', 'Edge 153.0.0.0', 'Desktop', 'Windows'),
+(211, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'maraon_123 updated role & privileges for shania_123 (role: super_admin) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:13:20', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(212, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'maraon_123 created account for rodeljames_101 (ID: 2026-0012) with role super_admin | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:16:20', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(213, '2026-0011', 'maraon_101', 'Rodel Jamesed Madmin', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:35:54', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(214, '2026-0011', 'maraon_101', 'Rodel Jamesed Madmin', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:35:56', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(215, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:36:05', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(216, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked shania_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:37:14', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(217, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SUPER_ADMIN_TRANSFER', 'maraon_123 unblocked shania_123 (super admin transfer) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:37:14', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(218, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:37:16', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(219, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login', 'shania_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:37:24', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(220, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'UNBLOCK_USER', 'shania_123 unblocked maraon_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:37:39', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(221, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'SUPER_ADMIN_TRANSFER', 'shania_123 unblocked maraon_123 (super admin transfer) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:37:39', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(222, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:39:11', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(223, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:39:21', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(224, '2026-0011', 'maraon_101', 'Rodel Jamesed Madmin', 'admin', 'Authentication', 'login', 'maraon_101 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:39:31', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(225, '2026-0011', 'maraon_101', 'Rodel Jamesed Madmin', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:39:41', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(226, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:39:49', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(227, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'UNBLOCK_USER', 'maraon_123 unblocked shania_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:40:00', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(228, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'User Management', 'SUPER_ADMIN_TRANSFER', 'maraon_123 unblocked shania_123 (super admin transfer) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:40:00', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(229, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:40:02', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(230, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login', 'shania_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:40:16', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(231, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:41:47', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(232, '2026-0008', 'shake_123', '', 'customer', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:42:01', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(233, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login', 'shania_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:42:21', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(234, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'SAVE_PRIVILEGES', 'shania_123 updated role & privileges for maraon_123 (role: admin) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:48:25', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(235, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'UNBLOCK_USER', 'shania_123 unblocked maraon_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:48:42', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(236, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:48:57', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(237, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:49:11', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(238, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:49:59', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(239, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login', 'shania_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:50:13', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(240, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'shania_123 created account for nathaniel_123 (ID: 2026-0013) with role super_admin | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:51:55', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(241, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:53:05', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(242, '2026-0013', 'nathaniel_123', '', 'super_admin', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:53:16', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(243, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login', 'shania_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:53:37', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(244, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:56:25', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(245, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login', 'shania_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 09:56:45', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(246, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'UNBLOCK_USER', 'shania_123 unblocked nathaniel_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:08:32', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(247, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'SUPER_ADMIN_TRANSFER', 'shania_123 unblocked nathaniel_123 (super admin transfer) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:08:32', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(248, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:08:33', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(249, '2026-0013', 'nathaniel_123', '', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:08:50', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(250, '2026-0013', 'nathaniel_123', '', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:10:34', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(251, '2026-0013', 'nathaniel_123', '', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:12:06', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(252, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'login', 'edrian_123 completed account setup and logged in | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:14:05', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(253, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:14:28', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(254, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:14:37', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(255, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:14:39', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(256, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:16:13', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(257, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:16:45', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(258, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:16:45', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(259, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'login', 'edrian_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-14 10:18:06', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(260, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'login', 'edrian_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-15 10:14:57', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(261, '2026-0009', 'edrian_123', 'Edrian  Prones', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-15 10:14:59', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(262, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-15 10:15:09', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(263, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'admin', 'Authentication', 'login', 'maraon_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-15 10:15:19', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(264, '2026-0004', 'maraon_123', 'Rodel Jame  Maraon', 'admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-15 10:15:25', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(265, '2026-0013', 'nathaniel_123', '', 'super_admin', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-15 10:15:39', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(266, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login_blocked', 'Inactive user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-15 10:18:15', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(267, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login', 'shania_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-15 10:19:07', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(268, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-15 10:21:06', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(269, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login', 'shania_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 06:31:28', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(270, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'DELETE_USER', 'shania_123 deleted rodeljames_101 (ID: 2026-0012) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 06:32:01', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(271, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'DELETE_USER', 'shania_123 deleted nathaniel_123 (ID: 2026-0013) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 06:32:13', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(272, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'DELETE_USER', 'shania_123 deleted edrian_123 (ID: 2026-0009) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 06:32:35', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(273, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'shania_123 created account for edrian_123 (ID: 2026-0012) with role super_admin | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 06:33:43', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(274, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'UNBLOCK_USER', 'shania_123 unblocked edrian_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 06:34:10', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(275, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'User Management', 'SUPER_ADMIN_TRANSFER', 'shania_123 unblocked edrian_123 (super admin transfer) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 06:34:10', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(276, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 06:34:11', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(277, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'login', 'edrian_123 completed account setup and logged in | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 06:35:32', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(278, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'User Management', 'DELETE_USER', 'edrian_123 deleted maraon_101 (ID: 2026-0011) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:00:26', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(279, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'edrian_123 created account for maraon_101 (ID: 2026-0013) with role admin | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:00:57', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(280, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'User Management', 'DELETE_USER', 'edrian_123 deleted maraon_101 (ID: 2026-0013) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:03:42', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(281, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'edrian_123 created account for maraon_101 (ID: 2026-0013) with role customer | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:05:24', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(282, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'User Management', 'DELETE_USER', 'edrian_123 deleted maraon_101 (ID: 2026-0013) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:45:12', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(283, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'edrian_123 created account for maraon_101 (ID: 2026-0013) with role customer (staging) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:45:38', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(284, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:47:46', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(285, '2026-0013', 'maraon_101', NULL, NULL, 'Authentication', 'STAGING_ACTIVATED', 'Staging account for maraon_101 (ID: 2026-0013) activated via first login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:48:00', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(286, NULL, 'maraon_101', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: maraon_101 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:48:17', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(287, NULL, 'maraon_101', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: maraon_101 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:48:24', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(288, '2026-0010', 'shania_123', 'Shania  Bugahod', 'super_admin', 'Authentication', 'login_blocked', 'Blocked user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:48:43', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(289, NULL, 'nathaniel_123', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: nathaniel_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:48:51', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(290, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'login', 'edrian_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:49:58', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(291, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:50:00', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(292, NULL, 'maraon_101', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: maraon_101 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:50:47', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(293, NULL, 'maraon_101', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: maraon_101 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:50:53', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(294, NULL, 'maraon_101', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: maraon_101 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-16 07:50:54', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(295, NULL, 'nathaniel_123', NULL, NULL, 'Authentication', 'failed_login', 'Unknown user: nathaniel_123 | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-18 15:51:21', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(296, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'login', 'edrian_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-18 15:51:32', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(297, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'login', 'edrian_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-18 19:13:01', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(298, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'edrian_123 created account for marsrodel_123 (ID: 2026-0013) with role super_admin (staged) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-18 19:13:48', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(299, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-18 19:15:36', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(300, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'login', 'edrian_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 04:42:43', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(301, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 04:50:36', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(302, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'login', 'edrian_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 04:55:14', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(303, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 04:56:06', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(304, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'login', 'edrian_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 04:56:19', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(305, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'edrian_123 created account for marsrodel_123 (ID: 2026-0013) with role super_admin (staged) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 04:57:01', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(306, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 04:57:42', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(307, '2026-0013', 'marsrodel_123', NULL, NULL, 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:12:42', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(308, '2026-0013', 'marsrodel_123', 'Test  User', 'super_admin', 'Account Setup', 'CREATE_ACCOUNT', 'marsrodel_123 completed setup. Account is blocked until activated by a super admin. | Browser: Unknown | OS: Unknown | Device: Desktop', '127.0.0.1', '2026-09-19 05:23:24', 'INFO', 'Unknown', 'Desktop', 'Unknown'),
+(309, '2026-0013', 'marsrodel_123', NULL, NULL, 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:25:07', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(310, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'login', 'edrian_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:27:09', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(311, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'User Management', 'CREATE_ACCOUNT', 'edrian_123 created account for marsrodel_123 (ID: 2026-0013) with role super_admin (staged) | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:27:36', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(312, '2026-0012', 'edrian_123', 'Edrian  Prones', 'super_admin', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:28:13', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(313, '2026-0013', 'marsrodel_123', 'Mars  Mars', 'super_admin', 'Account Setup', 'CREATE_ACCOUNT', 'marsrodel_123 completed setup. Account is blocked until activated by a super admin. | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:29:35', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(314, '2026-0013', 'marsrodel_123', 'Mars  Mars', 'super_admin', 'Authentication', 'login_blocked', 'Blocked user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:30:24', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(315, '2026-0013', 'marsrodel_123', 'Mars  Mars', 'super_admin', 'Authentication', 'login_blocked', 'Blocked user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:30:31', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(316, '2026-0013', 'marsrodel_123', 'Mars  Mars', 'super_admin', 'Authentication', 'login_blocked', 'Blocked user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:30:32', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(317, '2026-0013', 'marsrodel_123', 'Mars  Mars', 'super_admin', 'Authentication', 'login_blocked', 'Blocked user attempted login | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:30:33', 'ERROR', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(318, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:30:46', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(319, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:30:49', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(320, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'login', 'matamat_123 logged in successfully | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:32:06', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(321, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'logout', 'User logged out | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:32:08', 'INFO', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(322, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:32:15', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(323, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:32:17', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows'),
+(324, '2026-0001', 'matamat_123', 'Rodel Karate Qala', 'customer', 'Authentication', 'failed_login', 'Wrong password attempt | Browser: Chrome 153.0.0.0 | OS: Windows | Device: Desktop', '::1', '2026-09-19 05:32:18', 'WARNING', 'Chrome 153.0.0.0', 'Desktop', 'Windows');
 
 -- --------------------------------------------------------
 
@@ -213,8 +396,8 @@ CREATE TABLE `admin_privileges` (
 --
 
 INSERT INTO `admin_privileges` (`idNumber`, `can_manage_registrations`, `can_update_accounts`, `can_request_deletion`, `can_block`, `can_reset_password`, `updated_at`) VALUES
-('2026-0002', 1, 1, 1, 1, 1, '2026-09-12 05:24:08'),
-('2026-0009', 1, 1, 1, 1, 1, '2026-09-12 05:23:01');
+('2026-0004', 1, 1, 1, 1, 1, '2026-09-14 09:48:25'),
+('2026-0010', 1, 1, 1, 1, 1, '2026-09-13 10:39:18');
 
 -- --------------------------------------------------------
 
@@ -241,7 +424,8 @@ INSERT INTO `deletion_requests` (`id`, `target_id_number`, `requested_by`, `reas
 (3, '', '2026-0002', 'Failing', 'rejected', '2026-0004', '2026-09-08 04:37:22', '2026-09-08 02:36:51'),
 (4, '', '2026-0002', 'Apple', 'approved', '2026-0004', '2026-09-08 04:38:42', '2026-09-08 02:38:10'),
 (5, '', '2026-0002', 'Amnp', 'approved', '2026-0004', '2026-09-08 04:51:22', '2026-09-08 02:51:01'),
-(6, '', '2026-0002', 'jey', 'rejected', '2026-0004', '2026-09-08 04:52:57', '2026-09-08 02:52:45');
+(6, '', '2026-0002', 'jey', 'rejected', '2026-0004', '2026-09-08 04:52:57', '2026-09-08 02:52:45'),
+(7, '2026-0005', '2026-0002', 'I hatw', 'pending', NULL, NULL, '2026-09-12 06:05:20');
 
 -- --------------------------------------------------------
 
@@ -432,7 +616,14 @@ INSERT INTO `password_reset_otp` (`id`, `idNumber`, `otp_hash`, `expires_at`, `u
 (44, '2026-0007', '$2y$10$/H0k.X7MZQpAY0xBPFbTMeEwtZp.gkX0XfIVa7Y1qcFeXP5aRXk2m', '2026-09-09 11:48:48', 1, 1, '2026-09-09 09:43:48'),
 (45, '2026-0007', '$2y$10$093KTdYWuntrOiE/26.xkeqn4cYDsQCwfzy3VitZw5al5NE/Zsxay', '2026-09-09 11:52:09', 1, 1, '2026-09-09 09:47:09'),
 (46, '2026-0007', '$2y$10$pjr.VZhT/nje8LeiAQLdLe7QzQ4bAjbBSW1Wepv0sNHPMOx5zNJKK', '2026-09-09 12:20:55', 1, 1, '2026-09-09 10:15:55'),
-(48, '2026-0008', '$2y$10$sw/9T4qYxpZGvL2jSgj5R.rd1dDJvDa3vmkb7Iis4WA9NOQvUHKAK', '2026-09-09 12:30:06', 0, 0, '2026-09-09 10:25:06');
+(48, '2026-0008', '$2y$10$sw/9T4qYxpZGvL2jSgj5R.rd1dDJvDa3vmkb7Iis4WA9NOQvUHKAK', '2026-09-09 12:30:06', 0, 0, '2026-09-09 10:25:06'),
+(49, '2026-0007', '$2y$10$5Mzm3zUT1UjODEm0JOicgeoQyGSYYsxsjTY6oIxpz1bP2kXun2k2a', '2026-09-12 11:18:38', 1, 1, '2026-09-12 09:13:38'),
+(50, '2026-0010', '$2y$10$Ne84DyzIJirOnnd5nM7vk.Ew06UaoBrJFCQUAA28GDTkgrQpXozrO', '2026-09-13 15:29:02', 1, 1, '2026-09-13 13:24:02'),
+(56, '2026-0012', '$2y$10$sfdtvQHFHGkwMmPpDnYvP.4lpu8hV.ZNKE6MrONJMMMhG5a2Le0UO', '2026-09-16 08:39:20', 1, 1, '2026-09-16 06:34:20'),
+(57, '2026-0013', '$2y$10$4HOwhLnyOnOJD4L6fECu7OdwXPZrsF1nZUjYIBVbstU/PLAqTC7ky', '2026-09-18 21:20:48', 1, 1, '2026-09-18 19:15:48'),
+(58, '2026-0013', '$2y$10$JTqxapXgwmUQh9PSKPSmCer0aswIL2EmLG99.6fpZ9NnZf7laZ2QK', '2026-09-19 07:03:08', 1, 1, '2026-09-19 04:58:08'),
+(59, '2026-0013', '$2y$10$r7wmEGtwDw2GaFCULACF8u0r9GsuuPgamsRXkpbjfGOsHSAObHUCO', '2026-09-19 07:17:53', 1, 1, '2026-09-19 05:12:53'),
+(60, '2026-0013', '$2y$10$4rL7Frwlaj5EeQx0T3gJ/eE8GWoTpqzFxa47SRXXzJO/.WomoC4O.', '2026-09-19 07:33:22', 1, 2, '2026-09-19 05:28:22');
 
 -- --------------------------------------------------------
 
@@ -469,6 +660,23 @@ INSERT INTO `products` (`product_id`, `name`, `price`, `category`, `status`, `de
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `staging_accounts`
+--
+
+CREATE TABLE `staging_accounts` (
+  `id` int(11) NOT NULL,
+  `user_id` varchar(9) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `role` enum('admin','super_admin','customer') NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `expires_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -499,7 +707,7 @@ CREATE TABLE `users` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `is_active` tinyint(1) DEFAULT 1,
-  `profile_picture` varchar(255) NOT NULL,
+  `is_incomplete` tinyint(1) DEFAULT 0,
   `role` enum('super_admin','admin','customer') NOT NULL DEFAULT 'customer',
   `otp_code` varchar(255) DEFAULT NULL,
   `otp_expiry` timestamp NULL DEFAULT NULL,
@@ -513,15 +721,14 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `first_name`, `middle_name`, `last_name`, `extension_name`, `date_of_birth`, `age`, `sex`, `street`, `barangay`, `city_municipality`, `province`, `country`, `zip_code`, `username`, `email`, `password_hash`, `q1`, `a1`, `q2`, `a2`, `q3`, `a3`, `created_at`, `updated_at`, `is_active`, `profile_picture`, `role`, `otp_code`, `otp_expiry`, `status`, `is_logged_in`, `ip_address`, `device_used`) VALUES
-('2024-0001', 'Juan', 'Santos', 'Dela Cruz', 'Jr.', '1995-06-15', 29, 'Male', '123 Main Street', 'Barangay 1', 'Manila', 'Metro Manila', 'Philippines', '1000', 'juan.delacruz', 'juan.delacruz@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'What is your favorite color?', '$2y$10$hashA', 'What is your mother\'s maiden name?', '$2y$10$hashB', 'What city were you born in?', '$2y$10$hashC', '2026-08-16 10:39:21', '2026-09-07 03:58:23', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
-('2026-0001', 'Rodel', 'Karate', 'Qala', '', '2005-06-06', 21, 'Male', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', 'Philip', '8605', 'matamat_123', 'mat@gmail.com', '$2y$10$xvWQzCPnghWU6pUJdJgEve8lua.aM.B1D69vkZ8TTBXPb3dVmGnk2', 'Who is your best friend in Elementary?', '$2y$10$kQhkyXJGY6rUlaV4zrXTPOMs50RfCzSFOrxDdNUQzkdHIkt8N5JEC', 'What is the name of your favorite pet?', '$2y$10$3rgKLaNZPOMc.TCEbB4iGu.OyLpOfwxBDXx/IkQTuKrkcUVYWiQzO', 'Who is your favorite teacher in high school?', '$2y$10$UfV22H8Z1HZ7vCkyxk8XB.l9abg1l7TSrB07J8WCrH00j113SFwjS', '2026-08-20 03:55:02', '2026-09-07 05:06:55', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
-('2026-0002', 'Mary Rose', 'Rosmar', 'Lima', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_101', 'marsrodel@gmail.com', '$2y$10$qbjF4IMlME33xkPuAFL4gOeM8RKxPmArIiYw.RXu7BV0/7lltmfVS', 'Who is your best friend in Elementary?', '$2y$10$Pak2WjknMbhzA.ltbUfls.gi9BVzSfoiOIRoywFZx98jkkvhRVf8W', 'What is the name of your favorite pet?', '$2y$10$PjYuHjWco71roMWZZDy8/.gAzwIGvvLwAmM70/NgAg5exMA4p8G7m', 'Who is your favorite teacher in high school?', '$2y$10$ADnZK6wcr1HY4we0w9QgOexIwCQeej..LZFLo.0rH.SascBRMiHIG', '2026-08-26 05:01:36', '2026-09-12 05:24:08', 1, '', 'admin', NULL, NULL, 'active', 0, NULL, NULL),
-('2026-0004', 'Rodel Jame', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_123', 'maraon101@gmail.com', '$2y$10$prCKoJ89wTD9M1TgUqUjyOLSGUtxuAoYwqpGRdRZZz0hVXXKsexTW', 'What was the name of your first pet?', '$2y$10$jMcYrdYABJzblyyPkYEq1ehIhzA.k110nU6OyADyUbUET5Uj.760i', 'What is your favorite flower?', '$2y$10$xgFkdHVsFpdinf3ABwUEU.rT8r5orbIxUtjgPDzoWe9WK5dawoByG', 'What is your oldest sibling\'s first name?', '$2y$10$ghu8ckXp53/V7IHFAzzwZerrnUH6kwG2JyuEjJ9xloizmUD9S0eFW', '2026-09-04 14:20:03', '2026-09-08 01:52:26', 1, '', 'super_admin', NULL, NULL, 'active', 0, NULL, NULL),
-('2026-0005', 'Melani', 'June', 'Hubog', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8606', 'babies_123', 'baby@gmail.com', '$2y$10$cBEW.p9G1sFGLplPFeYgLOjmMJ6IgicSHDFn/aOFgTCiMZh8UAucC', 'What was the name of your first pet?', '$2y$10$Eidv/394sTYMziAeZJgAt.c1ffAoEwRzWxRRmWIgN1hzkHWcLKVki', 'What is your favorite flower?', '$2y$10$4k/1rs7Cniq2SVNZ5OuG6e4mGPB80gNr3lepncSduYjeHlq1azWC6', 'What is your oldest sibling\'s first name?', '$2y$10$lc3D0OSP0sjka6p5KlRKHOK7b43O0f7b7TCGQWWD36goaoYJVwyeS', '2026-09-04 14:22:31', '2026-09-07 02:26:03', 1, '', 'customer', NULL, NULL, 'active', 0, NULL, NULL),
-('2026-0007', 'Educator', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'rodel_123', 'rodeljames.maraon@csucc.edu.ph', '$2y$10$C75QD1WXxKZEVjAuX2kAqeDKPWY90TdDPHLotp4pdLG73eY.7x.WK', 'What was the name of your first pet?', '$2y$10$GXNIKm6e/dpM01a6ZR9tlekgVT0EV0IXD.Cuhxoa2wW2F4rpQcQjW', 'What is your favorite flower?', '$2y$10$PPm2rLOpASnQgGlx3yYFBuMF73CNRL3xehD53I6231o97bFCL905u', 'What is your oldest sibling\'s first name?', '$2y$10$qk0LJptodi.0lzBQfhCobOfzpKAWmMtrgn9QY09LZy.Ofss1Kv.66', '2026-09-09 04:03:22', '2026-09-12 05:03:45', 0, '', 'customer', NULL, NULL, 'pending', 0, NULL, NULL),
-('2026-0008', '', NULL, '', NULL, '0000-00-00', 0, '', '', '', '', '', '', '', 'shake_123', 'bshakeys2@gmail.com', '$2y$10$ldBu3MAu6WhuyCtg31c63OtFucQPhNr7wxIb0zDbMbkHUxIY77ecC', '', '', '', '', '', '', '2026-09-09 10:21:12', '2026-09-09 10:21:12', 0, '', 'customer', NULL, NULL, 'incomplete', 0, NULL, NULL),
-('2026-0009', '', NULL, '', NULL, '0000-00-00', 0, '', '', '', '', '', '', '', 'edrian_123', 'edrian.prones@csucc.edu.ph', '$2y$10$DHI.Jo/XK2NstL8DxogmJOFvCQq0UpfR7PBPpe9XNHMgthV0B5LCG', '', '', '', '', '', '', '2026-09-12 05:23:01', '2026-09-12 05:23:01', 0, '', 'admin', NULL, NULL, 'incomplete', 0, NULL, NULL);
+INSERT INTO `users` (`user_id`, `first_name`, `middle_name`, `last_name`, `extension_name`, `date_of_birth`, `age`, `sex`, `street`, `barangay`, `city_municipality`, `province`, `country`, `zip_code`, `username`, `email`, `password_hash`, `q1`, `a1`, `q2`, `a2`, `q3`, `a3`, `created_at`, `updated_at`, `is_active`, `is_incomplete`, `role`, `otp_code`, `otp_expiry`, `status`, `is_logged_in`, `ip_address`, `device_used`) VALUES
+('2026-0001', 'Rodel', 'Karate', 'Qala', '', '2005-06-06', 21, 'Male', 'Purok 3', 'Barangay 7', 'Cabadran City', 'Ambot', 'Philip', '8605', 'matamat_123', 'mat@gmail.com', '$2y$10$xvWQzCPnghWU6pUJdJgEve8lua.aM.B1D69vkZ8TTBXPb3dVmGnk2', 'Who is your best friend in Elementary?', '$2y$10$kQhkyXJGY6rUlaV4zrXTPOMs50RfCzSFOrxDdNUQzkdHIkt8N5JEC', 'What is the name of your favorite pet?', '$2y$10$3rgKLaNZPOMc.TCEbB4iGu.OyLpOfwxBDXx/IkQTuKrkcUVYWiQzO', 'Who is your favorite teacher in high school?', '$2y$10$UfV22H8Z1HZ7vCkyxk8XB.l9abg1l7TSrB07J8WCrH00j113SFwjS', '2026-08-20 03:55:02', '2026-09-07 05:06:55', 1, 0, 'customer', NULL, NULL, 'active', 0, NULL, NULL),
+('2026-0004', 'Rodel Jame', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'maraon_123', 'maraon101@gmail.com', '$2y$10$prCKoJ89wTD9M1TgUqUjyOLSGUtxuAoYwqpGRdRZZz0hVXXKsexTW', 'What was the name of your first pet?', '$2y$10$jMcYrdYABJzblyyPkYEq1ehIhzA.k110nU6OyADyUbUET5Uj.760i', 'What is your favorite flower?', '$2y$10$xgFkdHVsFpdinf3ABwUEU.rT8r5orbIxUtjgPDzoWe9WK5dawoByG', 'What is your oldest sibling\'s first name?', '$2y$10$ghu8ckXp53/V7IHFAzzwZerrnUH6kwG2JyuEjJ9xloizmUD9S0eFW', '2026-09-04 14:20:03', '2026-09-14 09:48:42', 1, 0, 'admin', NULL, NULL, 'active', 0, NULL, NULL),
+('2026-0005', 'Melani', 'June', 'Hubog', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran', 'Agusan Del Norte', 'Philippines', '8606', 'babies_123', 'baby@gmail.com', '$2y$10$cBEW.p9G1sFGLplPFeYgLOjmMJ6IgicSHDFn/aOFgTCiMZh8UAucC', 'What was the name of your first pet?', '$2y$10$Eidv/394sTYMziAeZJgAt.c1ffAoEwRzWxRRmWIgN1hzkHWcLKVki', 'What is your favorite flower?', '$2y$10$4k/1rs7Cniq2SVNZ5OuG6e4mGPB80gNr3lepncSduYjeHlq1azWC6', 'What is your oldest sibling\'s first name?', '$2y$10$lc3D0OSP0sjka6p5KlRKHOK7b43O0f7b7TCGQWWD36goaoYJVwyeS', '2026-09-04 14:22:31', '2026-09-14 08:18:28', 0, 0, 'customer', NULL, NULL, 'blocked', 0, NULL, NULL),
+('2026-0007', 'Educator', '', 'Maraon', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'rodel_123', 'rodeljames.maraon@csucc.edu.ph', '$2y$10$9dyyOj7O78HevUItZ0FCA.bIfVd.imQy/LcUPurxROlA8YtY2ZX6.', 'What was the name of your first pet?', '$2y$10$GXNIKm6e/dpM01a6ZR9tlekgVT0EV0IXD.Cuhxoa2wW2F4rpQcQjW', 'What is your favorite flower?', '$2y$10$PPm2rLOpASnQgGlx3yYFBuMF73CNRL3xehD53I6231o97bFCL905u', 'What is your oldest sibling\'s first name?', '$2y$10$qk0LJptodi.0lzBQfhCobOfzpKAWmMtrgn9QY09LZy.Ofss1Kv.66', '2026-09-09 04:03:22', '2026-09-12 09:14:42', 0, 0, 'customer', NULL, NULL, 'pending', 0, NULL, NULL),
+('2026-0010', 'Shania', '', 'Bugahod', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'shania_123', 'shania.bugahod@csucc.edu.ph', '$2y$10$DRQK/d8xBB44dXiJQ/TDY.3UgjXSza63H70/NmqgIVT3aDlA/d0yG', 'What was the name of your first pet?', '$2y$10$GegB9xepqDK5ZdnOq8bp6evxLRZsFGul.yHmntQ8GtvK1hLQIIzNa', 'What is your favorite flower?', '$2y$10$kIdnJiQrEw9k6/7yN6mn1.bynHbErJgiLqtH6aaHmRDSUARluYaJa', 'What is your oldest sibling\'s first name?', '$2y$10$.V61fwT54VuPIA8w6iKkPuGSHgBXCWSvZEZmPLS7pVVhPNzSG/oq2', '2026-09-12 05:38:50', '2026-09-16 06:34:10', 0, 0, 'super_admin', NULL, NULL, 'blocked', 0, NULL, NULL),
+('2026-0012', 'Edrian', '', 'Prones', '', '2005-06-06', 21, 'Male', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'edrian_123', 'edrian.prones@csucc.edu.ph', '$2y$10$i9LSNJ1ZY9PEDEliWhP4KOXjWDJvirnrIgxDM40IenzEbsL74xt1.', 'What was the name of your first pet?', '$2y$10$Sn0bP6Gubjq26CeHbMRK4Oz3AB6ezNrX3kmwBbi.ienI2LbmyUHjG', 'What is your favorite flower?', '$2y$10$WHaXKwrt/r0qFfN6iAxCaegZKQ.xy7uIsjh1vCAN/8WoYANJdisx2', 'What is your oldest sibling\'s first name?', '$2y$10$tiqQVh.gRXkpA5A9moRkBu71M0pm2.xkhJObK6v04V0QQt4y8JSUi', '2026-09-16 06:33:43', '2026-09-16 06:35:32', 1, 0, 'super_admin', NULL, NULL, 'active', 0, NULL, NULL),
+('2026-0013', 'Mars', '', 'Mars', '', '2005-05-05', 21, 'Female', 'Purok 2', 'Barangay 7', 'Cabadbaran City', 'Agusan Del Norte', 'Philippines', '8605', 'marsrodel_123', 'marsrodel@gmail.com', '$2y$10$3INSO5/uBCzFkK32KnPZR.SzbkjkwFxij04yCNQ.9JUi13Uf6yBMa', 'What was the name of your first pet?', '$2y$10$YM7/q9XSWMOS8Y6vGuDU3uWj0tYYMSbfwIRpFZvDP3ukAjbih02jK', 'What is your favorite flower?', '$2y$10$B5.qtitvHchpNoAc.QQYau8V4etEXOgeH4EqIlMwqGwFK1rgQU4o2', 'What is your oldest sibling\'s first name?', '$2y$10$yNS0BrPo5W9oYgUdsAfcKO9EwtKv47MNQhCv3Yeu3PZPgGaztgKva', '2026-09-19 05:29:35', '2026-09-19 05:29:35', 0, 0, 'super_admin', NULL, NULL, 'blocked', 0, NULL, NULL);
 
 --
 -- Triggers `users`
@@ -620,6 +827,15 @@ ALTER TABLE `products`
   ADD KEY `idx_status` (`status`);
 
 --
+-- Indexes for table `staging_accounts`
+--
+ALTER TABLE `staging_accounts`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_id` (`user_id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -639,13 +855,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=143;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=325;
 
 --
 -- AUTO_INCREMENT for table `deletion_requests`
 --
 ALTER TABLE `deletion_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `login_otp`
@@ -675,13 +891,19 @@ ALTER TABLE `order_items`
 -- AUTO_INCREMENT for table `password_reset_otp`
 --
 ALTER TABLE `password_reset_otp`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
   MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `staging_accounts`
+--
+ALTER TABLE `staging_accounts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables

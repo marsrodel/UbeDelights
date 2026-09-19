@@ -3,7 +3,6 @@ mysqli_report(MYSQLI_REPORT_OFF);
 // Simple login: prepared statements + password_verify + basic lockout
 include '../server/db.php';
 require_once __DIR__ . '/../server/user_logger.php';
-require_once __DIR__ . '/../server/mail_helper.php';
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // If already authenticated, send to dashboard
 if (isset($_SESSION['auth_user_id'])) {
@@ -26,92 +25,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Check staging accounts (admin-created accounts awaiting first login activation)
-    $stagingSql = "SELECT * FROM staging_accounts WHERE (BINARY username = ? OR email = ?) LIMIT 1";
-    $stagingStmt = mysqli_prepare($connect, $stagingSql);
-    mysqli_stmt_bind_param($stagingStmt, 'ss', $login, $login);
-    mysqli_stmt_execute($stagingStmt);
-    $stagingRes = mysqli_stmt_get_result($stagingStmt);
-    $stagingAccount = $stagingRes ? mysqli_fetch_assoc($stagingRes) : null;
-    mysqli_stmt_close($stagingStmt);
-
-    if ($stagingAccount) {
-        // Check if expired
-        if (strtotime($stagingAccount['expires_at']) <= time()) {
-            // Send expiration email
-            $expiryMailSubject = 'Ube Delights - Account Activation Expired';
-            $expiryMailBody = '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;">'
-                . '<h2 style="color:#dc2626;">Account Activation Expired</h2>'
-                . '<p>Hello, your Ube Delights account (<strong>' . htmlspecialchars($stagingAccount['username']) . '</strong>) was created on <strong>' . date('F j, Y', strtotime($stagingAccount['created_at'])) . '</strong> but was not activated within the 48-hour window.</p>'
-                . '<p>The account has been removed from the system.</p>'
-                . '<p>Please contact an administrator to have your account re-created.</p>'
-                . '<p style="color:#888;font-size:12px;">This is an automated message from Ube Delights.</p>'
-                . '</div>';
-            mail_send_message($stagingAccount['email'], $expiryMailSubject, $expiryMailBody);
-
-            // Delete expired staging account
-            $delStmt = mysqli_prepare($connect, "DELETE FROM staging_accounts WHERE id = ?");
-            mysqli_stmt_bind_param($delStmt, 'i', $stagingAccount['id']);
-            mysqli_stmt_execute($delStmt);
-            mysqli_stmt_close($delStmt);
-
-            log_activity('STAGING_EXPIRED', "Staging account for {$stagingAccount['username']} (ID: {$stagingAccount['user_id']}) expired and deleted", 'Authentication', null, $stagingAccount['username']);
-            header('Location: ./login.php?error=staging_expired');
-            exit();
-        }
-
-        // Not expired — verify password, then activate account
-        if (!password_verify($password, $stagingAccount['password_hash'])) {
-            log_activity('failed_login', 'Wrong password attempt (staging)', 'Authentication', $stagingAccount['user_id'], $stagingAccount['username']);
-            $u = urlencode($login);
-            header("Location: ./login.php?error=pass&u=$u");
-            exit();
-        }
-
-        // Activate: move from staging to users
-        $initialStatus = ($stagingAccount['role'] === 'super_admin') ? 'blocked' : 'incomplete';
-        $isIncomplete = 1;
-
-        $activateStmt = $connect->prepare("INSERT INTO users (user_id, username, first_name, middle_name, last_name, extension_name, date_of_birth, age, sex, email, password_hash, role, status, is_active, is_incomplete, street, barangay, city_municipality, province, country, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)");
-        $activateStmt->bind_param("sssssssissssssssssss",
-            $stagingAccount['user_id'], $stagingAccount['username'], $stagingAccount['first_name'],
-            $stagingAccount['middle_name'], $stagingAccount['last_name'], $stagingAccount['extension_name'],
-            $stagingAccount['date_of_birth'], $stagingAccount['age'], $stagingAccount['sex'],
-            $stagingAccount['email'], $stagingAccount['password_hash'], $stagingAccount['role'],
-            $initialStatus, $isIncomplete,
-            $stagingAccount['street'], $stagingAccount['barangay'], $stagingAccount['city_municipality'],
-            $stagingAccount['province'], $stagingAccount['country'], $stagingAccount['zip_code']
-        );
-        $activateStmt->execute();
-        $activateStmt->close();
-
-        // If role is admin, create privileges
-        if ($stagingAccount['role'] === 'admin') {
-            mysqli_query($connect, "INSERT INTO admin_privileges (idNumber, can_manage_registrations, can_update_accounts, can_request_deletion, can_block, can_reset_password) VALUES ('" . mysqli_real_escape_string($connect, $stagingAccount['user_id']) . "', 1, 1, 1, 1, 1)");
-        }
-
-        // Delete from staging
-        $delStmt2 = mysqli_prepare($connect, "DELETE FROM staging_accounts WHERE id = ?");
-        mysqli_stmt_bind_param($delStmt2, 'i', $stagingAccount['id']);
-        mysqli_stmt_execute($delStmt2);
-        mysqli_stmt_close($delStmt2);
-
-        log_activity('STAGING_ACTIVATED', "Staging account for {$stagingAccount['username']} (ID: {$stagingAccount['user_id']}) activated via first login", 'Authentication', $stagingAccount['user_id'], $stagingAccount['username']);
-
-        // Redirect to login to go through the normal incomplete/OTP flow
-        header('Location: ./login.php');
-        exit();
-    }
-
     // 1) Find user by username (case-sensitive) or email
     // Use BINARY for username to enforce case sensitivity. Email remains as-is.
-    $sqlUser = "SELECT user_id, username, first_name, last_name, email, password_hash, is_active, role, status FROM users WHERE (BINARY username = ? OR email = ?) LIMIT 1";
+    $sqlUser = "SELECT user_id, username, first_name, last_name, email, password_hash, is_active, role, status, 0 AS is_staging FROM users WHERE (BINARY username = ? OR email = ?) LIMIT 1";
     $stmtUser = mysqli_prepare($connect, $sqlUser);
     mysqli_stmt_bind_param($stmtUser, 'ss', $login, $login);
     mysqli_stmt_execute($stmtUser);
     $resUser = mysqli_stmt_get_result($stmtUser);
     $user = $resUser ? mysqli_fetch_assoc($resUser) : null;
     mysqli_stmt_close($stmtUser);
+
+    // If not found in users, check staging_accounts
+    if (!$user) {
+        $sqlStaging = "SELECT user_id, username, '' AS first_name, '' AS last_name, email, password_hash, 0 AS is_active, role, 'incomplete' AS status, 1 AS is_staging, expires_at FROM staging_accounts WHERE (BINARY username = ? OR email = ?) LIMIT 1";
+        $stmtStaging = mysqli_prepare($connect, $sqlStaging);
+        mysqli_stmt_bind_param($stmtStaging, 'ss', $login, $login);
+        mysqli_stmt_execute($stmtStaging);
+        $resStaging = mysqli_stmt_get_result($stmtStaging);
+        $user = $resStaging ? mysqli_fetch_assoc($resStaging) : null;
+        mysqli_stmt_close($stmtStaging);
+
+        // Check if staging account has expired
+        if ($user && isset($user['expires_at']) && strtotime($user['expires_at']) < time()) {
+            mysqli_query($connect, "DELETE FROM staging_accounts WHERE user_id = '" . mysqli_real_escape_string($connect, $user['user_id']) . "'");
+            header('Location: ./login.php?error=expired');
+            exit();
+        }
+    }
 
     if (!$user) {
         log_activity('failed_login', 'Unknown user: ' . $login, 'Authentication', null, $login);
@@ -120,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Incomplete accounts: send OTP and redirect to complete account flow
-    if ($user['status'] === 'incomplete' || $user['is_incomplete'] == 1) {
+    if ($user['status'] === 'incomplete' || $user['is_incomplete'] == 1 || !empty($user['is_staging'])) {
         if (!password_verify($password, $user['password_hash'])) {
             log_activity('failed_login', 'Wrong password attempt', 'Authentication', (string)$user['user_id'], $user['username']);
             $u = urlencode($login);
@@ -132,6 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['auth_username'] = $user['username'];
         $_SESSION['auth_role'] = $user['role'];
         $_SESSION['auth_status'] = 'incomplete';
+        if (!empty($user['is_staging'])) {
+            $_SESSION['auth_staging'] = true;
+        }
 
         require_once __DIR__ . '/../server/mail_helper.php';
 

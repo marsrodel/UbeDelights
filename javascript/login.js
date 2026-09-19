@@ -310,13 +310,9 @@ document.addEventListener('DOMContentLoaded', function(){
       // Blocked account message stays as a field-level error on username
       showErrorMessage('username', 'Your account is blocked. Contact a super admin.');
       return;
-    case 'staging':
-      // Staging account pending activation
-      showErrorMessage('username', 'Your account is pending activation. Please check your email.');
-      return;
-    case 'staging_expired':
-      // Staging account has expired
-      showErrorMessage('username', 'Your activation link has expired. Please contact an administrator.');
+    case 'expired':
+      // Staging invitation expired
+      showErrorMessage('username', 'Your invitation has expired. Contact your admin for a new one.');
       return;
     case 'incomplete':
       // Incomplete account — redirect to complete account flow

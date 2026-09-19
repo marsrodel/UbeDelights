@@ -7,9 +7,15 @@ $year = date('Y');
 $generated_id = $year . '-0001';
 
 try {
-    $q = "SELECT MAX(CAST(SUBSTRING_INDEX(user_id, '-', -1) AS UNSIGNED)) AS maxseq FROM users WHERE LEFT(user_id, 4) = ?";
+    $q = "SELECT MAX(seq) AS maxseq FROM (
+            SELECT MAX(CAST(SUBSTRING_INDEX(user_id, '-', -1) AS UNSIGNED)) AS seq
+            FROM users WHERE LEFT(user_id, 4) = ?
+            UNION ALL
+            SELECT MAX(CAST(SUBSTRING_INDEX(user_id, '-', -1) AS UNSIGNED)) AS seq
+            FROM staging_accounts WHERE LEFT(user_id, 4) = ?
+          ) AS combined";
     $stmt = mysqli_prepare($connect, $q);
-    mysqli_stmt_bind_param($stmt, "s", $year);
+    mysqli_stmt_bind_param($stmt, "ss", $year, $year);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
