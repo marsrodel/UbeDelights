@@ -2564,13 +2564,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    var transferOkBtn = document.getElementById('transferModalOkBtn');
-    if (transferOkBtn) {
-        transferOkBtn.addEventListener('click', function() {
-            window.location.href = '../../server/logout.php';
-        });
-    }
-
     function validateEditAddressField(profileId, registerId) {
         var el = document.getElementById(profileId);
         if (!el) return true;
@@ -3330,8 +3323,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('blockAction').value = 'unblock';
 
                 if (targetUser && targetUser.role === 'super_admin') {
-                    document.getElementById('blockModalTitle').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b; margin-right:6px;"></i> Super Admin Transfer';
-                    document.getElementById('blockModalMessage').textContent = 'Unblocking this super admin will transfer access to them. Your account will be blocked and you will be signed out. Continue?';
+                    document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
+                    document.getElementById('blockModalMessage').textContent = 'Unblock this super admin? They will be able to log in.';
                 } else {
                     document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
                     document.getElementById('blockModalMessage').textContent = 'Unblock this user? They will be able to log in again.';
@@ -3564,12 +3557,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         var res;
                         try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
                         if (res.success) {
-                            if (res.transfer) {
-                                document.getElementById('transferModal').classList.add('active');
-                            } else {
-                                var msg = action === 'block' ? 'User blocked successfully.' : 'User unblocked successfully.';
-                                showSuccessModal(msg, function() { location.reload(); });
-                            }
+                            var msg = action === 'block' ? 'User blocked successfully.' : 'User unblocked successfully.';
+                            showSuccessModal(msg, function() { location.reload(); });
                         } else {
                             alert(res.message || 'Action not available yet.');
                         }

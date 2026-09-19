@@ -134,13 +134,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // 3) Success: start session
+    // 4) Super admin shift check — only 1 super admin can be logged in at a time
+    if ($user['role'] === 'super_admin') {
+        $shiftSql = "SELECT user_id FROM users WHERE role = 'super_admin' AND status = 'active' AND user_id != ? AND is_logged_in = 1 AND last_activity > DATE_SUB(NOW(), INTERVAL 30 MINUTE) LIMIT 1";
+        $shiftStmt = mysqli_prepare($connect, $shiftSql);
+        mysqli_stmt_bind_param($shiftStmt, 's', $userId);
+        mysqli_stmt_execute($shiftStmt);
+        $shiftRes = mysqli_stmt_get_result($shiftStmt);
+        $shiftRow = $shiftRes ? mysqli_fetch_assoc($shiftRes) : null;
+        mysqli_stmt_close($shiftStmt);
+        if ($shiftRow) {
+            log_activity('login_blocked', 'Super admin shift conflict — another super admin is active', 'Authentication', $userId, $user['username']);
+            header('Location: ./login.php?error=shift');
+            exit();
+        }
+    }
+
+    // 5) Success: start session
     $_SESSION['auth_user_id'] = $userId;
     $_SESSION['auth_username'] = $user['username'];
     $_SESSION['auth_role'] = $user['role'];
     $_SESSION['auth_status'] = $user['status'];
     $_SESSION['auth_first_name'] = $user['first_name'] ?? '';
     $_SESSION['auth_last_name'] = $user['last_name'] ?? '';
+
+    // Mark super admin as logged in and update last_activity
+    if ($user['role'] === 'super_admin') {
+        $loginUpdate = $connect->prepare("UPDATE users SET is_logged_in = 1, last_activity = NOW() WHERE user_id = ?");
+        $loginUpdate->bind_param('s', $userId);
+        $loginUpdate->execute();
+        $loginUpdate->close();
+    }
 
     // Check if user already has security questions set
     // In new schema, questions are stored on users

@@ -310,6 +310,10 @@ document.addEventListener('DOMContentLoaded', function(){
       // Blocked account message stays as a field-level error on username
       showErrorMessage('username', 'Your account is blocked. Contact a super admin.');
       return;
+    case 'shift':
+      // Another super admin is currently active
+      showErrorMessage('username', 'Another super admin is currently active. Please wait for them to log out.');
+      return;
     case 'expired':
       // Staging invitation expired
       showErrorMessage('username', 'Your invitation has expired. Contact your admin for a new one.');

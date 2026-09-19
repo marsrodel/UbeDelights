@@ -190,6 +190,12 @@ try {
                 $errors[] = 'Invalid role';
             } elseif ($currentRole === 'admin' && $role === 'super_admin') {
                 $errors[] = 'Admins cannot create Super Admin accounts';
+            } elseif ($role === 'super_admin') {
+                $cntRes = $connect->query("SELECT COUNT(*) as cnt FROM users WHERE role = 'super_admin' AND status = 'active'");
+                $cntRow = $cntRes ? $cntRes->fetch_assoc() : null;
+                if ($cntRow && (int)$cntRow['cnt'] >= 2) {
+                    $errors[] = 'Maximum of 2 working super admin accounts reached. Consider demoting an existing super admin to Admin via Roles & Privileges.';
+                }
             }
 
             if (!empty($username)) {
@@ -366,7 +372,12 @@ try {
                 throw new Exception('User is already blocked');
             }
 
-            $stmt = $connect->prepare("UPDATE users SET status = 'blocked', is_active = 0 WHERE user_id = ?");
+            // Clear is_logged_in for super admins (force logout)
+            if ($target_user['role'] === 'super_admin') {
+                $stmt = $connect->prepare("UPDATE users SET status = 'blocked', is_active = 0, is_logged_in = 0 WHERE user_id = ?");
+            } else {
+                $stmt = $connect->prepare("UPDATE users SET status = 'blocked', is_active = 0 WHERE user_id = ?");
+            }
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
                 log_activity('BLOCK_USER', "{$_SESSION['auth_username']} blocked {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
@@ -395,6 +406,15 @@ try {
                 throw new Exception('User is not blocked');
             }
 
+            // Max 2 working super admins check
+            if ($target_user['role'] === 'super_admin') {
+                $cntRes = $connect->query("SELECT COUNT(*) as cnt FROM users WHERE role = 'super_admin' AND status = 'active'");
+                $cntRow = $cntRes ? $cntRes->fetch_assoc() : null;
+                if ($cntRow && (int)$cntRow['cnt'] >= 2) {
+                    throw new Exception('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.');
+                }
+            }
+
             if ($target_user['is_incomplete']) {
                 $stmt = $connect->prepare("UPDATE users SET status = 'incomplete', is_active = 0 WHERE user_id = ?");
                 $stmt->bind_param("s", $userId);
@@ -404,18 +424,7 @@ try {
             }
             if ($stmt->execute()) {
                 log_activity('UNBLOCK_USER', "{$_SESSION['auth_username']} unblocked {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
-
-                $transfer = false;
-                if ($target_user['role'] === 'super_admin' && $currentRole === 'super_admin') {
-                    $blockStmt = $connect->prepare("UPDATE users SET status = 'blocked', is_active = 0 WHERE user_id = ? AND role = 'super_admin' AND status = 'active'");
-                    $blockStmt->bind_param("s", $currentUserId);
-                    $blockStmt->execute();
-                    $blockStmt->close();
-                    $transfer = true;
-                    log_activity('SUPER_ADMIN_TRANSFER', "{$_SESSION['auth_username']} unblocked {$target_user['username']} (super admin transfer)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
-                }
-
-                $response = ['success' => true, 'message' => 'User unblocked successfully', 'transfer' => $transfer];
+                $response = ['success' => true, 'message' => 'User unblocked successfully'];
             } else {
                 throw new Exception('Failed to unblock user');
             }
@@ -566,6 +575,12 @@ try {
                 $errors[] = 'Invalid role';
             } elseif ($currentRole === 'admin' && $role === 'super_admin') {
                 $errors[] = 'Admins cannot create Super Admin accounts';
+            } elseif ($role === 'super_admin') {
+                $cntRes = $connect->query("SELECT COUNT(*) as cnt FROM users WHERE role = 'super_admin' AND status = 'active'");
+                $cntRow = $cntRes ? $cntRes->fetch_assoc() : null;
+                if ($cntRow && (int)$cntRow['cnt'] >= 2) {
+                    $errors[] = 'Maximum of 2 working super admin accounts reached. Consider demoting an existing super admin to Admin via Roles & Privileges.';
+                }
             }
 
             if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {

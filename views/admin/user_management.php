@@ -456,22 +456,6 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
         </div>
     </div>
 
-    <!-- Super Admin Transfer Modal -->
-    <div class="modal-overlay" id="transferModal" role="dialog" aria-modal="true">
-        <div class="modal" style="max-width:420px; text-align:center;">
-            <div class="modal-body" style="padding:30px 24px;">
-                <div style="font-size:2.5rem; color:var(--accent); margin-bottom:12px;">
-                    <i class="fa-solid fa-right-left"></i>
-                </div>
-                <h3 style="margin-bottom:8px;">Super Admin Transferred</h3>
-                <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px;">
-                    Super admin access has been transferred to the unblocked account. You will now be signed out.
-                </p>
-                <button class="btn-primary" id="transferModalOkBtn" style="min-width:120px; margin:0 auto;">OK</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Roles & Privileges Modal -->
     <div class="modal-overlay" id="rolesPrivilegesModal" role="dialog" aria-modal="true">
         <div class="modal" style="max-width:480px;">
