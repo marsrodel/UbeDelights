@@ -71,6 +71,7 @@ $statusLabel = $profile ? ucfirst($profile['status']) : '';
                 <a onclick="getShop()" class="nav-link">Shop</a>
                 <a onclick="getCart()" class="nav-link cart-link">Cart <span class="cart-badge" id="cartBadge" style="display:none;">0</span></a>
                 <a onclick="getOrders()" class="nav-link">My Orders</a>
+                <a onclick="getActivityLogs()" class="nav-link">Activity Logs</a>
                 <a onclick="getProfile()" class="nav-link active">Profile</a>
                 <a onclick="getLogout()" class="nav-link">Log Out</a>
             </div>

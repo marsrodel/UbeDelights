@@ -14,10 +14,14 @@
     border: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
     text-align: left;
+    padding: 0;
+    color: var(--text-primary);
+    position: static;
+    overflow: visible;
 }
 
 .profile-form {
-    padding: 20px 24px 24px;
+    padding: 24px;
 }
 
 /* ==========================================

@@ -38,6 +38,10 @@ const getProfile = () => {
     window.location.href = "./profile.php";
 };
 
+const getActivityLogs = () => {
+    window.location.href = "./activity_logs.php";
+};
+
 const getSecurity = () => {
     window.location.href = "./security_questions.php";
 };

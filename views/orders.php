@@ -68,6 +68,7 @@ if ($orderQuery) {
                 <a onclick="getShop()" class="nav-link">Shop</a>
                 <a onclick="getCart()" class="nav-link cart-link">Cart <span class="cart-badge" id="cartBadge" style="display:none;">0</span></a>
                 <a onclick="getOrders()" class="nav-link active">My Orders</a>
+                <a onclick="getActivityLogs()" class="nav-link">Activity Logs</a>
                 <a onclick="getProfile()" class="nav-link">Profile</a>
                 <a onclick="getLogout()" class="nav-link">Log Out</a>
             </div>
