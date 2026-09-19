@@ -1,13 +1,13 @@
 <?php require_once __DIR__ . '/../server/customer_auth.php';
 
 $userId = $currentUser['id'];
-$firstName = '';
-$lastName = '';
-$email = '';
-$username = '';
-$created = '';
+$profile = null;
 if ($connect) {
-    $sql = "SELECT first_name, last_name, email, username, created_at FROM users WHERE user_id = ? LIMIT 1";
+    $sql = "SELECT user_id, username, first_name, middle_name, last_name, extension_name,
+                   email, role, status, date_of_birth, age, sex,
+                   street, barangay, city_municipality, province, country, zip_code,
+                   created_at, updated_at
+            FROM users WHERE user_id = ? LIMIT 1";
     if ($stmt = mysqli_prepare($connect, $sql)) {
         mysqli_stmt_bind_param($stmt, 's', $userId);
         mysqli_stmt_execute($stmt);
@@ -15,18 +15,37 @@ if ($connect) {
         if ($res) {
             $row = mysqli_fetch_assoc($res);
             if ($row) {
-                $firstName = $row['first_name'] ?? '';
-                $lastName = $row['last_name'] ?? '';
-                $email = $row['email'] ?? '';
-                $username = $row['username'] ?? '';
-                $created = $row['created_at'] ?? '';
+                $profile = [
+                    'id'            => $row['user_id'],
+                    'username'      => $row['username'],
+                    'firstName'     => $row['first_name'],
+                    'middleName'    => $row['middle_name'] ?? '',
+                    'lastName'      => $row['last_name'],
+                    'extensionName' => $row['extension_name'] ?? '',
+                    'email'         => $row['email'],
+                    'role'          => $row['role'],
+                    'status'        => $row['status'],
+                    'dob'           => $row['date_of_birth'],
+                    'age'           => $row['age'],
+                    'sex'           => $row['sex'],
+                    'street'        => $row['street'],
+                    'barangay'      => $row['barangay'],
+                    'city'          => $row['city_municipality'],
+                    'province'      => $row['province'],
+                    'country'       => $row['country'],
+                    'zipCode'       => $row['zip_code'],
+                    'createdAt'     => $row['created_at'] ?? '-',
+                    'updatedAt'     => $row['updated_at'] ?? '-',
+                ];
             }
         }
         mysqli_stmt_close($stmt);
     }
     mysqli_close($connect);
 }
-$initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
+
+$roleLabel = 'Customer';
+$statusLabel = $profile ? ucfirst($profile['status']) : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,7 +53,9 @@ $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/dashboard.css?v=4.0">
+    <link rel="stylesheet" href="../css/customer_profile.css?v=1.0">
 </head>
 <body>
     <nav class="navbar">
@@ -64,62 +85,164 @@ $initials = strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
     </section>
 
     <main class="main-content">
-        <div class="profile-layout">
-            <div class="profile-card">
-                <div class="profile-avatar">
-                    <?php echo $initials; ?>
-                </div>
-                <h2 class="profile-name"><?php echo htmlspecialchars($firstName . ' ' . $lastName); ?></h2>
-                <span class="profile-username">@<?php echo htmlspecialchars($username); ?></span>
-            </div>
+        <div class="profile-card">
+            <form id="customerProfileForm" class="profile-form">
 
-            <div class="profile-details">
-                <div class="detail-card">
-                    <h3>Personal Information</h3>
-                    <div class="detail-row">
-                        <span class="detail-label">Full Name</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($firstName . ' ' . $lastName); ?></span>
+                <h3 class="profile-section-title">Personal Information</h3>
+                <div class="form-grid cols-4">
+                    <div class="form-field">
+                        <label for="profileId">ID Number <span class="required">*</span></label>
+                        <input type="text" id="profileId" value="<?php echo htmlspecialchars($profile['id'] ?? ''); ?>" readonly>
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Email</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($email); ?></span>
+                    <div class="form-field">
+                        <label for="profileFirstName">First Name <span class="required">*</span></label>
+                        <input type="text" id="profileFirstName" name="first_name">
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Username</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($username); ?></span>
+                    <div class="form-field">
+                        <label for="profileMiddleName">Middle Name <span class="optional">(Optional)</span></label>
+                        <input type="text" id="profileMiddleName" name="middle_name">
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">User ID</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($userId); ?></span>
+                    <div class="form-field">
+                        <label for="profileLastName">Last Name <span class="required">*</span></label>
+                        <input type="text" id="profileLastName" name="last_name">
                     </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Member Since</span>
-                        <span class="detail-value"><?php echo $created ? date('F Y', strtotime($created)) : 'N/A'; ?></span>
+                </div>
+                <div class="form-grid cols-4">
+                    <div class="form-field">
+                        <label for="profileExtensionName">Extension Name <span class="optional">(Optional)</span></label>
+                        <input type="text" id="profileExtensionName" name="extension_name" placeholder="Jr, Sr, III">
+                    </div>
+                    <div class="form-field">
+                        <label for="profileBirthdate">Date of Birth <span class="required">*</span></label>
+                        <input type="date" id="profileBirthdate" name="date_of_birth">
+                    </div>
+                    <div class="form-field">
+                        <label for="profileAge">Age <span class="required">*</span></label>
+                        <input type="number" id="profileAge" readonly>
+                    </div>
+                    <div class="form-field">
+                        <label for="profileSex">Sex <span class="required">*</span></label>
+                        <select id="profileSex" name="sex">
+                            <option value="">Select Sex</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="detail-card">
-                    <h3>Account Actions</h3>
-                    <div class="action-buttons">
-                        <button class="btn-outline" id="btnEditProfile">Edit Profile</button>
-                        <button class="btn-outline" id="btnChangePassword">Change Password</button>
+                <h3 class="profile-section-title">Account Information</h3>
+                <div class="form-grid cols-4">
+                    <div class="form-field">
+                        <label for="profileEmail">Email <span class="required">*</span></label>
+                        <input type="email" id="profileEmail" name="email">
+                    </div>
+                    <div class="form-field">
+                        <label for="profileUsername">Username <span class="required">*</span></label>
+                        <input type="text" id="profileUsername" name="username">
+                    </div>
+                    <div class="form-field">
+                        <label for="profileRole">Role</label>
+                        <input type="text" id="profileRole" value="<?php echo htmlspecialchars($roleLabel); ?>" readonly>
+                    </div>
+                    <div class="form-field">
+                        <label for="profileStatus">Status</label>
+                        <input type="text" id="profileStatus" value="<?php echo htmlspecialchars($statusLabel); ?>" readonly>
                     </div>
                 </div>
-            </div>
+
+                <h3 class="profile-section-title">Address Information</h3>
+                <div class="form-grid cols-3">
+                    <div class="form-field">
+                        <label for="profileStreet">Purok/Street <span class="required">*</span></label>
+                        <input type="text" id="profileStreet" name="street">
+                    </div>
+                    <div class="form-field">
+                        <label for="profileBarangay">Barangay <span class="required">*</span></label>
+                        <input type="text" id="profileBarangay" name="barangay">
+                    </div>
+                    <div class="form-field">
+                        <label for="profileCity">City/Municipality <span class="required">*</span></label>
+                        <input type="text" id="profileCity" name="city_municipality">
+                    </div>
+                </div>
+                <div class="form-grid cols-3">
+                    <div class="form-field">
+                        <label for="profileProvince">Province <span class="required">*</span></label>
+                        <input type="text" id="profileProvince" name="province">
+                    </div>
+                    <div class="form-field">
+                        <label for="profileCountry">Country <span class="required">*</span></label>
+                        <input type="text" id="profileCountry" name="country">
+                    </div>
+                    <div class="form-field">
+                        <label for="profileZipcode">Zip Code <span class="required">*</span></label>
+                        <input type="text" id="profileZipcode" name="zip_code">
+                    </div>
+                </div>
+
+                <div class="password-section">
+                    <h3>Change Password</h3>
+                    <p class="form-hint">Leave blank to keep your current password.</p>
+                    <div class="form-grid cols-3">
+                        <div class="form-field">
+                            <label for="profileCurrentPassword">Current Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="profileCurrentPassword" name="current_password" autocomplete="current-password">
+                                <i class="fa-solid fa-eye-slash" id="eyeicon-current"></i>
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label for="profileNewPassword">New Password <span id="profilePassStrength" class="field-hint"></span></label>
+                            <div class="password-wrapper">
+                                <input type="password" id="profileNewPassword" name="new_password" autocomplete="new-password">
+                                <i class="fa-solid fa-eye-slash" id="eyeicon-new"></i>
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label for="profileConfirmPassword">Confirm Password <span id="profileRepassMatch" class="field-hint"></span></label>
+                            <div class="password-wrapper">
+                                <input type="password" id="profileConfirmPassword" name="confirm_password" autocomplete="new-password">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button type="button" id="profileCancelBtn" class="btn-outline">Reset</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
         </div>
     </main>
 
     <footer class="footer">
-        <p>&copy; 2025 Ube Delights. All rights reserved.</p>
+        <p>&copy; 2026 Ube Delights. All rights reserved.</p>
     </footer>
 
-    <div class="toast" id="toast"></div>
+    <div class="profile-toast" id="profileToast"></div>
 
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:450px;">
+            <div class="modal-header" style="border-bottom:none;">
+                <h2>Success</h2>
+            </div>
+            <div class="modal-body" style="padding: 0 24px;">
+                <p id="successModalMessage" style="color:var(--text-secondary); font-size:0.9rem;"></p>
+            </div>
+            <div class="modal-footer" style="border-top:none; justify-content:flex-end;">
+                <button class="btn-primary" id="successModalOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>var customerProfile = <?php echo json_encode($profile); ?>;</script>
+    <script src="../javascript/register.js?v=2.0"></script>
+    <script src="../javascript/routing.js"></script>
+    <script src="../javascript/dashboard.js"></script>
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/index.js"></script>
-    <script src="../javascript/dashboard.js"></script>
-    <script src="../javascript/routing.js"></script>
     <script src="../javascript/inspect.js"></script>
-    <script src="../javascript/profile.js"></script>
+    <script src="../javascript/customer_profile.js?v=1.0"></script>
 </body>
 </html>
