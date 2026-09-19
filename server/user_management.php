@@ -434,7 +434,7 @@ try {
             if (!hasPrivilege($connect, 'approve')) {
                 throw new Exception('You are not authorized to approve registrations');
             }
-            $stmt = $connect->prepare("SELECT username, status FROM users WHERE user_id = ?");
+            $stmt = $connect->prepare("SELECT username, first_name, email, status FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             $stmt->execute();
             $target_user = $stmt->get_result()->fetch_assoc();
@@ -450,6 +450,16 @@ try {
             $stmt->bind_param("s", $userId);
             if ($stmt->execute()) {
                 log_activity('APPROVE_USER', "{$_SESSION['auth_username']} approved {$target_user['username']}", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
+
+                $mailSubject = 'Ube Delights - Account Approved';
+                $mailBody = '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;">'
+                    . '<h2 style="color:#6B21A8;">Account Approved</h2>'
+                    . '<p>Hello ' . htmlspecialchars($target_user['first_name']) . ',</p>'
+                    . '<p>Your account has been <strong>approved</strong>! You may now log in using your registered credentials.</p>'
+                    . '<p style="color:#888;font-size:12px;margin-top:24px;">This is an automated message from Ube Delights.</p>'
+                    . '</div>';
+                mail_send_message($target_user['email'], $mailSubject, $mailBody);
+
                 $response = ['success' => true, 'message' => 'Registration approved successfully'];
             } else {
                 throw new Exception('Failed to approve user');
@@ -460,7 +470,7 @@ try {
             if (!hasPrivilege($connect, 'reject')) {
                 throw new Exception('You are not authorized to reject registrations');
             }
-            $stmt = $connect->prepare("SELECT username, status FROM users WHERE user_id = ?");
+            $stmt = $connect->prepare("SELECT username, first_name, email, status FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
             $stmt->execute();
             $target_user = $stmt->get_result()->fetch_assoc();
@@ -471,6 +481,16 @@ try {
             if ($target_user['status'] !== 'pending') {
                 throw new Exception('User is not pending approval');
             }
+
+            $mailSubject = 'Ube Delights - Registration Rejected';
+            $mailBody = '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;">'
+                . '<h2 style="color:#dc2626;">Registration Rejected</h2>'
+                . '<p>Hello ' . htmlspecialchars($target_user['first_name']) . ',</p>'
+                . '<p>We regret to inform you that your registration has been <strong>rejected</strong>.</p>'
+                . '<p>Please contact the administrator for more information.</p>'
+                . '<p style="color:#888;font-size:12px;margin-top:24px;">This is an automated message from Ube Delights.</p>'
+                . '</div>';
+            mail_send_message($target_user['email'], $mailSubject, $mailBody);
 
             $stmt = $connect->prepare("DELETE FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);

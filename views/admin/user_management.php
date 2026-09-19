@@ -114,7 +114,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
                             <option value="">All Status</option>
                             <option value="active">Active</option>
                             <option value="blocked">Blocked</option>
-                            <option value="incomplete">Incomplete</option>
+                            <option value="inactive">Inactive</option>
                         </select>
                         <button id="btnAddUser" class="btn-primary" style="padding:10px 14px; font-size:1rem; border-radius:8px; min-width:40px;" title="Add New User"><i class="fa-solid fa-plus"></i></button>
                     </div>

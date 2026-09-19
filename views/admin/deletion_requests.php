@@ -54,6 +54,7 @@ if ($connect) {
                 'targetCountry'   => $row['target_country'],
                 'targetZipcode'   => $row['target_zipcode'],
                 'requestedBy'     => trim($row['requester_name']),
+                'requestedById'   => $row['requested_by'],
                 'reason'          => $row['reason'],
                 'status'          => $row['status'],
                 'reviewedBy'      => $row['reviewer_username'] ?? '',

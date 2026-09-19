@@ -2813,7 +2813,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 if ((u.id||'').toLowerCase().indexOf(idSearch) === -1) return false;
             }
             if (f.role && u.role !== f.role) return false;
-            if (f.status && u.status !== f.status) return false;
+            if (f.status) {
+                var isInactive = u.role === 'super_admin' && u.status !== 'blocked' && !u.isLoggedIn;
+                if (f.status === 'inactive') {
+                    if (!isInactive) return false;
+                } else {
+                    if (u.status !== f.status) return false;
+                    if (isInactive) return false;
+                }
+            }
             return true;
         });
     }

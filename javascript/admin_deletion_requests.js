@@ -51,7 +51,7 @@
             html += '<tr data-dr-id="' + esc(r.id) + '">';
             html += '<td><strong>' + esc(r.targetName) + '</strong></td>';
             html += '<td class="cell-muted" title="' + esc(r.reason) + '">' + truncate(r.reason, 40) + '</td>';
-            html += '<td>' + esc(r.requestedBy) + '</td>';
+            html += '<td><div>' + esc(r.requestedBy) + '</div><div class="cell-muted" style="font-size:0.8em;">' + esc(r.requestedById) + '</div></td>';
             html += '<td class="cell-muted">' + formatDate(r.createdAt) + '</td>';
             html += '<td>' + statusBadge(r.status) + '</td>';
             html += '<td class="actions-cell">';

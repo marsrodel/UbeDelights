@@ -1,5 +1,6 @@
 <?php
 include '../server/db.php';
+include '../server/mail_helper.php';
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 // If already logged in, send to dashboard
 if (isset($_SESSION['auth_user_id'])) {
@@ -95,6 +96,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
     if ($ok_user) {
         mysqli_commit($connect);
+
+        $mailSubject = 'Ube Delights - Registration Received';
+        $mailBody = '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;">'
+            . '<h2 style="color:#6B21A8;">Registration Received</h2>'
+            . '<p>Hello ' . htmlspecialchars($fn) . ',</p>'
+            . '<p>Your registration has been received and is <strong>pending admin approval</strong>.</p>'
+            . '<p>You will receive another email once your account has been reviewed and approved.</p>'
+            . '<p style="color:#888;font-size:12px;margin-top:24px;">This is an automated message from Ube Delights.</p>'
+            . '</div>';
+        mail_send_message($em, $mailSubject, $mailBody);
+
         unset($_SESSION['pending_registration']);
         $registration_success = true;
     } else {
