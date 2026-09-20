@@ -48,11 +48,14 @@ if ($connect) {
 
 $orderCount = 0;
 $pendingCount = 0;
+$stagingSACount = 0;
 if ($connect) {
     $r = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'pending'");
     if ($r) $orderCount = mysqli_fetch_assoc($r)['cnt'];
     $r2 = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM users WHERE status = 'pending'");
     if ($r2) $pendingCount = mysqli_fetch_assoc($r2)['cnt'];
+    $r3 = mysqli_query($connect, "SELECT COUNT(*) AS cnt FROM staging_accounts WHERE role = 'super_admin' AND expires_at > NOW()");
+    if ($r3) $stagingSACount = mysqli_fetch_assoc($r3)['cnt'];
 }
 
 $myPrivileges = ['can_manage_registrations' => 0, 'can_update_accounts' => 0, 'can_request_deletion' => 0, 'can_block' => 0, 'can_reset_password' => 0];
@@ -529,7 +532,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
 
     <script src="../../javascript/admin-routing.js?v=2.0"></script>
     <script src="../../javascript/admin_security.js?v=4.0"></script>
-    <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>;</script>
+    <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>; var stagingSACount = <?php echo (int)$stagingSACount; ?>;</script>
     <script src="../../javascript/user_management.js?v=4.3"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
 </body>

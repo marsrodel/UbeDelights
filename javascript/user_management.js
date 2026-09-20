@@ -2482,7 +2482,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     return u.role === 'super_admin' && u.status === 'active';
                 }).length;
                 if (activeSAs >= 2) {
-                    showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting an existing super admin to Admin via Roles & Privileges.');
+                    showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting an existing super admin to Admin via Roles & Privileges.', null, 'Notice');
+                    return;
+                }
+                if (typeof stagingSACount !== 'undefined' && stagingSACount > 0) {
+                    showSuccessModal('A pending super admin account already exists. Please wait for it to be completed or expire before creating another.', null, 'Notice');
                     return;
                 }
             }
@@ -2564,8 +2568,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     var successModalOkCallback = null;
-    function showSuccessModal(message, callback) {
-        document.getElementById('successModalTitle').textContent = 'Success';
+    function showSuccessModal(message, callback, title) {
+        document.getElementById('successModalTitle').textContent = title || 'Success';
         document.getElementById('successModalMessage').textContent = message;
         successModalOkCallback = callback || null;
         document.getElementById('successModal').classList.add('active');
@@ -3346,7 +3350,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         return u.role === 'super_admin' && u.status === 'active';
                     }).length;
                     if (activeSAs >= 2) {
-                        showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.');
+                        showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.', null, 'Notice');
+                        return;
+                    }
+                    if (typeof stagingSACount !== 'undefined' && stagingSACount > 0) {
+                        showSuccessModal('A pending super admin account already exists. Please wait for it to be completed or expire before unblocking another.', null, 'Notice');
                         return;
                     }
                     document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
@@ -3588,7 +3596,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             var msg = action === 'block' ? 'User blocked successfully.' : 'User unblocked successfully.';
                             showSuccessModal(msg, function() { location.reload(); });
                         } else {
-                            showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.');
+                            showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.', null, 'Notice');
                         }
                     } else {
                         showSuccessModal('Server error. Please try again.');

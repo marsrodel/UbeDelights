@@ -601,6 +601,11 @@ try {
                 if ($cntRow && (int)$cntRow['cnt'] >= 2) {
                     $errors[] = 'Maximum of 2 working super admin accounts reached. Consider demoting an existing super admin to Admin via Roles & Privileges.';
                 }
+                $stgRes = $connect->query("SELECT COUNT(*) as cnt FROM staging_accounts WHERE role = 'super_admin' AND expires_at > NOW()");
+                $stgRow = $stgRes ? $stgRes->fetch_assoc() : null;
+                if ($stgRow && (int)$stgRow['cnt'] > 0) {
+                    $errors[] = 'A pending super admin account already exists. Please wait for it to be completed or expire before creating another.';
+                }
             }
 
             if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
