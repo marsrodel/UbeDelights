@@ -31,7 +31,11 @@ function mask_email($email) {
     if (count($parts) !== 2) return $email;
     $name = $parts[0];
     $domain = $parts[1];
-    $masked = strlen($name) > 1 ? $name[0] . str_repeat('*', max(1, strlen($name) - 1)) : '*';
+    if (strlen($name) <= 4) {
+        $masked = $name;
+    } else {
+        $masked = substr($name, 0, 2) . str_repeat('*', strlen($name) - 4) . substr($name, -2);
+    }
     return $masked . '@' . $domain;
 }
 
@@ -440,7 +444,10 @@ $questionGroups = fetch_question_groups();
             <p class="step-desc">Enter your <strong>ID number</strong> below. We'll send a verification code to the email registered on that account before you answer your security questions.</p>
             <div class="form-group">
               <label for="id_number">ID Number <span class="required">*</span></label>
-              <input type="text" id="id_number" name="id_number" placeholder="e.g. 2026-0015" maxlength="9" required />
+              <div class="password-wrapper">
+                <input type="password" id="id_number" name="id_number" placeholder="e.g. 2026-0015" maxlength="9" required />
+                <i class="fa-solid fa-eye-slash"></i>
+              </div>
             </div>
             <div class="form-actions">
               <a class="btn-prev" onclick="getLogin()">Previous</a>
