@@ -52,3 +52,24 @@ if ($_SESSION['auth_role'] === 'super_admin') {
     mysqli_stmt_execute($upd);
     mysqli_stmt_close($upd);
 }
+
+// Auto-cleanup expired staging accounts (once per session)
+if (empty($_SESSION['staging_cleanup_done'])) {
+    $expired = $connect->query("SELECT username, email FROM staging_accounts WHERE expires_at < NOW()");
+    if ($expired && $expired->num_rows > 0) {
+        require_once __DIR__ . '/mail_helper.php';
+        while ($row = $expired->fetch_assoc()) {
+            $mailSubject = 'Ube Delights - Account Expired';
+            $mailBody = '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;">'
+                . '<h2 style="color:#6B21A8;">Account Invitation Expired</h2>'
+                . '<p>Hello ' . htmlspecialchars($row['username']) . ',</p>'
+                . '<p>Your admin-created account invitation has expired. The account was not completed within the 24-hour window.</p>'
+                . '<p>Please contact your administrator if you would like to be re-invited.</p>'
+                . '<p style="color:#888;font-size:12px;">This is an automated message from Ube Delights.</p>'
+                . '</div>';
+            mail_send_message($row['email'], $mailSubject, $mailBody);
+        }
+    }
+    $connect->query("DELETE FROM staging_accounts WHERE expires_at < NOW()");
+    $_SESSION['staging_cleanup_done'] = true;
+}
