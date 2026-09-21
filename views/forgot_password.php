@@ -10,7 +10,7 @@ if (isset($_SESSION['auth_user_id'])) {
 
 /* ── Helpers ── */
 function fetch_user_full($connect, $user_id) {
-    $sql = "SELECT user_id, email, username, q1, a1, q2, a2, q3, a3 FROM users WHERE user_id = ? LIMIT 1";
+    $sql = "SELECT user_id, email, username, q1, a1, q2, a2, q3, a3, status FROM users WHERE user_id = ? LIMIT 1";
     $stmt = mysqli_prepare($connect, $sql);
     mysqli_stmt_bind_param($stmt, 's', $user_id);
     mysqli_stmt_execute($stmt);
@@ -89,6 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = fetch_user_full($connect, $idnum);
         if (!$user) {
             header('Location: ./forgot_password.php?step=1&error=unknown_id');
+            exit();
+        }
+        if ($user['status'] === 'blocked') {
+            header('Location: ./forgot_password.php?step=1&error=blocked_id');
             exit();
         }
 

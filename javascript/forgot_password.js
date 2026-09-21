@@ -371,6 +371,7 @@
       if (error === 'empty_id') showFieldError('id_number', 'This field is required');
       else if (error === 'invalid_id') showFieldError('id_number', 'Please enter ID in format: xxxx-xxxx');
       else if (error === 'unknown_id') showFieldError('id_number', 'ID not found');
+      else if (error === 'blocked_id') showFieldError('id_number', 'Your account is blocked. Please contact an administrator.');
     }
 
     if (step === '2') {
