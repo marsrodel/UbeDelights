@@ -290,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function(){
       }
       break;
     case 'pending':
-      // Show pending confirmation modal
       var overlay = document.getElementById('pending-modal-overlay');
       if (overlay) {
         overlay.classList.add('active');
@@ -301,14 +300,17 @@ document.addEventListener('DOMContentLoaded', function(){
           }
         });
       }
+      if (forgot) forgot.style.display = 'none';
+      if (orSep) orSep.style.display = 'none';
       return;
     case 'inactive':
       // Inactive-account message stays as a field-level error on username
       showErrorMessage('username', 'Your account is inactive.');
       return;
     case 'blocked':
-      // Blocked account message stays as a field-level error on username
       showErrorMessage('username', 'Your account is blocked. Contact a super admin.');
+      if (forgot) forgot.style.display = 'none';
+      if (orSep) orSep.style.display = 'none';
       return;
     case 'shift':
       // Another super admin is currently active

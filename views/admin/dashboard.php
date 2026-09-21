@@ -222,6 +222,14 @@ if ($isSuperAdmin) {
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin.js"></script>
     <script src="../../javascript/inspect.js"></script>
+    <script>
+    try {
+        localStorage.setItem('lock_level', '0');
+        localStorage.removeItem('lock_deadline');
+        sessionStorage.setItem('login_err_count', '0');
+        localStorage.setItem('login_err_count', '0');
+    } catch(e) {}
+    </script>
     <?php if ($isSuperAdmin): ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script>var chartRegistrationsData = <?php echo json_encode($registrationsData); ?>; var chartStatusData = <?php echo json_encode($statusData); ?>; var chartActivityData = <?php echo json_encode($activityData); ?>; var chartRoleData = <?php echo json_encode($roleData); ?>;</script>
