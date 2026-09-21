@@ -454,6 +454,7 @@ CREATE TABLE `notifications` (
   `title` varchar(100) NOT NULL,
   `message` text NOT NULL,
   `action_type` varchar(50) NOT NULL DEFAULT 'system',
+  `role` varchar(20) DEFAULT NULL,
   `is_read` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

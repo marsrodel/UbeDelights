@@ -2779,7 +2779,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!isSuperAdmin || isOwn) {
                 h += '<button class="um-dropdown-item" data-action="edit" data-id="'+esc(user.id)+'"' + (canEdit ? '' : ' disabled title="Not Authorized"') + '><i class="fa-solid fa-pen"></i> Edit</button>';
             }
-            if (isCustomer || (iAmSuperAdmin && !isSuperAdmin)) {
+            if (!isSuperAdmin) {
                 h += '<button class="um-dropdown-item" data-action="reset-password" data-id="'+esc(user.id)+'"' + (canResetPwd ? '' : ' disabled title="Not Authorized"') + '><i class="fa-solid fa-key"></i> Reset Password</button>';
             }
             if (iAmSuperAdmin && (user.role === 'admin' || user.role === 'super_admin')) {

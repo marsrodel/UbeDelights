@@ -138,6 +138,19 @@ if ($isSuperAdmin) {
                 <p class="topbar-subtitle"><?php echo $isSuperAdmin ? 'System overview and activity insights.' : 'Overview of your store\'s performance and recent activity.'; ?></p>
             </div>
             <div class="topbar-right">
+                <div class="notif-wrapper">
+                    <button class="notif-btn" id="notifBtn">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="notif-badge" id="notifBadge">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">
+                            <h4>Notifications</h4>
+                            <a id="markAllRead">Mark all read</a>
+                        </div>
+                        <div class="notif-list" id="notifList"></div>
+                    </div>
+                </div>
                 <span class="topbar-date"><i class="fa-solid fa-calendar-days"></i><?php echo date('F j, Y'); ?></span>
             </div>
         </header>
@@ -221,6 +234,7 @@ if ($isSuperAdmin) {
 
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin.js"></script>
+    <script src="../../javascript/admin_notifications.js"></script>
     <script src="../../javascript/inspect.js"></script>
     <script>
     try {

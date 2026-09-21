@@ -73,6 +73,19 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
                 <p class="topbar-subtitle">Review and approve new user registrations.</p>
             </div>
             <div class="topbar-right">
+                <div class="notif-wrapper">
+                    <button class="notif-btn" id="notifBtn">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="notif-badge" id="notifBadge">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">
+                            <h4>Notifications</h4>
+                            <a id="markAllRead">Mark all read</a>
+                        </div>
+                        <div class="notif-list" id="notifList"></div>
+                    </div>
+                </div>
                 <span class="topbar-date"><i class="fa-solid fa-calendar-days"></i><?php echo date('F j, Y'); ?></span>
             </div>
         </header>
@@ -190,6 +203,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
 
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
+    <script src="../../javascript/admin_notifications.js"></script>
     <script>var pendingUsers = <?php echo json_encode($pendingUsers); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? ''); ?>;</script>
     <script src="../../javascript/admin_pending_approvals.js"></script>
     <script src="../../javascript/inspect.js"></script>

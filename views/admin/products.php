@@ -73,6 +73,19 @@ if ($connect) {
                 <p class="topbar-subtitle">Manage your bakery products and inventory.</p>
             </div>
             <div class="topbar-right">
+                <div class="notif-wrapper">
+                    <button class="notif-btn" id="notifBtn">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="notif-badge" id="notifBadge">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">
+                            <h4>Notifications</h4>
+                            <a id="markAllRead">Mark all read</a>
+                        </div>
+                        <div class="notif-list" id="notifList"></div>
+                    </div>
+                </div>
                 <span class="topbar-date"><i class="fa-solid fa-calendar-days"></i><?php echo date('F j, Y'); ?></span>
             </div>
         </header>
@@ -198,6 +211,7 @@ if ($connect) {
 
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin.js"></script>
+    <script src="../../javascript/admin_notifications.js"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
 </html>

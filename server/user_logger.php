@@ -39,6 +39,11 @@ function log_activity($action, $details, $module = 'General', $idNumber = null, 
     );
     $ok = mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
+
+    if ($ok) {
+        log_create_notification($action, $details, $role, $idNumber);
+    }
+
     return $ok;
 }
 
@@ -143,4 +148,37 @@ function canPerformAction($target_role, $action) {
     if ($current_role === 'admin' && $action === 'create_super_admin') return false;
     if ($action === 'delete' && $current_role !== 'super_admin') return false;
     return true;
+}
+
+function log_create_notification($action, $details, $role, $idNumber) {
+    global $connect;
+    if (!$connect) return;
+
+    $notifMap = [
+        'login'           => ['title' => 'User Login',          'type' => 'auth'],
+        'logout'          => ['title' => 'User Logout',         'type' => 'auth'],
+        'failed_login'    => ['title' => 'Failed Login',        'type' => 'security'],
+        'login_blocked'   => ['title' => 'Login Blocked',       'type' => 'security'],
+        'session_timeout' => ['title' => 'Session Timeout',     'type' => 'security'],
+        'CREATE_USER'     => ['title' => 'Account Created',     'type' => 'account'],
+        'BLOCK_USER'      => ['title' => 'Account Blocked',     'type' => 'account'],
+        'UNBLOCK_USER'    => ['title' => 'Account Unblocked',   'type' => 'account'],
+        'RESET_PASSWORD'  => ['title' => 'Password Reset',      'type' => 'account'],
+        'DELETE_USER'     => ['title' => 'Account Deleted',     'type' => 'account'],
+        'approve'         => ['title' => 'Registration Approved','type' => 'account'],
+        'reject'          => ['title' => 'Registration Rejected','type' => 'account'],
+    ];
+
+    if (!isset($notifMap[$action])) return;
+
+    $info = $notifMap[$action];
+    $title = $info['title'];
+    $type = $info['type'];
+    $message = $details;
+
+    $stmt = mysqli_prepare($connect, "INSERT INTO notifications (title, message, action_type, role) VALUES (?, ?, ?, ?)");
+    if (!$stmt) return;
+    mysqli_stmt_bind_param($stmt, 'ssss', $title, $message, $type, $role);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
 }

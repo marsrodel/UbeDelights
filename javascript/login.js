@@ -313,8 +313,9 @@ document.addEventListener('DOMContentLoaded', function(){
       if (orSep) orSep.style.display = 'none';
       return;
     case 'shift':
-      // Another super admin is currently active
       showErrorMessage('username', 'Another super admin is currently active. Please wait for them to log out.');
+      if (forgot) forgot.style.display = 'none';
+      if (orSep) orSep.style.display = 'none';
       return;
     case 'expired':
       // Staging invitation expired

@@ -86,6 +86,19 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
                 <p class="topbar-subtitle">Manage system users and their permissions.</p>
             </div>
             <div class="topbar-right">
+                <div class="notif-wrapper">
+                    <button class="notif-btn" id="notifBtn">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="notif-badge" id="notifBadge">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">
+                            <h4>Notifications</h4>
+                            <a id="markAllRead">Mark all read</a>
+                        </div>
+                        <div class="notif-list" id="notifList"></div>
+                    </div>
+                </div>
                 <span class="topbar-date"><i class="fa-solid fa-calendar-days"></i><?php echo date('F j, Y'); ?></span>
             </div>
         </header>
@@ -532,6 +545,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
 
     <script src="../../javascript/admin-routing.js?v=2.0"></script>
     <script src="../../javascript/admin_security.js?v=4.0"></script>
+    <script src="../../javascript/admin_notifications.js"></script>
     <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>; var stagingSACount = <?php echo (int)$stagingSACount; ?>;</script>
     <script src="../../javascript/user_management.js?v=4.3"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
