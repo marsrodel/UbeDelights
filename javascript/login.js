@@ -318,6 +318,9 @@ document.addEventListener('DOMContentLoaded', function(){
       // Staging invitation expired
       showErrorMessage('username', 'Your invitation has expired. Contact your admin for a new one.');
       return;
+    case 'timeout':
+      showErrorMessage('username', 'Your session has expired due to inactivity. Please log in again.');
+      return;
     case 'incomplete':
       // Incomplete account — redirect to complete account flow
       window.location.href = './complete_account.php?step=1';

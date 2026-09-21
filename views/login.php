@@ -72,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['auth_username'] = $user['username'];
         $_SESSION['auth_role'] = $user['role'];
         $_SESSION['auth_status'] = 'incomplete';
+        $_SESSION['last_activity'] = time();
         if (!empty($user['is_staging'])) {
             $_SESSION['auth_staging'] = true;
         }
@@ -157,6 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['auth_status'] = $user['status'];
     $_SESSION['auth_first_name'] = $user['first_name'] ?? '';
     $_SESSION['auth_last_name'] = $user['last_name'] ?? '';
+    $_SESSION['last_activity'] = time();
 
     // Mark super admin as logged in and update last_activity
     if ($user['role'] === 'super_admin') {
