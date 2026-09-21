@@ -130,7 +130,18 @@ const getCheckout = () => {
             if (!warningShown) {
                 resetTimers();
             } else {
-                extendSession();
+                if (countdownInterval) clearInterval(countdownInterval);
+                var countdownEl = document.getElementById('session-countdown');
+                var remaining = 60;
+                if (countdownEl) countdownEl.textContent = remaining;
+                countdownInterval = setInterval(function () {
+                    remaining--;
+                    if (countdownEl) countdownEl.textContent = remaining;
+                    if (remaining <= 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = LOGOUT_URL;
+                    }
+                }, 1000);
             }
         }, { passive: true });
     });
