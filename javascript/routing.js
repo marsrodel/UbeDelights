@@ -60,8 +60,8 @@ const getCheckout = () => {
 
 /* ── Inactivity Auto-Logout (15 min timeout, 60s warning) ── */
 (function () {
-    var TIMEOUT_MS = 15 * 60 * 1000;
-    var WARNING_MS = 14 * 60 * 1000;
+    var TIMEOUT_MS = 5 * 60 * 1000;
+    var WARNING_MS = 4 * 60 * 1000;
     var LOGOUT_URL = '../server/logout.php';
     var idleTimer = null;
     var warningTimer = null;
