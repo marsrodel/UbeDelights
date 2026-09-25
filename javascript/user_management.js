@@ -2568,17 +2568,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     var successModalOkCallback = null;
-    function showSuccessModal(message, callback, title) {
+    var successModalSecondaryCallback = null;
+    function showSuccessModal(message, callback, title, secondary) {
         document.getElementById('successModalTitle').textContent = title || 'Success';
         document.getElementById('successModalMessage').textContent = message;
         successModalOkCallback = callback || null;
+        var secBtn = document.getElementById('successModalSecondaryBtn');
+        if (secBtn) {
+            if (secondary && secondary.label && secondary.onClick) {
+                secBtn.style.display = '';
+                secBtn.textContent = secondary.label;
+                successModalSecondaryCallback = secondary.onClick;
+            } else {
+                secBtn.style.display = 'none';
+                successModalSecondaryCallback = null;
+            }
+        }
         document.getElementById('successModal').classList.add('active');
     }
     var successOkBtn = document.getElementById('successModalOkBtn');
     if (successOkBtn) {
         successOkBtn.addEventListener('click', function() {
             closeModal('successModal');
+            successModalSecondaryCallback = null;
             if (successModalOkCallback) { successModalOkCallback(); successModalOkCallback = null; }
+        });
+    }
+    var successSecondaryBtn = document.getElementById('successModalSecondaryBtn');
+    if (successSecondaryBtn) {
+        successSecondaryBtn.addEventListener('click', function() {
+            closeModal('successModal');
+            successModalOkCallback = null;
+            if (successModalSecondaryCallback) { successModalSecondaryCallback(); successModalSecondaryCallback = null; }
         });
     }
 
@@ -3350,7 +3371,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         return u.role === 'super_admin' && u.status === 'active';
                     }).length;
                     if (activeSAs >= 2) {
-                        showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.', null, 'Notice');
+                        showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.', null, 'Notice', {
+                            label: 'Open Roles and Privileges',
+                            onClick: function() { openRolesPrivilegesForUser(userId); }
+                        });
                         return;
                     }
                     if (typeof stagingSACount !== 'undefined' && stagingSACount > 0) {
@@ -3369,11 +3393,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('blockModal').classList.add('active');
             });
 
-            usersTableBody.addEventListener('click', function(e) {
-                var item = e.target.closest('[data-action="roles-privileges"]');
-                if (!item) return;
-                e.stopPropagation();
-                var userId = item.getAttribute('data-id');
+            function openRolesPrivilegesForUser(userId) {
                 var allData = typeof allUsers !== 'undefined' ? allUsers : [];
                 var user = allData.find(function(u) { return u.id === userId; });
                 if (!user) return;
@@ -3402,6 +3422,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('rolesPrivilegesModal').classList.add('active');
                 };
                 xhr.send(fd);
+            }
+
+            usersTableBody.addEventListener('click', function(e) {
+                var item = e.target.closest('[data-action="roles-privileges"]');
+                if (!item) return;
+                e.stopPropagation();
+                openRolesPrivilegesForUser(item.getAttribute('data-id'));
             });
 
             document.getElementById('blockConfirmBtn').addEventListener('click', function() {
@@ -3596,7 +3623,15 @@ document.addEventListener('DOMContentLoaded', function() {
                             var msg = action === 'block' ? 'User blocked successfully.' : 'User unblocked successfully.';
                             showSuccessModal(msg, function() { location.reload(); });
                         } else {
-                            showSuccessModal('Maximum of 2 working super admin accounts reached. Consider demoting this account to Admin via Roles & Privileges.', null, 'Notice');
+                            var failMsg = res.message || 'Unable to unblock user.';
+                            if (failMsg.indexOf('Maximum of 2') !== -1) {
+                                showSuccessModal(failMsg, null, 'Notice', {
+                                    label: 'Open Roles and Privileges',
+                                    onClick: function() { openRolesPrivilegesForUser(targetUserId); }
+                                });
+                            } else {
+                                showSuccessModal(failMsg, null, 'Notice');
+                            }
                         }
                     } else {
                         showSuccessModal('Server error. Please try again.');

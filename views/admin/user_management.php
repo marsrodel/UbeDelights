@@ -468,6 +468,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
                 <p id="successModalMessage" style="color:var(--text-secondary); font-size:0.9rem;"></p>
             </div>
             <div class="modal-footer" style="border-top:none; justify-content:flex-end;">
+                <button class="btn-outline" id="successModalSecondaryBtn" style="display:none;"></button>
                 <button class="btn-primary" id="successModalOkBtn">OK</button>
             </div>
         </div>
