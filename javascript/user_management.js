@@ -3593,13 +3593,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
                     if (res.success) {
                         closeModal('rolesPrivilegesModal');
-                        document.getElementById('successModalTitle').textContent = 'Success';
-                        document.getElementById('successModalMessage').textContent = res.message || 'Role & privileges saved successfully!';
-                        document.getElementById('successModal').classList.add('active');
-                        document.getElementById('successModalOkBtn').onclick = function() {
-                            closeModal('successModal');
+                        showSuccessModal(res.message || 'Role & privileges saved successfully!', function() {
                             location.reload();
-                        };
+                        });
                     } else {
                         alert(res.message || 'Failed to save.');
                     }
