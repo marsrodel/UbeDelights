@@ -27,7 +27,7 @@ switch ($action) {
             exit();
         }
 
-        $sql = "SELECT id, otp_hash, expires_at, attempts, used FROM password_reset_otp WHERE idNumber = ? AND used = 0 ORDER BY id DESC LIMIT 1";
+        $sql = "SELECT id, otp_hash, expires_at, attempts, used FROM otp_requests WHERE idNumber = ? AND used = 0 ORDER BY id DESC LIMIT 1";
         $stmt = mysqli_prepare($connect, $sql);
         mysqli_stmt_bind_param($stmt, 's', $userId);
         mysqli_stmt_execute($stmt);
@@ -42,20 +42,20 @@ switch ($action) {
 
         // Check expiry
         if (strtotime($row['expires_at']) < time()) {
-            mysqli_query($connect, "UPDATE password_reset_otp SET used = 1 WHERE id = {$row['id']}");
+            mysqli_query($connect, "UPDATE otp_requests SET used = 1 WHERE id = {$row['id']}");
             echo json_encode(['success' => false, 'message' => 'OTP has expired. Please resend.']);
             exit();
         }
 
         // Check attempts
         if ($row['attempts'] >= 5) {
-            mysqli_query($connect, "UPDATE password_reset_otp SET used = 1 WHERE id = {$row['id']}");
+            mysqli_query($connect, "UPDATE otp_requests SET used = 1 WHERE id = {$row['id']}");
             echo json_encode(['success' => false, 'message' => 'Too many failed attempts. Please request a new OTP.']);
             exit();
         }
 
         // Increment attempts
-        mysqli_query($connect, "UPDATE password_reset_otp SET attempts = attempts + 1 WHERE id = {$row['id']}");
+        mysqli_query($connect, "UPDATE otp_requests SET attempts = attempts + 1 WHERE id = {$row['id']}");
 
         // Verify
         if (!password_verify($otpCode, $row['otp_hash'])) {
@@ -64,7 +64,7 @@ switch ($action) {
         }
 
         // Mark as used
-        mysqli_query($connect, "UPDATE password_reset_otp SET used = 1 WHERE id = {$row['id']}");
+        mysqli_query($connect, "UPDATE otp_requests SET used = 1 WHERE id = {$row['id']}");
 
         // Set session flag
         $_SESSION['otp_verified'] = true;
@@ -74,7 +74,7 @@ switch ($action) {
 
     case 'resend_otp':
         // Invalidate old OTPs
-        mysqli_query($connect, "UPDATE password_reset_otp SET used = 1 WHERE idNumber = '" . mysqli_real_escape_string($connect, $userId) . "' AND used = 0");
+        mysqli_query($connect, "UPDATE otp_requests SET used = 1 WHERE idNumber = '" . mysqli_real_escape_string($connect, $userId) . "' AND used = 0");
 
         // Fetch user email (check users first, then staging_accounts)
         $userRes = mysqli_query($connect, "SELECT email, username FROM users WHERE user_id = '" . mysqli_real_escape_string($connect, $userId) . "' LIMIT 1");
@@ -95,7 +95,7 @@ switch ($action) {
         $otpHash = password_hash($otp, PASSWORD_BCRYPT);
         $expiry = date('Y-m-d H:i:s', time() + 300);
 
-        mysqli_query($connect, "INSERT INTO password_reset_otp (idNumber, otp_hash, expires_at, used) VALUES ('" . mysqli_real_escape_string($connect, $userId) . "', '" . mysqli_real_escape_string($connect, $otpHash) . "', '$expiry', 0)");
+        mysqli_query($connect, "INSERT INTO otp_requests (idNumber, otp_hash, expires_at, used) VALUES ('" . mysqli_real_escape_string($connect, $userId) . "', '" . mysqli_real_escape_string($connect, $otpHash) . "', '$expiry', 0)");
 
         // Send email
         $subject = 'Ube Delights - Account Verification';

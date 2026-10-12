@@ -86,10 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['otp_expiry'] = time() + 300;
 
         // Invalidate old OTPs
-        mysqli_query($connect, "DELETE FROM password_reset_otp WHERE idNumber = '" . mysqli_real_escape_string($connect, $userId) . "' AND used = 0");
+        mysqli_query($connect, "DELETE FROM otp_requests WHERE idNumber = '" . mysqli_real_escape_string($connect, $userId) . "' AND used = 0");
 
         // Store new OTP
-        mysqli_query($connect, "INSERT INTO password_reset_otp (idNumber, otp_hash, expires_at, used) VALUES ('" . mysqli_real_escape_string($connect, $userId) . "', '" . mysqli_real_escape_string($connect, $otpHash) . "', '$expiry', 0)");
+        mysqli_query($connect, "INSERT INTO otp_requests (idNumber, otp_hash, expires_at, used) VALUES ('" . mysqli_real_escape_string($connect, $userId) . "', '" . mysqli_real_escape_string($connect, $otpHash) . "', '$expiry', 0)");
 
         // Send OTP email
         $subject = 'Ube Delights - Account Verification';

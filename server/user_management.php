@@ -527,7 +527,7 @@ try {
             // Cleanup related data
             mysqli_query($connect, "DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM orders WHERE user_id = '$userId')");
             mysqli_query($connect, "DELETE FROM orders WHERE user_id = '$userId'");
-            mysqli_query($connect, "DELETE FROM password_reset_otp WHERE idNumber = '$userId'");
+            mysqli_query($connect, "DELETE FROM otp_requests WHERE idNumber = '$userId'");
             mysqli_query($connect, "DELETE FROM login_otp WHERE idNumber = '$userId'");
             mysqli_query($connect, "DELETE FROM admin_privileges WHERE idNumber = '$userId'");
             mysqli_query($connect, "UPDATE deletion_requests SET target_id_number = NULL WHERE target_id_number = '$userId'");

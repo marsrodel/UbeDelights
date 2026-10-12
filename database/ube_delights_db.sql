@@ -568,10 +568,10 @@ INSERT INTO `order_items` (`item_id`, `order_id`, `product_id`, `product_name`, 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `password_reset_otp`
+-- Table structure for table `otp_requests`
 --
 
-CREATE TABLE `password_reset_otp` (
+CREATE TABLE `otp_requests` (
   `id` int(11) NOT NULL,
   `idNumber` varchar(15) NOT NULL,
   `otp_hash` varchar(255) NOT NULL,
@@ -582,10 +582,10 @@ CREATE TABLE `password_reset_otp` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `password_reset_otp`
+-- Dumping data for table `otp_requests`
 --
 
-INSERT INTO `password_reset_otp` (`id`, `idNumber`, `otp_hash`, `expires_at`, `used`, `attempts`, `created_at`) VALUES
+INSERT INTO `otp_requests` (`id`, `idNumber`, `otp_hash`, `expires_at`, `used`, `attempts`, `created_at`) VALUES
 (8, '2026-0004', '$2y$10$DR3douLR/OiTt2UEvqvtueCSFEWdCZZhT7UnIhATDlDzzi8yv9rSy', '2026-09-07 09:44:34', 1, 1, '2026-09-07 07:39:34'),
 (9, '2026-0004', '$2y$10$wAydK9Ko777SVNCdJkmvNufiLFtfdD74z8SfwMOmx03k38pjJ78AK', '2026-09-08 03:55:21', 1, 1, '2026-09-08 01:50:22'),
 (10, '2026-0001', '$2y$10$DvxmbOshb8jQ2hSUWgKMnugggYEX8Hl24i3R088TTw97r9PN3glce', '2026-09-09 05:45:58', 0, 0, '2026-09-09 03:40:58'),
@@ -813,9 +813,9 @@ ALTER TABLE `order_items`
   ADD KEY `idx_order_id` (`order_id`);
 
 --
--- Indexes for table `password_reset_otp`
+-- Indexes for table `otp_requests`
 --
-ALTER TABLE `password_reset_otp`
+ALTER TABLE `otp_requests`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_idNumber` (`idNumber`),
   ADD KEY `idx_expires` (`expires_at`);
@@ -890,9 +890,9 @@ ALTER TABLE `order_items`
   MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
--- AUTO_INCREMENT for table `password_reset_otp`
+-- AUTO_INCREMENT for table `otp_requests`
 --
-ALTER TABLE `password_reset_otp`
+ALTER TABLE `otp_requests`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --

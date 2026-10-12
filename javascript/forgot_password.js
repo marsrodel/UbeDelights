@@ -8,6 +8,9 @@
     });
     var target = document.getElementById('step-' + n);
     if (target) target.classList.add('active');
+    var formSection = document.querySelector('.form-section');
+    if (formSection && n !== 3) formSection.classList.remove('step-3-has-errors');
+    if (n === 3) syncStep3ErrorLayout();
   }
 
   /* ── Error Helpers ── */
@@ -30,6 +33,23 @@
     if (el && el.parentNode) el.parentNode.removeChild(el);
   }
 
+  function syncStep3ErrorLayout() {
+    var step = document.getElementById('step-3');
+    var formSection = document.querySelector('.form-section');
+    if (!step || !formSection) return;
+
+    var hasVisibleError = Array.prototype.some.call(
+      step.querySelectorAll('.block-error, .field-error, .answer-feedback'),
+      function (element) {
+        if (!element.textContent.trim() || window.getComputedStyle(element).display === 'none') return false;
+        if (element.classList.contains('answer-feedback')) return element.textContent.trim() === 'Wrong answer';
+        return true;
+      }
+    );
+
+    formSection.classList.toggle('step-3-has-errors', hasVisibleError);
+  }
+
   function showBlockError(containerId, message) {
     var container = document.getElementById(containerId);
     if (!container) return;
@@ -44,6 +64,7 @@
     } else {
       container.appendChild(div);
     }
+    if (containerId === 'step-3') syncStep3ErrorLayout();
   }
 
   function clearBlockError(containerId) {
@@ -51,6 +72,7 @@
     if (!container) return;
     var existing = container.querySelector('.block-error');
     if (existing) existing.remove();
+    if (containerId === 'step-3') syncStep3ErrorLayout();
   }
 
   /* ── OTP Input Handling ── */
@@ -336,6 +358,7 @@
         g.error.textContent = '';
         g.error.style.display = 'none';
       }
+      syncStep3ErrorLayout();
       return true;
     }
 
@@ -348,6 +371,7 @@
 
     g.error.textContent = message;
     g.error.style.display = message ? 'block' : 'none';
+    syncStep3ErrorLayout();
     return message === '';
   }
 
@@ -357,6 +381,7 @@
       g.feedback.style.display = 'none';
       g.input.style.borderColor = '';
     }
+    syncStep3ErrorLayout();
   }
 
   /* ── Server-side Errors from URL ── */
@@ -507,6 +532,7 @@
           validateGroup(g, false);
           g.error.textContent = '';
           g.error.style.display = 'none';
+          syncStep3ErrorLayout();
         });
       });
 

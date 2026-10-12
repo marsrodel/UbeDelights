@@ -103,13 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $expiresAt = date('Y-m-d H:i:s', time() + $otpExpirySeconds);
 
         // Invalidate any old unused OTPs for this user
-        $invalidate = mysqli_prepare($connect, 'UPDATE password_reset_otp SET used = 1 WHERE idNumber = ? AND used = 0');
+        $invalidate = mysqli_prepare($connect, 'UPDATE otp_requests SET used = 1 WHERE idNumber = ? AND used = 0');
         mysqli_stmt_bind_param($invalidate, 's', $idnum);
         mysqli_stmt_execute($invalidate);
         mysqli_stmt_close($invalidate);
 
         // Store new OTP in database
-        $insert = mysqli_prepare($connect, 'INSERT INTO password_reset_otp (idNumber, otp_hash, expires_at) VALUES (?, ?, ?)');
+        $insert = mysqli_prepare($connect, 'INSERT INTO otp_requests (idNumber, otp_hash, expires_at) VALUES (?, ?, ?)');
         mysqli_stmt_bind_param($insert, 'sss', $idnum, $otpHash, $expiresAt);
         mysqli_stmt_execute($insert);
         mysqli_stmt_close($insert);
@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $idnum = $_SESSION['fp_user_id'];
 
         // Fetch latest unused OTP from database
-        $stmt = mysqli_prepare($connect, 'SELECT id, otp_hash, expires_at, attempts FROM password_reset_otp WHERE idNumber = ? AND used = 0 ORDER BY id DESC LIMIT 1');
+        $stmt = mysqli_prepare($connect, 'SELECT id, otp_hash, expires_at, attempts FROM otp_requests WHERE idNumber = ? AND used = 0 ORDER BY id DESC LIMIT 1');
         mysqli_stmt_bind_param($stmt, 's', $idnum);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
@@ -173,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Max 5 attempts
         if ($attempts > 5) {
-            $fail = mysqli_prepare($connect, 'UPDATE password_reset_otp SET used = 1, attempts = ? WHERE id = ?');
+            $fail = mysqli_prepare($connect, 'UPDATE otp_requests SET used = 1, attempts = ? WHERE id = ?');
             mysqli_stmt_bind_param($fail, 'ii', $attempts, $otpId);
             mysqli_stmt_execute($fail);
             mysqli_stmt_close($fail);
@@ -182,14 +182,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Update attempt count
-        $attemptUpdate = mysqli_prepare($connect, 'UPDATE password_reset_otp SET attempts = ? WHERE id = ?');
+        $attemptUpdate = mysqli_prepare($connect, 'UPDATE otp_requests SET attempts = ? WHERE id = ?');
         mysqli_stmt_bind_param($attemptUpdate, 'ii', $attempts, $otpId);
         mysqli_stmt_execute($attemptUpdate);
         mysqli_stmt_close($attemptUpdate);
 
         // Check expiry
         if (strtotime($row['expires_at']) < time()) {
-            $expire = mysqli_prepare($connect, 'UPDATE password_reset_otp SET used = 1 WHERE id = ?');
+            $expire = mysqli_prepare($connect, 'UPDATE otp_requests SET used = 1 WHERE id = ?');
             mysqli_stmt_bind_param($expire, 'i', $otpId);
             mysqli_stmt_execute($expire);
             mysqli_stmt_close($expire);
@@ -204,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // OTP verified — mark as used
-        $mark = mysqli_prepare($connect, 'UPDATE password_reset_otp SET used = 1 WHERE id = ?');
+        $mark = mysqli_prepare($connect, 'UPDATE otp_requests SET used = 1 WHERE id = ?');
         mysqli_stmt_bind_param($mark, 'i', $otpId);
         mysqli_stmt_execute($mark);
         mysqli_stmt_close($mark);
@@ -232,13 +232,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $expiresAt = date('Y-m-d H:i:s', time() + $otpExpirySeconds);
 
         // Invalidate old OTPs
-        $invalidate = mysqli_prepare($connect, 'UPDATE password_reset_otp SET used = 1 WHERE idNumber = ? AND used = 0');
+        $invalidate = mysqli_prepare($connect, 'UPDATE otp_requests SET used = 1 WHERE idNumber = ? AND used = 0');
         mysqli_stmt_bind_param($invalidate, 's', $idnum);
         mysqli_stmt_execute($invalidate);
         mysqli_stmt_close($invalidate);
 
         // Store new OTP
-        $insert = mysqli_prepare($connect, 'INSERT INTO password_reset_otp (idNumber, otp_hash, expires_at) VALUES (?, ?, ?)');
+        $insert = mysqli_prepare($connect, 'INSERT INTO otp_requests (idNumber, otp_hash, expires_at) VALUES (?, ?, ?)');
         mysqli_stmt_bind_param($insert, 'sss', $idnum, $otpHash, $expiresAt);
         mysqli_stmt_execute($insert);
         mysqli_stmt_close($insert);
@@ -412,7 +412,7 @@ $questionGroups = fetch_question_groups();
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forgot Password</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="../css/forgot_password.css?v=1.0" />
+  <link rel="stylesheet" href="../css/forgot_password.css?v=1.1" />
 </head>
 <body>
   <nav class="navbar">
@@ -591,7 +591,7 @@ $questionGroups = fetch_question_groups();
     <p>&copy; 2026 Ube Delights. All rights reserved.</p>
   </footer>
   <script src="../javascript/disable_back.js"></script>
-  <script src="../javascript/forgot_password.js?v=1.0"></script>
+  <script src="../javascript/forgot_password.js?v=1.1"></script>
   <script src="../javascript/routing.js"></script>
   <script src="../javascript/inspect.js"></script>
 </body>
