@@ -82,7 +82,7 @@ if ($connect) {
     <title>Deletion Requests - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
-    <link rel="stylesheet" href="../../css/user_management.css?v=2.0">
+    <link rel="stylesheet" href="../../css/user_management.css?v=2.3">
 </head>
 <body class="admin-body">
 <?php $activePage = 'deletion_requests'; include '_sidebar.php'; ?>
@@ -118,7 +118,7 @@ if ($connect) {
                         <i class="fa-solid fa-trash-can-arrow-up" style="color:var(--accent);"></i> Deletion Requests
                     </h2>
                 </div>
-                <div class="table-container">
+                <div class="table-container dr-table-container">
                     <table class="data-table" id="drTable">
                         <thead>
                             <tr>
@@ -126,7 +126,6 @@ if ($connect) {
                                 <th>REASON</th>
                                 <th>REQUESTED BY</th>
                                 <th>REQUESTED</th>
-                                <th>STATUS</th>
                                 <th>ACTIONS</th>
                             </tr>
                         </thead>
@@ -250,7 +249,7 @@ if ($connect) {
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_notifications.js"></script>
     <script>var deletionRequests = <?php echo json_encode($deletionRequests); ?>; var currentUsername = <?php echo json_encode($_SESSION['auth_username'] ?? ''); ?>;</script>
-    <script src="../../javascript/admin_deletion_requests.js"></script>
+    <script src="../../javascript/admin_deletion_requests.js?v=1.2"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
 </html>

@@ -8,6 +8,17 @@
 
 .card { overflow: visible !important; }
 .table-container { overflow: visible !important; }
+.table-container.dr-table-container { overflow-x: auto !important; }
+#drTable { table-layout: fixed; min-width: 920px; }
+#drTable thead th:nth-child(1) { width: 22%; }
+#drTable thead th:nth-child(2) { width: 24%; }
+#drTable thead th:nth-child(3) { width: 23%; }
+#drTable thead th:nth-child(4) { width: 16%; }
+#drTable thead th:nth-child(5) { width: 15%; }
+#drTable thead th, #drTable tbody td { padding-left: 16px; padding-right: 16px; }
+#drTable tbody td:nth-child(2), #drTable tbody td:nth-child(4) { white-space: normal; overflow-wrap: anywhere; }
+#drTable tbody td.actions-cell { display: table-cell; white-space: nowrap; }
+#drTable .dr-user-id { font-size: 0.8em; }
 .card-header-row { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); gap: 16px; flex-wrap: wrap; }
 .card-header-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .card-header-left h2 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }

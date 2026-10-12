@@ -8,12 +8,6 @@
 
     function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    function statusBadge(status) {
-        var cls = 'status-' + status;
-        var label = status.charAt(0).toUpperCase() + status.slice(1);
-        return '<span class="status-badge ' + cls + '">' + label + '</span>';
-    }
-
     function roleLabel(role) {
         if (role === 'super_admin') return 'Super Admin';
         if (role === 'admin') return 'Admin';
@@ -49,11 +43,10 @@
         var html = '';
         rows.forEach(function(r) {
             html += '<tr data-dr-id="' + esc(r.id) + '">';
-            html += '<td><strong>' + esc(r.targetName) + '</strong></td>';
+            html += '<td><div><strong>' + esc(r.targetName) + '</strong></div><div class="cell-muted dr-user-id">' + esc(r.targetId) + '</div></td>';
             html += '<td class="cell-muted" title="' + esc(r.reason) + '">' + truncate(r.reason, 40) + '</td>';
-            html += '<td><div>' + esc(r.requestedBy) + '</div><div class="cell-muted" style="font-size:0.8em;">' + esc(r.requestedById) + '</div></td>';
+            html += '<td><div>' + esc(r.requestedBy) + '</div><div class="cell-muted dr-user-id">' + esc(r.requestedById) + '</div></td>';
             html += '<td class="cell-muted">' + formatDate(r.createdAt) + '</td>';
-            html += '<td>' + statusBadge(r.status) + '</td>';
             html += '<td class="actions-cell">';
             html += '<button class="pending-action-btn btn-view" onclick="viewDeletionRequest(\'' + esc(r.id) + '\')" title="View Details"><i class="fa-solid fa-eye"></i></button> ';
             if (r.status === 'pending') {
