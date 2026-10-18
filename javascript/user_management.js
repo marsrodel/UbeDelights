@@ -77,9 +77,13 @@ function showErrorMessage(fieldId, message) {
     
     var errorDiv = document.createElement('div');
     errorDiv.id = fieldId + '-error';
-    errorDiv.style.color = '#FF0000';
-    errorDiv.style.fontSize = '.8rem';
-    errorDiv.style.gap = '0px';
+    if (fieldInput.closest('#addUserForm')) {
+        errorDiv.className = 'field-error';
+    } else {
+        errorDiv.style.color = '#FF0000';
+        errorDiv.style.fontSize = '.8rem';
+        errorDiv.style.gap = '0px';
+    }
     errorDiv.textContent = message;
     
     var parentBox = fieldInput.parentNode; // usually .form-box or .password-wrapper
@@ -1857,6 +1861,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.__requiredStepFocusOverride) return;
                 clearAllRequiredErrors();
             }, true);
+            form.addEventListener('click', function(e){
+                if (e.target.closest('input, select, textarea, .password-wrapper')) {
+                    clearAllRequiredErrors();
+                }
+            }, true);
 
             // Ensure trailing-space error shows when leaving name fields (robust at form level)
             form.addEventListener('focusout', function(ev){
@@ -2430,27 +2439,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function validateCreateAccountFields() {
-        var fields = [
-            { id: 'id', label: 'ID Number' },
-            { id: 'email', label: 'Email' },
-            { id: 'user', label: 'Username' },
-            { id: 'defaultPass', label: 'Default Password' },
-            { id: 'role', label: 'Role' }
-        ];
+        var fields = ['id', 'email', 'user', 'defaultPass', 'role'];
+        var anyEmpty = false;
         for (var i = 0; i < fields.length; i++) {
-            var el = document.getElementById(fields[i].id);
+            var el = document.getElementById(fields[i]);
+            var error = document.getElementById(fields[i] + '-error');
+            if (error && /this field is required/i.test(error.textContent || '')) {
+                clearErrorMessage(fields[i]);
+            }
             if (!el || !el.value.trim()) {
-                window.adminToast(fields[i].label + ' is required', 'error');
-                if (el) el.focus();
-                return false;
+                if (el) showErrorMessage(fields[i], 'This field is required.');
+                anyEmpty = true;
             }
         }
+        if (anyEmpty) return false;
         var emailEl = document.getElementById('email');
         if (emailEl && emailEl.value.trim()) {
             var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRe.test(emailEl.value.trim())) {
                 window.adminToast('Invalid email format', 'error');
-                emailEl.focus();
                 return false;
             }
         }
@@ -2459,13 +2466,11 @@ document.addEventListener('DOMContentLoaded', function() {
             var pVal = passEl2.value.trim();
             if (pVal.length < 8) {
                 window.adminToast('Password must be at least 8 characters', 'error');
-                passEl2.focus();
                 return false;
             }
             var pErr = document.getElementById('defaultPass-error');
             if (pErr) {
                 window.adminToast('Please fix the password errors', 'error');
-                passEl2.focus();
                 return false;
             }
         }

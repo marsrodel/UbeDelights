@@ -455,8 +455,13 @@ CREATE TABLE `notifications` (
   `message` text NOT NULL,
   `action_type` varchar(50) NOT NULL DEFAULT 'system',
   `role` varchar(20) DEFAULT NULL,
-  `is_read` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `notification_reads` (
+  `notification_id` int(11) NOT NULL,
+  `user_id` varchar(9) NOT NULL,
+  `read_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -792,8 +797,11 @@ ALTER TABLE `login_otp`
 --
 ALTER TABLE `notifications`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_notifications_read` (`is_read`),
   ADD KEY `idx_notifications_created` (`created_at`);
+
+ALTER TABLE `notification_reads`
+  ADD PRIMARY KEY (`notification_id`, `user_id`),
+  ADD KEY `idx_notification_reads_user` (`user_id`);
 
 --
 -- Indexes for table `orders`
@@ -917,6 +925,10 @@ ALTER TABLE `staging_accounts`
 ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE SET NULL;
+
+ALTER TABLE `notification_reads`
+  ADD CONSTRAINT `fk_notification_reads_notification` FOREIGN KEY (`notification_id`) REFERENCES `notifications` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_notification_reads_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

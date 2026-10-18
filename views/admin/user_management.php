@@ -548,7 +548,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
     <script src="../../javascript/admin_security.js?v=4.0"></script>
     <script src="../../javascript/admin_notifications.js"></script>
     <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>; var stagingSACount = <?php echo (int)$stagingSACount; ?>;</script>
-    <script src="../../javascript/user_management.js?v=4.3"></script>
+    <script src="../../javascript/user_management.js?v=4.4"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
 </body>
 </html>
