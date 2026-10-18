@@ -52,6 +52,16 @@ function mail_log_dev_otp($toEmail, $subject, $otp = '')
  */
 function mail_send_message($toEmail, $subject, $body, $devOtp = null)
 {
+    $result = mail_deliver_message($toEmail, $subject, $body, $devOtp);
+    if (empty($result['success'])) {
+        require_once __DIR__ . '/user_logger.php';
+        log_system_event('mail_failed', 'An outgoing email could not be delivered. Check the email configuration and service availability.', 'Email', 'ERROR', $_SESSION['auth_user_id'] ?? null, $_SESSION['auth_username'] ?? null);
+    }
+    return $result;
+}
+
+function mail_deliver_message($toEmail, $subject, $body, $devOtp = null)
+{
     $config = mail_load_config();
 
     if (empty($config['enabled'])) {

@@ -2,6 +2,7 @@
 include '../server/db.php';
 include '../server/mail_helper.php';
 session_start();
+require_once __DIR__ . '/../server/user_logger.php';
 
 if (isset($_SESSION['auth_user_id'])) {
     header('Location: ./index.php');
@@ -124,6 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             . '<p>This code expires in <strong>5 minutes</strong>. Do not share it with anyone.</p>'
             . '</div>';
 
+        log_activity('otp_requested', 'Password reset verification code requested.', 'Password Recovery', $idnum, $user['username']);
         $mailResult = mail_send_message($user['email'], $subject, $body, $otp);
 
         $_SESSION['fp_user_id'] = (string)$user['user_id'];
@@ -163,6 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_close($stmt);
 
         if ($result->num_rows === 0) {
+            log_activity('otp_failed', 'Password reset verification failed because no active code was available.', 'Password Recovery', $idnum);
             header('Location: ./forgot_password.php?step=2&error=otp_none');
             exit();
         }
@@ -173,6 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Max 5 attempts
         if ($attempts > 5) {
+            log_activity('otp_locked', 'Password reset verification attempt limit reached.', 'Password Recovery', $idnum);
             $fail = mysqli_prepare($connect, 'UPDATE otp_requests SET used = 1, attempts = ? WHERE id = ?');
             mysqli_stmt_bind_param($fail, 'ii', $attempts, $otpId);
             mysqli_stmt_execute($fail);
@@ -189,6 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Check expiry
         if (strtotime($row['expires_at']) < time()) {
+            log_activity('otp_expired', 'Password reset verification code expired.', 'Password Recovery', $idnum);
             $expire = mysqli_prepare($connect, 'UPDATE otp_requests SET used = 1 WHERE id = ?');
             mysqli_stmt_bind_param($expire, 'i', $otpId);
             mysqli_stmt_execute($expire);
@@ -199,6 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Verify OTP against hash
         if (!password_verify($otp, $row['otp_hash'])) {
+            log_activity('otp_failed', 'Password reset verification code was incorrect.', 'Password Recovery', $idnum);
             header('Location: ./forgot_password.php?step=2&error=otp_wrong');
             exit();
         }
@@ -209,6 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_execute($mark);
         mysqli_stmt_close($mark);
 
+        log_activity('otp_verified', 'Password reset verification code accepted.', 'Password Recovery', $idnum);
         unset($_SESSION['fp_otp_attempts']);
         header('Location: ./forgot_password.php?step=3');
         exit();
@@ -253,6 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             . '<p>This code expires in <strong>5 minutes</strong>. Do not share it with anyone.</p>'
             . '</div>';
 
+        log_activity('otp_resent', 'Password reset verification code requested again.', 'Password Recovery', $idnum, $username);
         mail_send_message($email, $subject, $body, $otp);
 
         $_SESSION['fp_otp_expiry'] = strtotime($expiresAt);
@@ -384,6 +392,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
+        log_activity('password_reset_completed', 'Account password reset completed.', 'Password Recovery', $user_id, $_SESSION['fp_username'] ?? null);
         unset($_SESSION['fp_user_id'], $_SESSION['fp_email'], $_SESSION['fp_username'], $_SESSION['fp_qa']);
         header('Location: ./forgot_password.php?reset=success');
         exit();

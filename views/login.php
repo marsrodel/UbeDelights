@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Incomplete accounts: send OTP and redirect to complete account flow
-    if ($user['status'] === 'incomplete' || $user['is_incomplete'] == 1 || !empty($user['is_staging'])) {
+    if ($user['status'] === 'incomplete' || ($user['is_incomplete'] ?? 0) == 1 || !empty($user['is_staging'])) {
         if (!password_verify($password, $user['password_hash'])) {
             log_activity('failed_login', 'Wrong password attempt', 'Authentication', (string)$user['user_id'], $user['username']);
             $u = urlencode($login);
@@ -100,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             . '<p style="font-size:28px;font-weight:bold;letter-spacing:4px;">' . $otp . '</p>'
             . '<p>This code expires in <strong>5 minutes</strong>. Do not share it with anyone.</p>'
             . '</div>';
+        log_activity('otp_requested', 'Account setup verification code requested.', 'Account Setup', $userId, $user['username']);
         mail_send_message($user['email'], $subject, $emailBody, $otp);
 
         header('Location: ./complete_account.php?step=1');

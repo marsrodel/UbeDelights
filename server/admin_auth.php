@@ -22,10 +22,9 @@ if (isset($_SESSION['auth_status']) && $_SESSION['auth_status'] !== 'active') {
     exit();
 }
 
-// Auto-logout after 15 minutes of inactivity
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > 300) {
     require_once __DIR__ . '/user_logger.php';
-    log_activity('session_timeout', 'Session expired after 15 minutes of inactivity', 'Authentication', $_SESSION['auth_user_id'] ?? null, $_SESSION['auth_username'] ?? null);
+    log_activity('session_timeout', 'Session expired after 5 minutes of inactivity', 'Authentication', $_SESSION['auth_user_id'] ?? null, $_SESSION['auth_username'] ?? null);
     session_unset();
     session_destroy();
     header('Location: ../views/login.php?error=timeout');
@@ -81,6 +80,14 @@ if (empty($_SESSION['staging_cleanup_done'])) {
             mail_send_message($row['email'], $mailSubject, $mailBody);
         }
     }
-    $connect->query("DELETE FROM staging_accounts WHERE expires_at < NOW()");
-    $_SESSION['staging_cleanup_done'] = true;
+    require_once __DIR__ . '/user_logger.php';
+    if ($connect->query("DELETE FROM staging_accounts WHERE expires_at < NOW()")) {
+        $removed = $connect->affected_rows;
+        if ($removed > 0) {
+            log_system_event('staging_cleanup', 'Removed ' . $removed . ' expired staging account invitation(s) during page-load cleanup.', 'Staging Accounts', 'INFO');
+        }
+        $_SESSION['staging_cleanup_done'] = true;
+    } else {
+        log_system_event('staging_cleanup_failed', 'Expired staging account invitations could not be removed.', 'Staging Accounts');
+    }
 }

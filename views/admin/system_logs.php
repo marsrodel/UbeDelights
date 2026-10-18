@@ -14,9 +14,10 @@ if ($connect) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Logs - Ube Delights Admin</title>
+    <title>Logs - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
+    <link rel="stylesheet" href="../../css/logs.css?v=1.7">
 </head>
 <body class="admin-body">
 <?php $activePage = 'system_logs'; include '_sidebar.php'; ?>
@@ -24,8 +25,8 @@ if ($connect) {
     <div class="admin-main">
         <header class="admin-topbar">
             <div>
-                <h1>System Logs</h1>
-                <p class="topbar-subtitle">Track user activity and system events.</p>
+                <h1>Logs</h1>
+                <p class="topbar-subtitle">Review system events, login and security records, and account activity.</p>
             </div>
             <div class="topbar-right">
                 <div class="notif-wrapper">
@@ -47,39 +48,55 @@ if ($connect) {
 
         <main class="admin-content">
             <div class="card logs-card">
-                <div class="filters-grid" style="padding:18px 18px 14px; border-bottom:1px solid var(--border);">
+                <div class="filters-grid logs-filters">
                     <div class="filter-field">
-                        <label>Search</label>
-                        <input type="text" id="logsSearch" placeholder="Search username, name, action...">
-                    </div>
-                    <div class="filter-field">
-                        <label>Role</label>
-                        <select id="logsRoleFilter">
-                            <option value="">All Roles</option>
-                            <option value="admin">Admin</option>
-                            <option value="customer">Customer</option>
+                        <label for="logsTypeFilter">Log Type</label>
+                        <select id="logsTypeFilter">
+                            <option value="authentication" selected>Login &amp; Security Logs</option>
+                            <option value="activity">Activity Logs</option>
+                            <option value="system">System Logs</option>
                         </select>
                     </div>
                     <div class="filter-field">
-                        <label>From Date</label>
+                        <label for="logsSearch">Search</label>
+                        <input type="text" id="logsSearch" placeholder="Search username, name, action...">
+                    </div>
+                    <div class="filter-field">
+                        <label for="logsRoleFilter">Role</label>
+                        <select id="logsRoleFilter">
+                            <option value="">All Roles</option>
+                            <?php if ($isSuperAdmin): ?>
+                            <option value="super_admin">Super Admin</option>
+                            <?php endif; ?>
+                            <option value="admin">Admin</option>
+                            <option value="customer">Customer</option>
+                            <?php if ($isSuperAdmin): ?>
+                            <option value="system">Unattributed</option>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label for="logsFromDate">From Date</label>
                         <input type="date" id="logsFromDate">
                     </div>
                     <div class="filter-field">
-                        <label>To Date</label>
+                        <label for="logsToDate">To Date</label>
                         <input type="date" id="logsToDate">
                     </div>
                     <div class="filter-buttons">
-                        <button class="btn-primary" id="btnApplyLogsFilter" style="padding:10px 18px; font-size:0.85rem;"><i class="fa-solid fa-filter"></i> Apply</button>
-                        <button class="btn-outline" id="btnClearLogsFilter" style="padding:10px 18px; font-size:0.85rem;"><i class="fa-solid fa-xmark"></i> Clear</button>
+                        <button type="button" class="btn-primary" id="btnApplyLogsFilter"><i class="fa-solid fa-filter"></i> Apply</button>
+                        <button type="button" class="btn-outline" id="btnClearLogsFilter"><i class="fa-solid fa-xmark"></i> Clear</button>
                     </div>
                 </div>
-                <div class="table-container">
+                <p id="logsStatus" class="logs-status" role="status" hidden></p>
+                <div class="table-container logs-table-scroll">
                     <table class="data-table" id="logsTable">
-                        <thead>
+                        <thead id="logsTableHead">
                             <tr>
                                 <th>User ID</th>
                                 <th>Name</th>
                                 <th>Role</th>
+                                <th>Module</th>
                                 <th>Action</th>
                                 <th>Browser / OS</th>
                                 <th>Time In</th>
@@ -92,25 +109,30 @@ if ($connect) {
                         </tbody>
                     </table>
                 </div>
+                <div class="empty-state" id="emptyLogs" hidden>
+                    <div class="empty-icon"><i class="fa-solid fa-list-check"></i></div>
+                    <h3 id="emptyLogsTitle">No login &amp; security logs</h3>
+                    <p id="emptyLogsMessage">No login or security records match your current filters.</p>
+                </div>
                 <div class="pagination-bar" id="logsPaginationContainer">
                 </div>
-            </div>
-
-            <div class="empty-state" id="emptyLogs" style="display:none;">
-                <div class="empty-icon">📋</div>
-                <h3>No system logs</h3>
-                <p>Activity records will appear here once users start logging in.</p>
             </div>
 
         </main>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div class="modal-overlay logs-notice-overlay" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
+        <div class="modal logs-notice">
+            <div class="modal-header"><h2 id="successModalTitle">Notice</h2></div>
+            <div class="modal-body"><p id="successModalMessage"></p></div>
+            <div class="modal-footer"><button type="button" class="btn-primary" id="successModalOkBtn">OK</button></div>
+        </div>
+    </div>
 
     <script src="../../javascript/admin-routing.js"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_notifications.js"></script>
-    <script src="../../javascript/admin_logs.js"></script>
+    <script src="../../javascript/admin_logs.js?v=2.3"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
 </html>

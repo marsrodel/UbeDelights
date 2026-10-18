@@ -3,7 +3,7 @@ ob_start();
 mysqli_report(MYSQLI_REPORT_OFF);
 include __DIR__ . '/db.php';
 include __DIR__ . '/mail_helper.php';
-include __DIR__ . '/user_logger.php';
+require_once __DIR__ . '/user_logger.php';
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 header('Content-Type: application/json');
@@ -36,12 +36,14 @@ switch ($action) {
         mysqli_stmt_close($stmt);
 
         if (!$row) {
+            log_activity('otp_failed', 'Account setup verification failed because no active code was available.', 'Account Setup', $userId, $_SESSION['auth_username'] ?? null);
             echo json_encode(['success' => false, 'message' => 'No active OTP found. Please request a new one.']);
             exit();
         }
 
         // Check expiry
         if (strtotime($row['expires_at']) < time()) {
+            log_activity('otp_expired', 'Account setup verification code expired.', 'Account Setup', $userId, $_SESSION['auth_username'] ?? null);
             mysqli_query($connect, "UPDATE otp_requests SET used = 1 WHERE id = {$row['id']}");
             echo json_encode(['success' => false, 'message' => 'OTP has expired. Please resend.']);
             exit();
@@ -49,6 +51,7 @@ switch ($action) {
 
         // Check attempts
         if ($row['attempts'] >= 5) {
+            log_activity('otp_locked', 'Account setup verification attempt limit reached.', 'Account Setup', $userId, $_SESSION['auth_username'] ?? null);
             mysqli_query($connect, "UPDATE otp_requests SET used = 1 WHERE id = {$row['id']}");
             echo json_encode(['success' => false, 'message' => 'Too many failed attempts. Please request a new OTP.']);
             exit();
@@ -59,6 +62,7 @@ switch ($action) {
 
         // Verify
         if (!password_verify($otpCode, $row['otp_hash'])) {
+            log_activity('otp_failed', 'Account setup verification code was incorrect.', 'Account Setup', $userId, $_SESSION['auth_username'] ?? null);
             echo json_encode(['success' => false, 'message' => 'Invalid OTP. Please try again.']);
             exit();
         }
@@ -68,6 +72,7 @@ switch ($action) {
 
         // Set session flag
         $_SESSION['otp_verified'] = true;
+        log_activity('otp_verified', 'Account setup verification code accepted.', 'Account Setup', $userId, $_SESSION['auth_username'] ?? null);
 
         echo json_encode(['success' => true, 'message' => 'OTP verified successfully.']);
         break;
@@ -106,6 +111,7 @@ switch ($action) {
             . '<p style="font-size:28px;font-weight:bold;letter-spacing:4px;">' . $otp . '</p>'
             . '<p>This code expires in <strong>5 minutes</strong>. Do not share it with anyone.</p>'
             . '</div>';
+        log_activity('otp_resent', 'Account setup verification code requested again.', 'Account Setup', $userId, $userData['username']);
         mail_send_message($userData['email'], $subject, $emailBody, $otp);
 
         // Update session expiry
@@ -319,6 +325,8 @@ switch ($action) {
             exit();
         }
 
+        log_activity('account_activated', 'Account setup completed and account activated.', 'Account Setup', $userId, $userData['username']);
+
         // Super admins are redirected to login — the shift system enforces access there
         if ($userData['role'] === 'super_admin') {
             unset(
@@ -333,11 +341,6 @@ switch ($action) {
                 $_SESSION['auth_first_name'],
                 $_SESSION['auth_last_name']
             );
-            try {
-                log_activity('CREATE_ACCOUNT', $userData['username'] . ' completed account setup.', 'Account Setup', $userId, $userData['username']);
-            } catch (\Throwable $e) {
-                // logging failure should not break user flow
-            }
             echo json_encode([
                 'success' => true,
                 'message' => 'Account setup completed successfully!',

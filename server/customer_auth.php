@@ -16,10 +16,9 @@ if (isset($_SESSION['auth_status']) && $_SESSION['auth_status'] !== 'active') {
     exit();
 }
 
-// Auto-logout after 15 minutes of inactivity
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > 300) {
     require_once __DIR__ . '/user_logger.php';
-    log_activity('session_timeout', 'Session expired after 15 minutes of inactivity', 'Authentication', $_SESSION['auth_user_id'] ?? null, $_SESSION['auth_username'] ?? null);
+    log_activity('session_timeout', 'Session expired after 5 minutes of inactivity', 'Authentication', $_SESSION['auth_user_id'] ?? null, $_SESSION['auth_username'] ?? null);
     session_unset();
     session_destroy();
     header('Location: ../login.php?error=timeout');

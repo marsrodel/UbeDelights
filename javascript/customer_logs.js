@@ -4,11 +4,13 @@
     var state = {
         page: 1,
         perPage: 10,
-        filters: { search: '', date_from: '', date_to: '' },
-        loading: false
+        filters: { search: '', date_from: '', date_to: '' }
     };
 
     var searchTimer = null;
+    var activeRequest = null;
+    var requestNumber = 0;
+    var noticeCallback = null;
 
     function escapeHtml(str) {
         return String(str || '')
@@ -21,7 +23,7 @@
     function formatLogTimestamp(ts) {
         if (!ts) return '\u2014';
         var d = new Date(ts.replace(' ', 'T'));
-        if (isNaN(d)) return ts;
+        if (isNaN(d)) return escapeHtml(ts);
         var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         var month = months[d.getMonth()];
         var day = d.getDate();
@@ -30,7 +32,7 @@
         var ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12 || 12;
         var mins = d.getMinutes().toString().padStart(2, '0');
-        return month + ' ' + day + ', ' + year + '<br><span style="font-size:0.75rem;color:var(--text-muted);">' + hours + ':' + mins + ' ' + ampm + '</span>';
+        return month + ' ' + day + ', ' + year + '<br><span class="log-time">' + hours + ':' + mins + ' ' + ampm + '</span>';
     }
 
     function cleanLogDetails(details) {
@@ -59,11 +61,21 @@
             'DELETION_REQUEST': 'Deletion Request',
             'RESET_PASSWORD': 'Reset Password'
         };
-        return map[action] || action;
+        return map[action] || String(action || '').toLowerCase().split('_').map(function(word) {
+            return word === 'otp' ? 'OTP' : word.charAt(0).toUpperCase() + word.slice(1);
+        }).join(' ');
     }
 
     function getActionClass(action) {
         var map = {
+            'account_activated': 'activity-create',
+            'account_lockout': 'activity-block',
+            'session_timeout': 'activity-logout',
+            'otp_verified': 'activity-approve',
+            'otp_failed': 'activity-failed_login',
+            'otp_expired': 'activity-failed_login',
+            'otp_locked': 'activity-block',
+            'password_reset_completed': 'activity-update',
             'login': 'activity-login',
             'logout': 'activity-logout',
             'failed_login': 'activity-failed_login',
@@ -86,6 +98,23 @@
         return map[action] || 'activity-login';
     }
 
+    function showSuccessModal(message, callback, title) {
+        noticeCallback = typeof callback === 'function' ? callback : null;
+        document.getElementById('successModalTitle').textContent = title || 'Success';
+        document.getElementById('successModalMessage').textContent = message;
+        document.getElementById('successModal').classList.add('active');
+        document.body.classList.add('logs-modal-open');
+    }
+    window.showSuccessModal = showSuccessModal;
+
+    function closeNotice() {
+        document.getElementById('successModal').classList.remove('active');
+        document.body.classList.remove('logs-modal-open');
+        var callback = noticeCallback;
+        noticeCallback = null;
+        if (callback) callback();
+    }
+
     function buildParams() {
         var p = new URLSearchParams();
         p.set('page', state.page);
@@ -97,22 +126,25 @@
     }
 
     function loadLogs() {
-        if (state.loading) return;
-        state.loading = true;
-
+        var sequence = ++requestNumber;
+        if (activeRequest) activeRequest.abort();
         var xhr = new XMLHttpRequest();
+        activeRequest = xhr;
         xhr.open('GET', '../server/customer_get_logs.php?' + buildParams(), true);
+        xhr.timeout = 20000;
         xhr.onreadystatechange = function() {
-            if (xhr.readyState !== 4) return;
-            state.loading = false;
-            if (xhr.status === 200) {
-                try {
-                    var data = JSON.parse(xhr.responseText);
-                    if (data.success) {
-                        renderTable(data.logs);
-                        renderPagination(data.pagination);
-                    }
-                } catch (e) {}
+            if (xhr.readyState !== 4 || sequence !== requestNumber) return;
+            activeRequest = null;
+            var data = null;
+            try { data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
+            if (xhr.status === 200 && data && data.success) {
+                state.page = data.pagination.page;
+                renderTable(data.logs);
+                renderPagination(data.pagination);
+            } else {
+                renderTable([]);
+                document.getElementById('logsPaginationContainer').innerHTML = '';
+                showSuccessModal(data && data.message ? data.message : 'Unable to load your logs. Please try again.', null, 'Notice');
             }
         };
         xhr.send();
@@ -126,30 +158,31 @@
 
         if (!logs || logs.length === 0) {
             tbody.innerHTML = '';
-            if (tableEl) tableEl.style.display = 'none';
-            if (emptyEl) emptyEl.style.display = '';
+            if (tableEl) tableEl.hidden = true;
+            if (emptyEl) emptyEl.hidden = false;
             return;
         }
 
-        if (tableEl) tableEl.style.display = '';
-        if (emptyEl) emptyEl.style.display = 'none';
+        if (tableEl) tableEl.hidden = false;
+        if (emptyEl) emptyEl.hidden = true;
 
         var html = '';
         for (var i = 0; i < logs.length; i++) {
             var log = logs[i];
             var ip = log.ip_address === '::1' ? '127.0.0.1' : (log.ip_address || '\u2014');
-            var timeIn = log.time_in ? formatLogTimestamp(log.time_in) : '\u2014';
+            var timeIn = formatLogTimestamp(log.log_type === 'authentication' ? log.time_in : log.created_at);
             var timeOut = '\u2014';
             if (log.time_out === 'active') {
-                timeOut = '<span style="color:var(--success);font-weight:600;">Active</span>';
+                timeOut = '<span class="log-active">Active</span>';
             } else if (log.time_out) {
                 timeOut = formatLogTimestamp(log.time_out);
             }
-            var browser = (log.browser || 'Unknown').replace(/\s+\S+$/, '').trim();
+            var browser = (log.browser || 'Unknown').replace(/\s+[0-9.]+$/, '').trim();
 
             html += '<tr>' +
                 '<td>' + escapeHtml(log.idNumber || '\u2014') + '</td>' +
                 '<td>' + escapeHtml(log.fullName || log.username || '\u2014') + '</td>' +
+                '<td><span class="log-type-pill">' + (log.log_type === 'authentication' ? 'Login &amp; Security' : 'Activity') + '</span></td>' +
                 '<td><span class="activity-badge ' + getActionClass(log.action) + '">' + escapeHtml(getActionLabel(log.action)) + '</span></td>' +
                 '<td>' + escapeHtml(browser + '/' + (log.os || 'Unknown')) + '</td>' +
                 '<td>' + timeIn + '</td>' +
@@ -286,6 +319,13 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         bindEvents();
+        document.getElementById('successModalOkBtn').addEventListener('click', closeNotice);
+        document.getElementById('successModal').addEventListener('click', function(event) {
+            if (event.target === this) closeNotice();
+        });
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') closeNotice();
+        });
         loadLogs();
     });
 })();

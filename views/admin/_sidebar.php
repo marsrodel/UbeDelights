@@ -48,7 +48,7 @@ if ($isSuperAdmin && $connect) {
             <?php if ($isSuperAdmin): ?>
             <a onclick="getAdminDeletionRequests()" class="sidebar-link<?php echo $activePage === 'deletion_requests' ? ' active' : ''; ?>"><i class="fa-solid fa-trash-can-arrow-up"></i><span>Deletion Requests</span><?php if ($deletionPendingCount > 0): ?><span class="sidebar-badge"><?php echo $deletionPendingCount; ?></span><?php endif; ?></a>
             <?php endif; ?>
-            <a onclick="getAdminSystemLogs()" class="sidebar-link<?php echo $activePage === 'system_logs' ? ' active' : ''; ?>"><i class="fa-solid fa-list-alt"></i><span>System Logs</span></a>
+            <a href="system_logs.php" class="sidebar-link<?php echo $activePage === 'system_logs' ? ' active' : ''; ?>"><i class="fa-solid fa-list-alt"></i><span>Logs</span></a>
             <a onclick="getAdminProfile()" class="sidebar-link<?php echo $activePage === 'admin_profile' ? ' active' : ''; ?>"><i class="fa-solid fa-user"></i><span>My Account</span></a>
         </nav>
 
