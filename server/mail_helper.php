@@ -56,6 +56,9 @@ function mail_send_message($toEmail, $subject, $body, $devOtp = null)
     if (empty($result['success'])) {
         require_once __DIR__ . '/user_logger.php';
         log_system_event('mail_failed', 'An outgoing email could not be delivered. Check the email configuration and service availability.', 'Email', 'ERROR', $_SESSION['auth_user_id'] ?? null, $_SESSION['auth_username'] ?? null);
+    } elseif (empty($result['dev_mode'])) {
+        require_once __DIR__ . '/user_logger.php';
+        log_system_event('mail_sent', 'An outgoing email was delivered successfully.', 'Email', 'INFO', $_SESSION['auth_user_id'] ?? null, $_SESSION['auth_username'] ?? null);
     }
     return $result;
 }

@@ -2,13 +2,17 @@
 session_start();
 include __DIR__ . '/db.php';
 require_once __DIR__ . '/user_logger.php';
+require_once __DIR__ . '/session_guard.php';
 
 header('Content-Type: application/json');
+session_guard_api_timeout();
 
 if (!isset($_SESSION['auth_user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Not authenticated.']);
     exit();
 }
+
+session_guard_touch();
 
 $userId = $_SESSION['auth_user_id'];
 

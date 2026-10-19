@@ -2,14 +2,18 @@
 session_start();
 include __DIR__ . '/db.php';
 require_once __DIR__ . '/user_logger.php';
+require_once __DIR__ . '/session_guard.php';
 
 header('Content-Type: application/json');
+session_guard_api_timeout();
 
 if (!isset($_SESSION['auth_user_id']) || $_SESSION['auth_role'] !== 'super_admin') {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Access denied.']);
     exit();
 }
+
+session_guard_touch();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request.']);

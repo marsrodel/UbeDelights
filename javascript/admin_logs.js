@@ -95,9 +95,54 @@
         headings.push('IP Address', 'Details');
         var tableScroll = document.querySelector('.logs-table-scroll');
         if (tableScroll) tableScroll.classList.toggle('logs-authentication-view', state.type === 'authentication');
+        setActionColumnTier(state.type === 'authentication' ? 'compact' : null);
         document.getElementById('logsTableHead').innerHTML = '<tr>' + headings.map(function(label) {
             return '<th scope="col">' + label + '</th>';
         }).join('') + '</tr>';
+    }
+
+    function setActionColumnTier(tier) {
+        var tableScroll = document.querySelector('.logs-table-scroll');
+        if (!tableScroll) return;
+        ['compact', 'medium', 'wide'].forEach(function(size) {
+            tableScroll.classList.remove('logs-auth-action-' + size);
+        });
+        if (tier) tableScroll.classList.add('logs-auth-action-' + tier);
+    }
+
+    function updateActionColumnTier() {
+        if (state.type !== 'authentication') {
+            setActionColumnTier(null);
+            return;
+        }
+
+        var tbody = document.getElementById('logsTableBody');
+        var badges = tbody ? tbody.querySelectorAll('.activity-badge') : [];
+        if (!badges.length) {
+            setActionColumnTier('compact');
+            return;
+        }
+
+        var table = document.getElementById('logsTable');
+        var tableWidth = table ? table.getBoundingClientRect().width : 0;
+        if (!tableWidth) {
+            setActionColumnTier('wide');
+            return;
+        }
+
+        var widestBadge = 0;
+        Array.prototype.forEach.call(badges, function(badge) {
+            if (!badge.parentNode) return;
+            var probe = badge.cloneNode(true);
+            probe.classList.add('logs-action-measure');
+            badge.parentNode.appendChild(probe);
+            widestBadge = Math.max(widestBadge, probe.getBoundingClientRect().width);
+            probe.parentNode.removeChild(probe);
+        });
+
+        var requiredWidth = widestBadge + 16;
+        var requiredPercent = (requiredWidth / tableWidth) * 100;
+        setActionColumnTier(requiredPercent <= 8 ? 'compact' : (requiredPercent <= 10 ? 'medium' : 'wide'));
     }
 
     function loadLogs() {
@@ -165,6 +210,7 @@
             return html + cell('IP Address', '<code class="ip-badge">' + escapeHtml(ip) + '</code>') +
                 cell('Details', escapeHtml(cleanLogDetails(log.details) || '\u2014')) + '</tr>';
         }).join('');
+        updateActionColumnTier();
     }
 
     function renderPagination(pagination) {

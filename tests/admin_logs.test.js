@@ -11,6 +11,7 @@ class Element {
         this.textContent = '';
         this.listeners = {};
         this.classes = new Set();
+        this.rectWidth = 0;
         this.classList = {
             add: name => this.classes.add(name),
             remove: name => this.classes.delete(name),
@@ -28,7 +29,26 @@ class Element {
     fire(name, detail = {}) {
         for (const fn of this.listeners[name] || []) fn.call(this, { target: this, ...detail });
     }
-    querySelectorAll() {
+    querySelectorAll(selector) {
+        if (selector === '.activity-badge') {
+            return [...this.innerHTML.matchAll(/<span class="activity-badge [^"]*">([^<]*)<\/span>/g)].map(match => {
+                const parentNode = {
+                    appendChild(probe) { probe.parentNode = this; },
+                    removeChild(probe) { probe.parentNode = null; }
+                };
+                const widths = { Login: 60, 'Failed Login': 110, 'Session Timeout': 140 };
+                return {
+                    parentNode,
+                    cloneNode() {
+                        return {
+                            parentNode: null,
+                            classList: { add() {} },
+                            getBoundingClientRect() { return { width: widths[match[1]] || match[1].length * 8 + 20 }; }
+                        };
+                    }
+                };
+            });
+        }
         this.links = [...this.innerHTML.matchAll(/data-page="(\d+)"/g)].map(match => {
             const link = new Element();
             link.getAttribute = () => match[1];
@@ -36,12 +56,16 @@ class Element {
         });
         return this.links;
     }
+    getBoundingClientRect() {
+        return { width: this.rectWidth };
+    }
 }
 
 const nodes = new Map();
 const pageSource = fs.readFileSync(path.join(__dirname, '../views/admin/system_logs.php'), 'utf8');
 for (const match of pageSource.matchAll(/id="([^"]+)"/g)) nodes.set(match[1], new Element());
 nodes.set('perPageSelect', new Element('10'));
+nodes.get('logsTable').rectWidth = 1500;
 const document = new Element();
 document.body = new Element();
 document.getElementById = id => nodes.get(id) || null;
@@ -83,6 +107,7 @@ assert.match(nodes.get('logsTableHead').innerHTML, /Time In/);
 assert.match(nodes.get('logsTableHead').innerHTML, /Time Out/);
 assert.doesNotMatch(nodes.get('logsTableHead').innerHTML, /Severity/);
 assert.equal(tableScroll.classes.has('logs-authentication-view'), true);
+assert.equal(tableScroll.classes.has('logs-auth-action-compact'), true);
 
 nodes.get('logsSearch').value = 'account';
 nodes.get('logsRoleFilter').value = 'admin';
@@ -116,6 +141,12 @@ assert.match(nodes.get('logsTableBody').innerHTML, /&lt;img/);
 assert.doesNotMatch(nodes.get('logsTableBody').innerHTML, /style=/);
 assert.match(nodes.get('logsTableBody').innerHTML, /10:30 AM/);
 assert.match(nodes.get('logsTableBody').innerHTML, /127\.0\.0\.1/);
+assert.equal(tableScroll.classes.has('logs-auth-action-compact'), true);
+
+reply([{ ...authRow, action: 'failed_login' }]);
+assert.equal(tableScroll.classes.has('logs-auth-action-medium'), true);
+reply([{ ...authRow, action: 'session_timeout' }], 30);
+assert.equal(tableScroll.classes.has('logs-auth-action-wide'), true);
 
 nodes.get('logsPaginationContainer').links.find(link => link.getAttribute() === '2').fire('click');
 assert.equal(current().url.searchParams.get('page'), '2');
@@ -125,6 +156,9 @@ nodes.get('logsTypeFilter').fire('change');
 assert.equal(current().url.searchParams.get('page'), '1');
 assert.equal(current().url.searchParams.get('search'), 'account');
 assert.equal(tableScroll.classes.has('logs-authentication-view'), false);
+assert.equal(tableScroll.classes.has('logs-auth-action-compact'), false);
+assert.equal(tableScroll.classes.has('logs-auth-action-medium'), false);
+assert.equal(tableScroll.classes.has('logs-auth-action-wide'), false);
 assert.doesNotMatch(nodes.get('logsTableHead').innerHTML, /Severity/);
 const stale = current();
 nodes.get('logsTypeFilter').value = 'system';

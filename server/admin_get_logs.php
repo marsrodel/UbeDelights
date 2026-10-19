@@ -1,7 +1,9 @@
 <?php
 session_start();
 require_once __DIR__ . '/log_reader.php';
+require_once __DIR__ . '/session_guard.php';
 header('Content-Type: application/json');
+session_guard_api_timeout();
 
 if (!isset($_SESSION['auth_user_id']) || !in_array($_SESSION['auth_role'] ?? '', ['admin', 'super_admin'], true)) {
     http_response_code(403);
@@ -13,6 +15,8 @@ if (($_SESSION['auth_status'] ?? '') !== 'active') {
     echo json_encode(['success' => false, 'message' => 'Account not active']);
     exit();
 }
+
+session_guard_touch();
 
 try {
     $type = $_GET['type'] ?? 'authentication';

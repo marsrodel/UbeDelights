@@ -57,7 +57,7 @@ $statusLabel = $profile ? ucfirst($profile['status']) : '';
     <link rel="stylesheet" href="../css/dashboard.css?v=4.0">
     <link rel="stylesheet" href="../css/customer_profile.css?v=1.0">
 </head>
-<body>
+<body data-session-active="true">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -239,7 +239,8 @@ $statusLabel = $profile ? ucfirst($profile['status']) : '';
 
     <script>var customerProfile = <?php echo json_encode($profile); ?>;</script>
     <script src="../javascript/register.js?v=2.0"></script>
-    <script src="../javascript/routing.js"></script>
+    <script src="../javascript/session_timeout.js?v=1.0"></script>
+    <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/dashboard.js"></script>
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/index.js"></script>

@@ -5,8 +5,10 @@ include __DIR__ . '/db.php';
 include __DIR__ . '/mail_helper.php';
 require_once __DIR__ . '/user_logger.php';
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
+require_once __DIR__ . '/session_guard.php';
 
 header('Content-Type: application/json');
+session_guard_api_timeout(['auth_user_id']);
 
 $userId = $_SESSION['auth_user_id'] ?? null;
 $status = $_SESSION['auth_status'] ?? null;
@@ -15,6 +17,8 @@ if (!$userId || $status !== 'incomplete') {
     echo json_encode(['success' => false, 'message' => 'Unauthorized. Please log in.']);
     exit();
 }
+
+session_guard_touch();
 
 $action = $_POST['action'] ?? '';
 

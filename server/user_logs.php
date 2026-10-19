@@ -1,5 +1,8 @@
 <?php
 session_start();
+require_once __DIR__ . '/session_guard.php';
+header('Content-Type: application/json; charset=utf-8');
+session_guard_api_timeout(['user_id']);
 
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'super_admin', 'customer'])) {
     http_response_code(403);
@@ -7,9 +10,9 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'supe
     exit();
 }
 
-require_once 'db.php';
+session_guard_touch();
 
-header('Content-Type: application/json');
+require_once 'db.php';
 
 $response = ['success' => false, 'message' => ''];
 

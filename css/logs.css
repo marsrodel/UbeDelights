@@ -57,6 +57,13 @@
     line-height: 1.35;
 }
 
+@media (min-width: 1201px) {
+    .logs-card .logs-table-scroll.logs-authentication-view th:first-child,
+    .logs-card .logs-table-scroll.logs-authentication-view td:first-child {
+        padding-left: 14px;
+    }
+}
+
 .logs-card .logs-table-scroll.logs-authentication-view th:nth-child(1),
 .logs-card .logs-table-scroll.logs-authentication-view td:nth-child(1) { width: 8%; }
 .logs-card .logs-table-scroll.logs-authentication-view th:nth-child(2),
@@ -66,7 +73,7 @@
 .logs-card .logs-table-scroll.logs-authentication-view th:nth-child(4),
 .logs-card .logs-table-scroll.logs-authentication-view td:nth-child(4) { width: 8%; }
 .logs-card .logs-table-scroll.logs-authentication-view th:nth-child(5),
-.logs-card .logs-table-scroll.logs-authentication-view td:nth-child(5) { width: 12%; }
+.logs-card .logs-table-scroll.logs-authentication-view td:nth-child(5) { width: 8%; }
 .logs-card .logs-table-scroll.logs-authentication-view th:nth-child(6),
 .logs-card .logs-table-scroll.logs-authentication-view td:nth-child(6) { width: 10%; }
 .logs-card .logs-table-scroll.logs-authentication-view th:nth-child(7),
@@ -76,7 +83,17 @@
 .logs-card .logs-table-scroll.logs-authentication-view th:nth-child(9),
 .logs-card .logs-table-scroll.logs-authentication-view td:nth-child(9) { width: 7%; }
 .logs-card .logs-table-scroll.logs-authentication-view th:nth-child(10),
-.logs-card .logs-table-scroll.logs-authentication-view td:nth-child(10) { width: 18%; }
+.logs-card .logs-table-scroll.logs-authentication-view td:nth-child(10) { width: 22%; }
+
+.logs-card .logs-table-scroll.logs-authentication-view.logs-auth-action-medium th:nth-child(5),
+.logs-card .logs-table-scroll.logs-authentication-view.logs-auth-action-medium td:nth-child(5) { width: 10%; }
+.logs-card .logs-table-scroll.logs-authentication-view.logs-auth-action-medium th:nth-child(10),
+.logs-card .logs-table-scroll.logs-authentication-view.logs-auth-action-medium td:nth-child(10) { width: 20%; }
+
+.logs-card .logs-table-scroll.logs-authentication-view.logs-auth-action-wide th:nth-child(5),
+.logs-card .logs-table-scroll.logs-authentication-view.logs-auth-action-wide td:nth-child(5) { width: 12%; }
+.logs-card .logs-table-scroll.logs-authentication-view.logs-auth-action-wide th:nth-child(10),
+.logs-card .logs-table-scroll.logs-authentication-view.logs-auth-action-wide td:nth-child(10) { width: 18%; }
 
 .logs-card .logs-table-scroll.logs-authentication-view .role-pill,
 .logs-card .logs-table-scroll.logs-authentication-view .activity-badge,
@@ -89,6 +106,17 @@
 .logs-card .logs-table-scroll.logs-authentication-view td:last-child {
     min-width: 0;
     max-width: none;
+}
+
+.logs-card .logs-table-scroll.logs-authentication-view .activity-badge.logs-action-measure {
+    position: fixed;
+    top: 0;
+    left: -10000px;
+    width: max-content;
+    max-width: none !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    visibility: hidden;
 }
 
 @media (min-width: 1351px) {

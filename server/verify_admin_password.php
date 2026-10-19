@@ -1,13 +1,17 @@
 <?php
 session_start();
 include __DIR__ . '/db.php';
+require_once __DIR__ . '/session_guard.php';
 
 header('Content-Type: application/json');
+session_guard_api_timeout();
 
 if (!isset($_SESSION['auth_user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Not authenticated.']);
     exit();
 }
+
+session_guard_touch();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request.']);

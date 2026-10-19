@@ -245,7 +245,7 @@ if ($connect) {
 
     <div class="toast" id="toast"></div>
 
-    <script src="../../javascript/admin-routing.js"></script>
+    <script src="../../javascript/admin-routing.js?v=3.0"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_notifications.js"></script>
     <script>var deletionRequests = <?php echo json_encode($deletionRequests); ?>; var currentUsername = <?php echo json_encode($_SESSION['auth_username'] ?? ''); ?>;</script>

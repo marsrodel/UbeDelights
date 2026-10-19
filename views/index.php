@@ -149,7 +149,7 @@ $features = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/dashboard.css?v=5.5">
 </head>
-<body>
+<body data-session-active="true">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -309,7 +309,8 @@ $features = [
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/index.js"></script>
     <script src="../javascript/dashboard.js"></script>
-    <script src="../javascript/routing.js"></script>
+    <script src="../javascript/session_timeout.js?v=1.0"></script>
+    <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/inspect.js"></script>
 </body>
 </html>

@@ -1,36 +1,25 @@
 <?php
 session_start();
 include __DIR__ . '/db.php';
+require_once __DIR__ . '/session_guard.php';
 
-// Must be logged in
 if (!isset($_SESSION['auth_user_id'])) {
-    header('Location: ../login.php');
+    header('Location: ' . session_guard_login_url());
     exit();
 }
 
-// Must be admin or super_admin
 if (!isset($_SESSION['auth_role']) || !in_array($_SESSION['auth_role'], ['admin', 'super_admin'])) {
-    header('Location: ../index.php');
+    header('Location: ' . session_guard_app_url('/views/index.php'));
     exit();
 }
 
-// Must be active (not blocked/pending/incomplete)
 if (isset($_SESSION['auth_status']) && $_SESSION['auth_status'] !== 'active') {
-    session_unset();
-    session_destroy();
-    header('Location: ../login.php?error=inactive');
+    session_guard_clear_session();
+    header('Location: ' . session_guard_login_url('inactive'));
     exit();
 }
 
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > 300) {
-    require_once __DIR__ . '/user_logger.php';
-    log_activity('session_timeout', 'Session expired after 5 minutes of inactivity', 'Authentication', $_SESSION['auth_user_id'] ?? null, $_SESSION['auth_username'] ?? null);
-    session_unset();
-    session_destroy();
-    header('Location: ../views/login.php?error=timeout');
-    exit();
-}
-$_SESSION['last_activity'] = time();
+session_guard_page_timeout();
 
 $currentUser = [
     'id'       => $_SESSION['auth_user_id'],
@@ -38,7 +27,6 @@ $currentUser = [
     'role'     => $_SESSION['auth_role'],
 ];
 
-// For super admins: refresh last_activity on each page load and verify still logged in
 if ($_SESSION['auth_role'] === 'super_admin') {
     $uid = $_SESSION['auth_user_id'];
     $chk = mysqli_prepare($connect, "SELECT is_logged_in FROM users WHERE user_id = ?");
@@ -49,14 +37,11 @@ if ($_SESSION['auth_role'] === 'super_admin') {
     mysqli_stmt_close($chk);
 
     if ($chkRow && !$chkRow['is_logged_in']) {
-        // Another super admin blocked/logged this one out
-        session_unset();
-        session_destroy();
-        header('Location: ../views/login.php?error=inactive');
+        session_guard_clear_session();
+        header('Location: ' . session_guard_login_url('inactive'));
         exit();
     }
 
-    // Update last_activity
     $upd = mysqli_prepare($connect, "UPDATE users SET last_activity = NOW() WHERE user_id = ?");
     mysqli_stmt_bind_param($upd, 's', $uid);
     mysqli_stmt_execute($upd);

@@ -17,7 +17,7 @@ if ($connect) {
     <title>Logs - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
-    <link rel="stylesheet" href="../../css/logs.css?v=1.7">
+    <link rel="stylesheet" href="../../css/logs.css?v=1.9">
 </head>
 <body class="admin-body">
 <?php $activePage = 'system_logs'; include '_sidebar.php'; ?>
@@ -129,10 +129,10 @@ if ($connect) {
         </div>
     </div>
 
-    <script src="../../javascript/admin-routing.js"></script>
+    <script src="../../javascript/admin-routing.js?v=3.0"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_notifications.js"></script>
-    <script src="../../javascript/admin_logs.js?v=2.3"></script>
+    <script src="../../javascript/admin_logs.js?v=2.4"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
 </html>

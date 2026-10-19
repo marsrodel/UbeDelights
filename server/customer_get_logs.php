@@ -1,13 +1,17 @@
 <?php
 session_start();
 require_once __DIR__ . '/log_reader.php';
+require_once __DIR__ . '/session_guard.php';
 header('Content-Type: application/json');
+session_guard_api_timeout();
 
 if (!isset($_SESSION['auth_user_id']) || ($_SESSION['auth_role'] ?? '') !== 'customer' || ($_SESSION['auth_status'] ?? '') !== 'active') {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit();
 }
+
+session_guard_touch();
 
 try {
     $filters = logs_request_filters($_GET);

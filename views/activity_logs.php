@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../css/customer_logs.css?v=1.1">
     <link rel="stylesheet" href="../css/logs.css?v=1.0">
 </head>
-<body>
+<body data-session-active="true">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -100,7 +100,8 @@
         <p>&copy; 2026 Ube Delights. All rights reserved.</p>
     </footer>
 
-    <script src="../javascript/routing.js"></script>
+    <script src="../javascript/session_timeout.js?v=1.0"></script>
+    <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/dashboard.js"></script>
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/index.js"></script>

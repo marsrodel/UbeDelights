@@ -24,6 +24,13 @@
 // password show
 var eyeicon = document.getElementById('eyeicon');
 var password = document.getElementById('password');
+var isSessionTimeoutLogin = new URLSearchParams(window.location.search).get('error') === 'timeout';
+function clearPersistedLoginPassword() {
+  try { sessionStorage.removeItem('login_password'); } catch(e) {}
+  if (password) password.value = '';
+}
+if (isSessionTimeoutLogin) clearPersistedLoginPassword();
+
 if (eyeicon && password) {
   eyeicon.onclick = function () {
     if (password.type === 'password') {
@@ -169,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var form = document.querySelector('form');
   var u = document.getElementById('username');
   var p = document.getElementById('password');
+  if (isSessionTimeoutLogin) clearPersistedLoginPassword();
   if (!form) return;
 
   // If we just came from logout, clear any persisted credentials so fields
@@ -190,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function(){
       u.value = savedU;
     }
     var savedP = sessionStorage.getItem('login_password');
-    if (savedP !== null && p) {
+    if (savedP !== null && p && !isSessionTimeoutLogin) {
       p.value = savedP;
     }
   } catch (e) {}

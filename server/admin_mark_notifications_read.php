@@ -1,7 +1,9 @@
 <?php
 session_start();
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/session_guard.php';
 header('Content-Type: application/json; charset=utf-8');
+session_guard_api_timeout();
 
 if (!isset($_SESSION['auth_user_id']) || !isset($_SESSION['auth_role'])) {
     http_response_code(401);
@@ -15,6 +17,8 @@ if (!in_array($role, ['admin', 'super_admin'], true)) {
     echo json_encode(['success' => false, 'message' => 'Forbidden']);
     exit();
 }
+
+session_guard_touch();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

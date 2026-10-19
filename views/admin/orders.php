@@ -184,7 +184,7 @@ if ($connect) {
 
     <div class="toast" id="toast"></div>
 
-    <script src="../../javascript/admin-routing.js"></script>
+    <script src="../../javascript/admin-routing.js?v=3.0"></script>
     <script src="../../javascript/admin_orders.js"></script>
     <script src="../../javascript/admin_notifications.js"></script>
     <script src="../../javascript/inspect.js"></script>

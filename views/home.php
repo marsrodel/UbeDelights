@@ -77,7 +77,8 @@ $vs = isset($_GET['viewsource']) ? '?viewsource=1' : '';
     <footer class="footer">
         <p>&copy; 2026 Ube Delights. All rights reserved.</p>
     </footer>
-    <script src="../javascript/routing.js"></script>
+    <script src="../javascript/session_timeout.js?v=1.0"></script>
+    <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/inspect.js"></script>
 </body>
 </html>

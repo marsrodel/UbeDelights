@@ -8,6 +8,9 @@ if (!isset($_SESSION['auth_user_id']) || ($_SESSION['auth_status'] ?? '') !== 'i
     exit();
 }
 
+require_once __DIR__ . '/../server/session_guard.php';
+session_guard_page_timeout();
+
 $userId = $_SESSION['auth_user_id'];
 
 // Fetch user data for masked display (check users first, then staging_accounts)
@@ -63,7 +66,7 @@ $otpExpiryTs = $otpExpiry;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/complete_account.css?v=1.0">
 </head>
-<body>
+<body data-session-active="true">
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -306,7 +309,8 @@ $otpExpiryTs = $otpExpiry;
 
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/register.js"></script>
-    <script src="../javascript/routing.js"></script>
+    <script src="../javascript/session_timeout.js?v=1.0"></script>
+    <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/complete_account.js"></script>
     <script src="../javascript/inspect.js"></script>
 

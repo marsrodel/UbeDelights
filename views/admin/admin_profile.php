@@ -240,7 +240,7 @@ if ($connect) {
     </div>
 
     <script>var adminProfile = <?php echo json_encode($profile); ?>;</script>
-    <script src="../../javascript/admin-routing.js?v=2.0"></script>
+    <script src="../../javascript/admin-routing.js?v=3.0"></script>
     <script src="../../javascript/register.js?v=2.0"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
     <script src="../../javascript/admin_profile.js?v=3.0"></script>

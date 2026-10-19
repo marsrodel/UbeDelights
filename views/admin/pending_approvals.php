@@ -201,7 +201,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
 
     <div class="toast" id="toast"></div>
 
-    <script src="../../javascript/admin-routing.js"></script>
+    <script src="../../javascript/admin-routing.js?v=3.0"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_notifications.js"></script>
     <script>var pendingUsers = <?php echo json_encode($pendingUsers); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? ''); ?>;</script>
