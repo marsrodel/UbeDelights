@@ -101,6 +101,8 @@ if ($isSuperAdmin) {
         if ($r) $pendingCount = mysqli_fetch_assoc($r)['cnt'];
     }
 
+    $orderCount = $pendingOrders;
+
     $stats = [
         ['label' => 'Total Orders', 'value' => number_format($totalOrders),   'icon' => 'fa-solid fa-bag-shopping',    'color' => '#7c3aed'],
         ['label' => 'Pending',      'value' => number_format($pendingOrders),  'icon' => 'fa-solid fa-clock',           'color' => '#f59e0b'],

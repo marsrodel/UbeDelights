@@ -1430,6 +1430,13 @@ body.admin-body {
     margin-left: 2px;
 }
 
+.modal-form .product-field-error {
+    color: var(--danger);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    margin-top: -2px;
+}
+
 .modal-form input[type="text"],
 .modal-form input[type="number"],
 .modal-form select,
@@ -1451,6 +1458,15 @@ body.admin-body {
 .modal-form textarea:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+}
+
+.modal-form .is-invalid {
+    border-color: var(--danger);
+}
+
+.modal-form .is-invalid:focus {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
 }
 
 .modal-form textarea {

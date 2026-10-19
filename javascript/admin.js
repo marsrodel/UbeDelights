@@ -19,6 +19,112 @@
     }
     window.adminToast = showToast;
 
+    function clearProductFieldError(field) {
+        if (!field) return;
+
+        var error = document.getElementById(field.id + '-error');
+        if (error && error.classList.contains('product-field-error')) {
+            error.remove();
+        }
+
+        field.classList.remove('is-invalid');
+        field.removeAttribute('aria-invalid');
+
+        var describedBy = (field.getAttribute('aria-describedby') || '')
+            .split(/\s+/)
+            .filter(function(id) { return id && id !== field.id + '-error'; });
+        if (describedBy.length) {
+            field.setAttribute('aria-describedby', describedBy.join(' '));
+        } else {
+            field.removeAttribute('aria-describedby');
+        }
+    }
+
+    function clearAllProductFieldErrors() {
+        if (!modalForm) return;
+
+        modalForm.querySelectorAll('.product-field-error').forEach(function(error) {
+            var fieldId = error.id.replace(/-error$/, '');
+            clearProductFieldError(document.getElementById(fieldId));
+        });
+    }
+
+    function clearRequiredProductErrors() {
+        if (!modalForm) return;
+
+        modalForm.querySelectorAll('.product-field-error').forEach(function(error) {
+            if (error.textContent === 'This field is required.') {
+                var fieldId = error.id.replace(/-error$/, '');
+                clearProductFieldError(document.getElementById(fieldId));
+            }
+        });
+    }
+
+    function showProductFieldError(field, message) {
+        if (!field) return;
+
+        clearProductFieldError(field);
+
+        var error = document.createElement('span');
+        error.id = field.id + '-error';
+        error.className = 'product-field-error';
+        error.setAttribute('role', 'alert');
+        error.textContent = message;
+        field.classList.add('is-invalid');
+        field.setAttribute('aria-invalid', 'true');
+        field.setAttribute('aria-describedby', error.id);
+
+        var group = field.closest('.form-group');
+        var preview = field === imageInput && group
+            ? group.querySelector('.image-preview-wrapper')
+            : null;
+        if (preview) {
+            preview.insertAdjacentElement('afterend', error);
+        } else {
+            field.insertAdjacentElement('afterend', error);
+        }
+    }
+
+    function validateProductFields(isEdit) {
+        var nameField = document.getElementById('productName');
+        var descField = document.getElementById('productDesc');
+        var typeField = document.getElementById('productType');
+        var priceField = document.getElementById('productPrice');
+        var isValid = true;
+
+        clearAllProductFieldErrors();
+
+        if (!nameField.value.trim()) {
+            showProductFieldError(nameField, 'This field is required.');
+            isValid = false;
+        }
+        if (!descField.value.trim()) {
+            showProductFieldError(descField, 'This field is required.');
+            isValid = false;
+        }
+        if (!typeField.value) {
+            showProductFieldError(typeField, 'This field is required.');
+            isValid = false;
+        }
+
+        var priceValue = priceField.value.trim();
+        var priceNumber = Number(priceValue);
+        if (!priceValue && !(priceField.validity && priceField.validity.badInput)) {
+            showProductFieldError(priceField, 'This field is required.');
+            isValid = false;
+        } else if (!Number.isFinite(priceNumber) || priceNumber <= 0 || !Number.isInteger(priceNumber)) {
+            showProductFieldError(priceField, 'Enter a whole-number price greater than 0.');
+            isValid = false;
+        }
+
+        if (!isEdit && (!imageInput || !imageInput.files || !imageInput.files.length)) {
+            showProductFieldError(imageInput, 'This field is required.');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
     // ===== FILTER TABS =====
     var filterBtns = document.querySelectorAll('.filter-btn');
 
@@ -81,14 +187,18 @@
     var productIdInput = document.getElementById('productId');
     var modalTitle = document.getElementById('modalTitle');
     var modalSubmitBtn = document.getElementById('modalSubmit');
+    var productImageRequired = document.getElementById('productImageRequired');
 
     function openModal(editCard) {
         modalForm.reset();
+        clearAllProductFieldErrors();
         imagePreview.src = '';
         imagePreview.style.display = 'none';
         var ph = document.querySelector('.preview-placeholder');
         if (ph) ph.style.display = 'block';
         productIdInput.value = '';
+        imageInput.required = !editCard;
+        if (productImageRequired) productImageRequired.hidden = !!editCard;
 
         if (editCard) {
             modalTitle.textContent = 'Edit Product';
@@ -163,6 +273,21 @@
 
     // ===== FORM SUBMIT (ADD / EDIT) =====
     if (modalForm) {
+        modalForm.addEventListener('focusin', clearRequiredProductErrors, true);
+        modalForm.addEventListener('click', function(e) {
+            if (e.target && e.target.closest('input, select, textarea')) {
+                clearRequiredProductErrors();
+            }
+        }, true);
+        ['input', 'change'].forEach(function(eventName) {
+            modalForm.addEventListener(eventName, function(e) {
+                clearRequiredProductErrors();
+                if (e.target && e.target.id) {
+                    clearProductFieldError(e.target);
+                }
+            }, true);
+        });
+
         modalForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -171,18 +296,11 @@
             var type = document.getElementById('productType').value;
             var status = document.getElementById('productStatus').value;
             var price = document.getElementById('productPrice').value;
-            var imageFile = imageInput.files[0];
+            var imageFile = imageInput && imageInput.files ? imageInput.files[0] : null;
             var productId = productIdInput.value;
             var isEdit = !!productId;
 
-            if (!name || !desc || !type || !price) {
-                showToast('Please fill in all required fields.', 'error');
-                return;
-            }
-            if (!isEdit && !imageFile) {
-                showToast('Please select a product image.', 'error');
-                return;
-            }
+            if (!validateProductFields(isEdit)) return;
 
             var formData = new FormData();
             formData.append('productName', name);

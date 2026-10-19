@@ -61,7 +61,7 @@ if ($connect) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ube Delights - Admin Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../../css/admin.css?v=1.4">
+    <link rel="stylesheet" href="../../css/admin.css?v=1.5">
 </head>
 <body class="admin-body">
 <?php $activePage = 'products'; include '_sidebar.php'; ?>
@@ -152,7 +152,7 @@ if ($connect) {
                         <h2 id="modalTitle">Add Product</h2>
                         <button class="modal-close" id="modalClose" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
                     </div>
-                    <form class="modal-form" id="productForm">
+                    <form class="modal-form" id="productForm" novalidate>
                         <input type="hidden" name="productId" id="productId">
                         <div class="form-group">
                             <label for="productName">Product Name <span class="required">*</span></label>
@@ -190,8 +190,8 @@ if ($connect) {
                             <input type="number" id="productPrice" name="productPrice" required min="1" step="1" placeholder="850">
                         </div>
                         <div class="form-group">
-                            <label for="productImage">Product Image <span class="required">*</span></label>
-                            <input type="file" id="productImage" name="productImage" accept="image/*">
+                            <label for="productImage">Product Image <span class="required" id="productImageRequired">*</span></label>
+                            <input type="file" id="productImage" name="productImage" accept="image/*" required>
                             <div class="image-preview-wrapper">
                                 <img id="imagePreview" src="" alt="Image preview" style="display:none;">
                                 <span class="preview-placeholder">No image selected</span>
@@ -210,7 +210,7 @@ if ($connect) {
     <div class="toast" id="toast"></div>
 
     <script src="../../javascript/admin-routing.js?v=3.0"></script>
-    <script src="../../javascript/admin.js"></script>
+    <script src="../../javascript/admin.js?v=1.1"></script>
     <script src="../../javascript/admin_notifications.js"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
