@@ -3010,12 +3010,56 @@ document.addEventListener('DOMContentLoaded', function() {
         var rpSaveBtn = document.getElementById('rpSaveBtn');
         if (rpSaveBtn) {
             rpSaveBtn.addEventListener('click', function() {
-                closeModal('rolesPrivilegesModal');
-                document.getElementById('blockPasswordUserId').value = document.getElementById('rpUserId').value;
-                document.getElementById('blockPasswordAction').value = 'roles-privileges';
-                document.getElementById('blockPasswordTitle').textContent = 'Enter your password to save role & privileges.';
-                resetBlockPasswordLockout();
-                document.getElementById('blockPasswordModal').classList.add('active');
+                var targetUserId = document.getElementById('rpUserId').value;
+                var selectedRole = document.getElementById('rpRole').value;
+
+                function continueRoleSave() {
+                    closeModal('rolesPrivilegesModal');
+                    document.getElementById('blockPasswordUserId').value = targetUserId;
+                    document.getElementById('blockPasswordAction').value = 'roles-privileges';
+                    document.getElementById('blockPasswordTitle').textContent = 'Enter your password to save role & privileges.';
+                    resetBlockPasswordLockout();
+                    document.getElementById('blockPasswordModal').classList.add('active');
+                }
+
+                if (selectedRole !== 'super_admin') {
+                    continueRoleSave();
+                    return;
+                }
+
+                rpSaveBtn.disabled = true;
+                var fd = new FormData();
+                fd.append('action', 'check_super_admin_promotion_limit');
+                fd.append('target_user_id', targetUserId);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '../../server/user_management.php', true);
+                xhr.onload = function() {
+                    rpSaveBtn.disabled = false;
+                    var res;
+                    try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+
+                    if (xhr.status === 200 && res.success) {
+                        if (res.super_admin_limit_reached === true) {
+                            closeModal('rolesPrivilegesModal');
+                            showSuccessModal(
+                                'Maximum of 2 working super admin accounts reached. Promotion was not saved; this account remains an Admin.',
+                                null,
+                                'Notice'
+                            );
+                            return;
+                        }
+                        continueRoleSave();
+                        return;
+                    }
+
+                    alert(res.message || 'Could not verify the working super admin account limit. Please try again.');
+                };
+                xhr.onerror = function() {
+                    rpSaveBtn.disabled = false;
+                    alert('Could not verify the working super admin account limit. Please try again.');
+                };
+                xhr.send(fd);
             });
         }
 
@@ -3601,6 +3645,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         showSuccessModal(res.message || 'Role & privileges saved successfully!', function() {
                             location.reload();
                         });
+                    } else if (res.code === 'super_admin_limit_reached') {
+                        showSuccessModal(
+                            res.message || 'Maximum of 2 working super admin accounts reached. Promotion was not saved; this account remains an Admin.',
+                            null,
+                            'Notice'
+                        );
                     } else {
                         alert(res.message || 'Failed to save.');
                     }

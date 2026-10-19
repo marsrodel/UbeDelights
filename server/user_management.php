@@ -674,6 +674,35 @@ try {
             }
             break;
 
+        case 'check_super_admin_promotion_limit':
+            if ($currentRole !== 'super_admin') {
+                throw new Exception('Only super admins can promote accounts to Super Admin');
+            }
+            $targetId = (string)($_POST['target_user_id'] ?? '');
+            if ($targetId === '') throw new Exception('User ID is required');
+
+            $targetStmt = $connect->prepare("SELECT role FROM users WHERE user_id = ?");
+            if (!$targetStmt) throw new Exception('Could not verify the target account');
+            $targetStmt->bind_param('s', $targetId);
+            $targetStmt->execute();
+            $targetRoleRow = $targetStmt->get_result()->fetch_assoc();
+            $targetStmt->close();
+            if (!$targetRoleRow) throw new Exception('User not found');
+
+            $superAdminLimitReached = false;
+            if ($targetRoleRow['role'] === 'admin') {
+                $countResult = $connect->query("SELECT COUNT(*) AS cnt FROM users WHERE role = 'super_admin' AND status = 'active'");
+                if (!$countResult) {
+                    throw new Exception('Could not verify the working super admin account limit.');
+                }
+                $countRow = $countResult->fetch_assoc();
+                if (!$countRow) throw new Exception('Could not verify the working super admin account limit.');
+                $superAdminLimitReached = (int)$countRow['cnt'] >= 2;
+            }
+
+            $response = ['success' => true, 'super_admin_limit_reached' => $superAdminLimitReached];
+            break;
+
         case 'get_privileges':
             $targetId = $_GET['user_id'] ?? $userId;
             if (empty($targetId)) throw new Exception('User ID is required');
@@ -709,6 +738,20 @@ try {
             $oldRole = $target_user['role'];
             $statusSql = '';
             if ($oldRole === 'admin' && $newRole === 'super_admin') {
+                $countResult = $connect->query("SELECT COUNT(*) AS cnt FROM users WHERE role = 'super_admin' AND status = 'active'");
+                if (!$countResult) {
+                    throw new Exception('Could not verify the working super admin account limit.');
+                }
+                $countRow = $countResult->fetch_assoc();
+                if (!$countRow) throw new Exception('Could not verify the working super admin account limit.');
+                if ((int)$countRow['cnt'] >= 2) {
+                    $response = [
+                        'success' => false,
+                        'code' => 'super_admin_limit_reached',
+                        'message' => 'Maximum of 2 working super admin accounts reached. Promotion was not saved; this account remains an Admin.'
+                    ];
+                    break;
+                }
                 $statusSql = ", status = 'blocked'";
             } elseif ($oldRole === 'super_admin' && $newRole === 'admin') {
                 $statusSql = ", status = 'blocked'";
