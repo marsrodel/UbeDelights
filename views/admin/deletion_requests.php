@@ -249,7 +249,7 @@ if ($connect) {
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_notifications.js"></script>
     <script>var deletionRequests = <?php echo json_encode($deletionRequests); ?>; var currentUsername = <?php echo json_encode($_SESSION['auth_username'] ?? ''); ?>;</script>
-    <script src="../../javascript/admin_deletion_requests.js?v=1.2"></script>
+    <script src="../../javascript/admin_deletion_requests.js?v=1.3"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
 </html>

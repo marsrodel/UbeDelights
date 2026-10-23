@@ -147,6 +147,8 @@ function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'
 
 var pendingDrAction = '';
 var pendingDrRequestId = '';
+var drRejectionAuthorized = false;
+var drRejectionRetryMode = 'retry';
 
 function openApproveDr(id) {
     var req = deletionRequests.find(function(r) { return String(r.id) === String(id); });
@@ -228,7 +230,48 @@ function closeViewDrModal() {
     document.body.style.overflow = '';
 }
 
+function setDrRejectionProcessing() {
+    var title = document.getElementById('drPasswordTitle');
+    var input = document.getElementById('drPasswordInput');
+    var error = document.getElementById('drPasswordError');
+    var button = document.getElementById('drPasswordConfirmBtn');
+    if (title) title.textContent = 'Rejecting deletion request…';
+    if (input) { input.value = ''; input.disabled = true; input.style.cursor = 'not-allowed'; }
+    if (error) {
+        error.textContent = 'Please wait while the request and its activity log are saved.';
+        error.style.color = 'var(--text-secondary)';
+    }
+    if (button) {
+        button.disabled = true;
+        button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+        button.style.opacity = '0.65';
+        button.style.cursor = 'wait';
+    }
+}
+
+function setDrRejectionError(message, retryMode) {
+    var title = document.getElementById('drPasswordTitle');
+    var input = document.getElementById('drPasswordInput');
+    var error = document.getElementById('drPasswordError');
+    var button = document.getElementById('drPasswordConfirmBtn');
+    if (title) title.textContent = 'Rejection could not be completed';
+    if (input) { input.value = ''; input.disabled = true; input.style.cursor = 'not-allowed'; }
+    if (error) {
+        error.textContent = message;
+        error.style.color = 'var(--danger, #e17055)';
+    }
+    drRejectionRetryMode = retryMode || 'retry';
+    if (button) {
+        button.disabled = false;
+        button.textContent = drRejectionRetryMode === 'refresh' ? 'Refresh Page' : 'Retry Rejection';
+        button.style.opacity = '';
+        button.style.cursor = '';
+    }
+}
+
 function reviewDeletionRequest(requestId, action) {
+    if (action === 'reject' && drRejectionAuthorized) setDrRejectionProcessing();
+
     var fd = new FormData();
     fd.append('request_id', requestId);
     fd.append('action', action);
@@ -236,20 +279,30 @@ function reviewDeletionRequest(requestId, action) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '../../server/review_deletion.php', true);
     xhr.onload = function() {
-        if (xhr.status === 200) {
-            var res;
-            try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
-            if (res.success) {
-                document.getElementById('drSuccessMessage').textContent = res.message || 'Request updated successfully.';
-                document.getElementById('drSuccessModal').classList.add('active');
-            } else {
-                alert(res.message || 'Action failed.');
+        var res;
+        try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
+        if (xhr.status >= 200 && xhr.status < 300 && res.success) {
+            if (action === 'reject') {
+                drRejectionAuthorized = false;
+                closeModal('drPasswordModal');
             }
+            document.getElementById('drSuccessMessage').textContent = res.message || 'Request updated successfully.';
+            document.getElementById('drSuccessModal').classList.add('active');
+        } else if (action === 'reject' && drRejectionAuthorized) {
+            var message = res.message || 'The deletion request could not be rejected. It remains pending; please try again.';
+            var retryMode = res.code === 'request_already_reviewed' ? 'refresh' : 'retry';
+            setDrRejectionError(message, retryMode);
         } else {
-            alert('Server error. Please try again.');
+            alert(res.message || 'The request could not be processed. Please try again.');
         }
     };
-    xhr.onerror = function() { alert('Network error. Please try again.'); };
+    xhr.onerror = function() {
+        if (action === 'reject' && drRejectionAuthorized) {
+            setDrRejectionError('Network error. The request remains pending; retry when your connection is available.');
+        } else {
+            alert('Network error. Please try again.');
+        }
+    };
     xhr.send(fd);
 }
 
@@ -261,12 +314,19 @@ var drPasswordLocked = false;
 function resetDrPasswordLockout() {
     drPasswordAttempts = 0;
     drPasswordLocked = false;
+    drRejectionAuthorized = false;
+    drRejectionRetryMode = 'retry';
     var input = document.getElementById('drPasswordInput');
     var error = document.getElementById('drPasswordError');
     var btn = document.getElementById('drPasswordConfirmBtn');
     if (input) { input.disabled = false; input.value = ''; input.style.cursor = ''; }
-    if (error) error.textContent = '';
-    if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+    if (error) { error.textContent = ''; error.style.color = ''; }
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Confirm';
+        btn.style.opacity = '';
+        btn.style.cursor = '';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -316,6 +376,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (drPasswordConfirmBtn) {
         drPasswordConfirmBtn.addEventListener('click', function() {
+            var action = document.getElementById('drPasswordAction').value;
+            var requestId = document.getElementById('drPasswordRequestId').value;
+            if (action === 'reject' && drRejectionAuthorized) {
+                if (drRejectionRetryMode === 'refresh') {
+                    location.reload();
+                } else {
+                    reviewDeletionRequest(requestId, 'reject');
+                }
+                return;
+            }
+
             if (drPasswordLocked) {
                 drPasswordError.textContent = 'Too many failed attempts. Action is locked.';
                 return;
@@ -342,10 +413,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
 
                     if (res.success) {
-                        var action = document.getElementById('drPasswordAction').value;
-                        var requestId = document.getElementById('drPasswordRequestId').value;
-                        closeModal('drPasswordModal');
-                        reviewDeletionRequest(requestId, action);
+                        if (action === 'reject') {
+                            drRejectionAuthorized = true;
+                            reviewDeletionRequest(requestId, action);
+                        } else {
+                            closeModal('drPasswordModal');
+                            reviewDeletionRequest(requestId, action);
+                        }
                     } else {
                         drPasswordAttempts++;
                         if (drPasswordAttempts >= drPasswordMaxAttempts) {
