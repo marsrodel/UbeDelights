@@ -4,11 +4,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# PHP / composer
-/vendor/
-composer.lock
-.env
-*.log
+
 
 # Node / build
 node_modules/
