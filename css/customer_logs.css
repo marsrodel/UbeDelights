@@ -15,7 +15,7 @@
    ========================================== */
 .filters-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
+    grid-template-columns: minmax(190px, 0.9fr) minmax(220px, 1.2fr) repeat(2, minmax(160px, 1fr)) auto;
     gap: 12px;
     padding: 16px 20px;
     border-bottom: 1px solid var(--border);
@@ -51,6 +51,15 @@
 .filter-field select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+}
+
+.filter-field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px 14px;
+    padding-right: 34px;
 }
 
 .filter-buttons {
@@ -282,15 +291,28 @@
 /* ==========================================
    RESPONSIVE
    ========================================== */
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
     .filters-grid {
         grid-template-columns: 1fr 1fr;
+    }
+
+    .filter-buttons {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
     }
 }
 
 @media (max-width: 600px) {
     .filters-grid {
         grid-template-columns: 1fr;
+    }
+
+    .filter-buttons {
+        justify-content: stretch;
+    }
+
+    .filter-buttons button {
+        flex: 1;
     }
 
     .pagination-bar {

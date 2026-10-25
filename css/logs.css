@@ -267,6 +267,17 @@
     overflow-wrap: anywhere;
 }
 
+.logs-detail-person-name,
+.logs-detail-person-meta {
+    display: block;
+}
+
+.logs-detail-person-meta {
+    margin-top: 2px;
+    color: var(--text-muted, #77748a);
+    font-size: 0.75rem;
+}
+
 .logs-detail-reason,
 .logs-detail-outcome {
     grid-column: 1 / -1;

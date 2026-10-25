@@ -24,6 +24,25 @@ try {
         throw new InvalidArgumentException('Invalid log type.');
     }
     $response = logs_fetch_page($connect, [$type], logs_request_filters($_GET), $_SESSION['auth_role']);
+    if ($type === 'activity') {
+        $requesterIdsByRequest = [];
+        $requestIdsByRow = [];
+        foreach ($response['logs'] as $index => $log) {
+            if (strtolower((string)$log['action']) !== 'deletion_review') continue;
+            $metadata = log_deletion_event_metadata($log['details']);
+            $requestId = (int)($metadata['request_id'] ?? 0);
+            $requesterId = (string)($metadata['requested_by_id'] ?? '');
+            if ($requestId <= 0 || $requesterId === '' || !empty($metadata['requested_by_full_name'])) continue;
+            $requesterIdsByRequest[$requestId] = $requesterId;
+            $requestIdsByRow[$index] = $requestId;
+        }
+        $requesterNames = log_deletion_requester_names($connect, $requesterIdsByRequest);
+        foreach ($requestIdsByRow as $index => $requestId) {
+            if (isset($requesterNames[$requestId])) {
+                $response['logs'][$index]['requestedByFullName'] = $requesterNames[$requestId];
+            }
+        }
+    }
     $response['type'] = $type;
     echo json_encode($response);
 } catch (InvalidArgumentException $e) {

@@ -82,7 +82,7 @@ if ($connect) {
     <title>Deletion Requests - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
-    <link rel="stylesheet" href="../../css/user_management.css?v=2.3">
+    <link rel="stylesheet" href="../../css/user_management.css?v=2.4">
     <link rel="stylesheet" href="../../css/admin_selects.css?v=1.1">
 </head>
 <body class="admin-body">
@@ -148,6 +148,22 @@ if ($connect) {
         </main>
     </div>
 
+    <!-- Full Deletion Reason Modal -->
+    <div class="modal-overlay" id="reasonDrModal" role="dialog" aria-modal="true" aria-labelledby="reasonDrModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="reasonDrModalTitle">Deletion Request Reason</h2>
+                <button type="button" class="modal-close" id="reasonDrModalClose" aria-label="Close reason"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p id="reasonDrFullText"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-primary" id="reasonDrModalCloseBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- View Deletion Request Modal -->
     <div class="modal-overlay" id="viewDrModal" role="dialog" aria-modal="true" aria-labelledby="viewDrModalTitle">
         <div class="modal">
@@ -175,7 +191,7 @@ if ($connect) {
                 <button class="modal-close" onclick="closeModal('approveDrModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body" style="padding:0 24px 24px;">
-                <p style="color:var(--text-secondary); font-size:0.95rem;">Approving this request will <strong>permanently delete</strong> the target account and all associated data. This action cannot be undone.</p>
+                <p style="color:var(--text-secondary); font-size:0.95rem;">Approving this request will <strong>permanently delete</strong> the target account. Past orders remain in Admin Orders history. This action cannot be undone.</p>
                 <p id="approveDrUserName" style="color:var(--text-secondary); font-size:0.95rem; margin-top:8px;">Target: <strong></strong></p>
                 <input type="hidden" id="approveDrId">
             </div>
@@ -250,7 +266,7 @@ if ($connect) {
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_notifications.js"></script>
     <script>var deletionRequests = <?php echo json_encode($deletionRequests); ?>; var currentUsername = <?php echo json_encode($_SESSION['auth_username'] ?? ''); ?>;</script>
-    <script src="../../javascript/admin_deletion_requests.js?v=1.3"></script>
+    <script src="../../javascript/admin_deletion_requests.js?v=1.5"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
 </html>

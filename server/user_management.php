@@ -15,6 +15,7 @@ session_guard_touch();
 require_once 'db.php';
 require_once 'user_logger.php';
 require_once 'mail_helper.php';
+require_once __DIR__ . '/account_deletion.php';
 
 $response = ['success' => false, 'message' => ''];
 
@@ -516,44 +517,37 @@ try {
                 throw new Exception('A reason is required to delete an account.');
             }
 
-            // Get user details
-            $stmt = $connect->prepare("SELECT username, role FROM users WHERE user_id = ?");
-            $stmt->bind_param("s", $userId);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $target_user = $result->fetch_assoc();
-
-            if (!$target_user) {
-                throw new Exception('User not found');
-            }
-
             // Super admin cannot delete their own account
             if ($userId === $currentUserId) {
                 throw new Exception('You cannot delete your own account');
             }
 
-            // Cleanup related data
-            mysqli_query($connect, "DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM orders WHERE user_id = '$userId')");
-            mysqli_query($connect, "DELETE FROM orders WHERE user_id = '$userId'");
-            mysqli_query($connect, "DELETE FROM otp_requests WHERE idNumber = '$userId'");
-            mysqli_query($connect, "DELETE FROM login_otp WHERE idNumber = '$userId'");
-            mysqli_query($connect, "DELETE FROM admin_privileges WHERE idNumber = '$userId'");
-            mysqli_query($connect, "UPDATE deletion_requests SET target_id_number = NULL WHERE target_id_number = '$userId'");
+            if (!$connect->begin_transaction()) {
+                throw new Exception('Could not start account deletion.');
+            }
+            try {
+                $stmt = $connect->prepare("SELECT username, role FROM users WHERE user_id = ? FOR UPDATE");
+                $stmt->bind_param("s", $userId);
+                $stmt->execute();
+                $target_user = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+                if (!$target_user) throw new Exception('User not found');
 
-            // Delete the user
-            $del_stmt = $connect->prepare("DELETE FROM users WHERE user_id = ?");
-            $del_stmt->bind_param("s", $userId);
-            if ($del_stmt->execute()) {
+                account_delete_with_history($connect, $userId);
                 $summary = "{$_SESSION['auth_username']} deleted {$target_user['username']} (ID: $userId)";
                 $details = log_deletion_event_details($summary, [
                     'kind' => 'direct_delete',
                     'reason' => $deleteReason,
                 ]);
-                log_activity('DELETE_USER', $details, 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
-                $response = ['success' => true, 'message' => "User {$target_user['username']} has been deleted successfully"];
-            } else {
-                throw new Exception('Failed to delete user');
+                if (!log_activity('DELETE_USER', $details, 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username'])) {
+                    throw new Exception('Could not record the deletion activity log.');
+                }
+                if (!$connect->commit()) throw new Exception('Could not save account deletion.');
+            } catch (Throwable $e) {
+                $connect->rollback();
+                throw $e;
             }
+            $response = ['success' => true, 'message' => "User {$target_user['username']} has been deleted successfully"];
             break;
 
         case 'reset_password':

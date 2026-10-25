@@ -17,7 +17,7 @@ if ($connect) {
     <title>Logs - Ube Delights Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
-    <link rel="stylesheet" href="../../css/logs.css?v=2.2">
+    <link rel="stylesheet" href="../../css/logs.css?v=2.3">
     <link rel="stylesheet" href="../../css/admin_selects.css?v=1.1">
 </head>
 <body class="admin-body">
@@ -146,7 +146,7 @@ if ($connect) {
     <script src="../../javascript/admin-routing.js?v=3.0"></script>
     <script src="../../javascript/admin_security.js"></script>
     <script src="../../javascript/admin_notifications.js"></script>
-    <script src="../../javascript/admin_logs.js?v=2.6"></script>
+    <script src="../../javascript/admin_logs.js?v=2.7"></script>
     <script src="../../javascript/inspect.js"></script>
 </body>
 </html>

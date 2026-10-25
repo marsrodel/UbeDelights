@@ -2,6 +2,7 @@
     'use strict';
 
     var state = {
+        type: 'authentication',
         page: 1,
         perPage: 10,
         filters: { search: '', date_from: '', date_to: '' }
@@ -117,6 +118,7 @@
 
     function buildParams() {
         var p = new URLSearchParams();
+        p.set('type', state.type);
         p.set('page', state.page);
         p.set('limit', state.perPage);
         if (state.filters.search) p.set('search', state.filters.search);
@@ -268,6 +270,7 @@
     }
 
     function collectFilters() {
+        state.type = document.getElementById('logsTypeFilter').value;
         state.filters = {
             search: (document.getElementById('logsSearch') || {}).value ? document.getElementById('logsSearch').value.trim() : '',
             date_from: (document.getElementById('logsFromDate') || {}).value || '',
@@ -278,6 +281,7 @@
     }
 
     function clearFilters() {
+        clearTimeout(searchTimer);
         var s = document.getElementById('logsSearch');
         var fd = document.getElementById('logsFromDate');
         var td = document.getElementById('logsToDate');
@@ -290,11 +294,14 @@
     }
 
     function bindEvents() {
+        var typeSelect = document.getElementById('logsTypeFilter');
         var searchInput = document.getElementById('logsSearch');
         var btnApply = document.getElementById('btnApplyLogsFilter');
         var btnClear = document.getElementById('btnClearLogsFilter');
         var fromDate = document.getElementById('logsFromDate');
         var toDate = document.getElementById('logsToDate');
+
+        if (typeSelect) typeSelect.addEventListener('change', collectFilters);
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {

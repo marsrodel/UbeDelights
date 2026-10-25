@@ -216,7 +216,7 @@ assert.doesNotMatch(nodes.get('logsTableBody').innerHTML, /DELETION_META_V1|Brow
 let detailHtml = openDeletionDetails();
 assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Account Deletion Details');
 assert.match(detailHtml, /Deleted by/);
-assert.match(detailHtml, /edrian_123/);
+assert.match(detailHtml, /logs-detail-person-name">Edrian Prones<\/span><span class="logs-detail-person-meta">edrian_123 \(ID: 2026-0012\)<\/span>/);
 assert.match(detailHtml, /Deleted on/);
 assert.match(detailHtml, /Reason/);
 assert.match(detailHtml, /&lt;script&gt;bad\(\)&lt;\/script&gt;/);
@@ -234,16 +234,17 @@ reply([requestLog]);
 detailHtml = openDeletionDetails();
 assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Deletion Request Details');
 assert.match(detailHtml, /Requested by/);
+assert.match(detailHtml, /logs-detail-person-name">Shania Bugahod<\/span><span class="logs-detail-person-meta">admin_123 \(ID: 2026-0010\)<\/span>/);
 assert.match(detailHtml, /Requested on/);
 assert.match(detailHtml, /Duplicate account/);
 closeDeletionDetails();
 
 const approvedReviewLog = {
     ...directDeleteLog, id: 503, action: 'DELETION_REVIEW', username: 'marsrodel_123',
-    idNumber: '2026-0013', created_at: '2026-10-20 14:30:00',
+    idNumber: '2026-0013', fullName: 'Mars Mars', created_at: '2026-10-20 14:30:00',
     details: 'marsrodel_123 approved deletion request for marsrodel_123 (ID: 2026-0013)' + deletionMetadata({
         kind: 'deletion_review', outcome: 'approved', requested_by: 'admin_123', requested_by_id: '2026-0010',
-        requested_on: '2026-10-20 13:59:00', reason: 'Duplicate account'
+        requested_by_full_name: 'Shania Bugahod', requested_on: '2026-10-20 13:59:00', reason: 'Duplicate account'
     })
 };
 reply([approvedReviewLog]);
@@ -251,11 +252,13 @@ detailHtml = openDeletionDetails();
 assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Deletion Approval Details');
 assert.match(detailHtml, /Approved by/);
 assert.match(detailHtml, /Approved on/);
+assert.match(detailHtml, /logs-detail-person-name">Shania Bugahod<\/span><span class="logs-detail-person-meta">admin_123 \(ID: 2026-0010\)<\/span>/);
+assert.match(detailHtml, /logs-detail-person-name">Mars Mars<\/span><span class="logs-detail-person-meta">marsrodel_123 \(ID: 2026-0013\)<\/span>/);
 assert.doesNotMatch(detailHtml, /Reviewed by/);
 closeDeletionDetails();
 
 const rejectedReviewLog = {
-    ...approvedReviewLog, id: 504,
+    ...approvedReviewLog, id: 504, requestedByFullName: 'Shania Bugahod',
     details: 'marsrodel_123 rejected deletion request for marsrodel_123 (ID: 2026-0013)' + deletionMetadata({
         kind: 'deletion_review', outcome: 'rejected', requested_by: 'admin_123', requested_by_id: '2026-0010',
         requested_on: '2026-10-20 13:59:00', reason: 'Duplicate account'
@@ -266,15 +269,17 @@ detailHtml = openDeletionDetails();
 assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Deletion Request Review');
 assert.match(detailHtml, /Reviewed by/);
 assert.match(detailHtml, /Reviewed on/);
+assert.match(detailHtml, /logs-detail-person-name">Shania Bugahod<\/span><span class="logs-detail-person-meta">admin_123 \(ID: 2026-0010\)<\/span>/);
 assert.doesNotMatch(detailHtml, /Approved by/);
 closeDeletionDetails();
 
-reply([{ ...rejectedReviewLog, id: 505, details: 'marsrodel_123 rejected deletion request for an older entry' }]);
+reply([{ ...rejectedReviewLog, id: 505, requestedByFullName: undefined, details: 'marsrodel_123 rejected deletion request for an older entry' }]);
 detailHtml = openDeletionDetails();
 assert.match(detailHtml, /Not recorded for this historical entry\./);
+assert.match(detailHtml, /Full name not recorded for this historical entry\./);
 closeDeletionDetails();
 
-reply([{ ...rejectedReviewLog, id: 506, details: 'marsrodel_123 rejectedd deletion request for an older entry' }]);
+reply([{ ...rejectedReviewLog, id: 506, requestedByFullName: undefined, details: 'marsrodel_123 rejectedd deletion request for an older entry' }]);
 detailHtml = openDeletionDetails();
 assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Deletion Request Review Details');
 assert.match(detailHtml, /Review outcome/);

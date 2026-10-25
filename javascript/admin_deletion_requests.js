@@ -44,7 +44,11 @@
         rows.forEach(function(r) {
             html += '<tr data-dr-id="' + esc(r.id) + '">';
             html += '<td><div><strong>' + esc(r.targetName) + '</strong></div><div class="cell-muted dr-user-id">' + esc(r.targetId) + '</div></td>';
-            html += '<td class="cell-muted" title="' + esc(r.reason) + '">' + truncate(r.reason, 40) + '</td>';
+            html += '<td class="cell-muted">' + truncate(r.reason, 40);
+            if (String(r.reason || '').length > 40) {
+                html += ' <button type="button" class="dr-reason-more" data-action="show-dr-reason" data-id="' + esc(r.id) + '">Show more</button>';
+            }
+            html += '</td>';
             html += '<td><div>' + esc(r.requestedBy) + '</div><div class="cell-muted dr-user-id">' + esc(r.requestedById) + '</div></td>';
             html += '<td class="cell-muted">' + formatDate(r.createdAt) + '</td>';
             html += '<td class="actions-cell">';
@@ -149,6 +153,9 @@ var pendingDrAction = '';
 var pendingDrRequestId = '';
 var drRejectionAuthorized = false;
 var drRejectionRetryMode = 'retry';
+var drApprovalAuthorized = false;
+var drApprovalRetryMode = 'retry';
+var drReviewInFlight = false;
 
 function openApproveDr(id) {
     var req = deletionRequests.find(function(r) { return String(r.id) === String(id); });
@@ -167,6 +174,7 @@ function openRejectDr(id) {
 }
 
 function closeModal(modalId) {
+    if (modalId === 'drPasswordModal' && drReviewInFlight) return;
     var modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.remove('active');
@@ -230,12 +238,23 @@ function closeViewDrModal() {
     document.body.style.overflow = '';
 }
 
-function setDrRejectionProcessing() {
+function showDeletionReason(requestId) {
+    var req = deletionRequests.find(function(r) { return String(r.id) === String(requestId); });
+    if (!req) return;
+    document.getElementById('reasonDrFullText').textContent = req.reason || '';
+    document.getElementById('reasonDrModal').classList.add('active');
+}
+
+function closeDeletionReason() {
+    document.getElementById('reasonDrModal').classList.remove('active');
+}
+
+function setDrReviewProcessing(action) {
     var title = document.getElementById('drPasswordTitle');
     var input = document.getElementById('drPasswordInput');
     var error = document.getElementById('drPasswordError');
     var button = document.getElementById('drPasswordConfirmBtn');
-    if (title) title.textContent = 'Rejecting deletion request…';
+    if (title) title.textContent = action === 'approve' ? 'Approving deletion request…' : 'Rejecting deletion request…';
     if (input) { input.value = ''; input.disabled = true; input.style.cursor = 'not-allowed'; }
     if (error) {
         error.textContent = 'Please wait while the request and its activity log are saved.';
@@ -249,28 +268,31 @@ function setDrRejectionProcessing() {
     }
 }
 
-function setDrRejectionError(message, retryMode) {
+function setDrReviewError(action, message, retryMode) {
     var title = document.getElementById('drPasswordTitle');
     var input = document.getElementById('drPasswordInput');
     var error = document.getElementById('drPasswordError');
     var button = document.getElementById('drPasswordConfirmBtn');
-    if (title) title.textContent = 'Rejection could not be completed';
+    if (title) title.textContent = action === 'approve' ? 'Approval could not be completed' : 'Rejection could not be completed';
     if (input) { input.value = ''; input.disabled = true; input.style.cursor = 'not-allowed'; }
     if (error) {
         error.textContent = message;
         error.style.color = 'var(--danger, #e17055)';
     }
-    drRejectionRetryMode = retryMode || 'retry';
+    if (action === 'approve') drApprovalRetryMode = retryMode || 'retry';
+    else drRejectionRetryMode = retryMode || 'retry';
     if (button) {
         button.disabled = false;
-        button.textContent = drRejectionRetryMode === 'refresh' ? 'Refresh Page' : 'Retry Rejection';
+        button.textContent = retryMode === 'refresh' ? 'Refresh Page' : (action === 'approve' ? 'Retry Approval' : 'Retry Rejection');
         button.style.opacity = '';
         button.style.cursor = '';
     }
 }
 
 function reviewDeletionRequest(requestId, action) {
-    if (action === 'reject' && drRejectionAuthorized) setDrRejectionProcessing();
+    if (drReviewInFlight) return;
+    drReviewInFlight = true;
+    setDrReviewProcessing(action);
 
     var fd = new FormData();
     fd.append('request_id', requestId);
@@ -278,31 +300,28 @@ function reviewDeletionRequest(requestId, action) {
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '../../server/review_deletion.php', true);
+    xhr.timeout = 30000;
     xhr.onload = function() {
+        drReviewInFlight = false;
         var res;
         try { res = JSON.parse(xhr.responseText); } catch(e) { res = {}; }
         if (xhr.status >= 200 && xhr.status < 300 && res.success) {
-            if (action === 'reject') {
-                drRejectionAuthorized = false;
-                closeModal('drPasswordModal');
-            }
+            drRejectionAuthorized = false;
+            drApprovalAuthorized = false;
+            closeModal('drPasswordModal');
             document.getElementById('drSuccessMessage').textContent = res.message || 'Request updated successfully.';
             document.getElementById('drSuccessModal').classList.add('active');
-        } else if (action === 'reject' && drRejectionAuthorized) {
-            var message = res.message || 'The deletion request could not be rejected. It remains pending; please try again.';
-            var retryMode = res.code === 'request_already_reviewed' ? 'refresh' : 'retry';
-            setDrRejectionError(message, retryMode);
         } else {
-            alert(res.message || 'The request could not be processed. Please try again.');
+            var message = res.message || 'The deletion request could not be processed. Please refresh and check its status.';
+            var retryMode = res.code === 'request_already_reviewed' ? 'refresh' : 'retry';
+            setDrReviewError(action, message, retryMode);
         }
     };
     xhr.onerror = function() {
-        if (action === 'reject' && drRejectionAuthorized) {
-            setDrRejectionError('Network error. The request remains pending; retry when your connection is available.');
-        } else {
-            alert('Network error. Please try again.');
-        }
+        drReviewInFlight = false;
+        setDrReviewError(action, 'Network error. Please refresh and check the request status before retrying.', 'refresh');
     };
+    xhr.ontimeout = xhr.onerror;
     xhr.send(fd);
 }
 
@@ -316,6 +335,8 @@ function resetDrPasswordLockout() {
     drPasswordLocked = false;
     drRejectionAuthorized = false;
     drRejectionRetryMode = 'retry';
+    drApprovalAuthorized = false;
+    drApprovalRetryMode = 'retry';
     var input = document.getElementById('drPasswordInput');
     var error = document.getElementById('drPasswordError');
     var btn = document.getElementById('drPasswordConfirmBtn');
@@ -334,6 +355,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!tbody) return;
 
     tbody.addEventListener('click', function(e) {
+        var reasonBtn = e.target.closest('[data-action="show-dr-reason"]');
+        if (reasonBtn) { showDeletionReason(reasonBtn.getAttribute('data-id')); return; }
+
         var approveBtn = e.target.closest('[data-action="approve-dr"]');
         if (approveBtn) { openApproveDr(approveBtn.getAttribute('data-id')); return; }
 
@@ -386,6 +410,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 return;
             }
+            if (action === 'approve' && drApprovalAuthorized) {
+                if (drApprovalRetryMode === 'refresh') {
+                    location.reload();
+                } else {
+                    reviewDeletionRequest(requestId, 'approve');
+                }
+                return;
+            }
 
             if (drPasswordLocked) {
                 drPasswordError.textContent = 'Too many failed attempts. Action is locked.';
@@ -415,11 +447,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (res.success) {
                         if (action === 'reject') {
                             drRejectionAuthorized = true;
-                            reviewDeletionRequest(requestId, action);
                         } else {
-                            closeModal('drPasswordModal');
-                            reviewDeletionRequest(requestId, action);
+                            drApprovalAuthorized = true;
                         }
+                        reviewDeletionRequest(requestId, action);
                     } else {
                         drPasswordAttempts++;
                         if (drPasswordAttempts >= drPasswordMaxAttempts) {
@@ -467,6 +498,9 @@ document.addEventListener('DOMContentLoaded', function() {
     var viewDrCloseBtn = document.getElementById('viewDrModalCloseBtn');
     if (viewDrClose) viewDrClose.addEventListener('click', closeViewDrModal);
     if (viewDrCloseBtn) viewDrCloseBtn.addEventListener('click', closeViewDrModal);
+
+    document.getElementById('reasonDrModalClose').addEventListener('click', closeDeletionReason);
+    document.getElementById('reasonDrModalCloseBtn').addEventListener('click', closeDeletionReason);
 });
 
 document.querySelectorAll('.modal-overlay').forEach(function(overlay) {

@@ -63,11 +63,13 @@
         return ['delete_user', 'deletion_request', 'deletion_review'].indexOf(String(action || '').toLowerCase()) !== -1;
     }
 
-    function deletionAccountLabel(username, userId) {
-        var label = String(username || '').trim();
+    function deletionPersonValue(fullName, username, userId) {
+        var name = String(fullName || '').trim();
+        var subtitle = String(username || '').trim();
         var id = String(userId || '').trim();
-        if (id) label += (label ? ' ' : '') + '(ID: ' + id + ')';
-        return label || 'Not recorded for this historical entry.';
+        if (id) subtitle += (subtitle ? ' ' : '') + '(ID: ' + id + ')';
+        return '<span class="logs-detail-person-name">' + escapeHtml(name || 'Full name not recorded for this historical entry.') + '</span>' +
+            (subtitle ? '<span class="logs-detail-person-meta">' + escapeHtml(subtitle) + '</span>' : '');
     }
 
     function deletionDetailField(label, value, className) {
@@ -90,14 +92,14 @@
 
         if (action === 'delete_user') {
             title = 'Account Deletion Details';
-            fields.push(deletionDetailField('Deleted by', escapeHtml(deletionAccountLabel(log.username || log.fullName, log.idNumber))));
+            fields.push(deletionDetailField('Deleted by', deletionPersonValue(log.fullName, log.username, log.idNumber)));
             fields.push(deletionDetailField('Deleted on', formatLogTimestamp(log.created_at)));
             fields.push(deletionDetailField('Reason', escapeHtml(metadata.reason || unavailable), 'logs-detail-reason'));
         } else if (action === 'deletion_request') {
             title = 'Deletion Request Details';
-            var requesterUsername = metadata.requested_by || log.username || log.fullName;
+            var requesterUsername = metadata.requested_by || log.username;
             var requesterId = metadata.requested_by_id || log.idNumber;
-            fields.push(deletionDetailField('Requested by', escapeHtml(deletionAccountLabel(requesterUsername, requesterId))));
+            fields.push(deletionDetailField('Requested by', deletionPersonValue(metadata.requested_by_full_name || log.fullName, requesterUsername, requesterId)));
             fields.push(deletionDetailField('Requested on', formatLogTimestamp(metadata.requested_on || log.created_at)));
             fields.push(deletionDetailField('Reason', escapeHtml(metadata.reason || unavailable), 'logs-detail-reason'));
         } else {
@@ -110,10 +112,10 @@
             }
             var rejected = outcome === 'rejected';
             title = rejected ? 'Deletion Request Review' : outcome === 'approved' ? 'Deletion Approval Details' : 'Deletion Request Review Details';
-            fields.push(deletionDetailField('Requested by', escapeHtml(deletionAccountLabel(metadata.requested_by, metadata.requested_by_id))));
+            fields.push(deletionDetailField('Requested by', deletionPersonValue(metadata.requested_by_full_name || log.requestedByFullName, metadata.requested_by, metadata.requested_by_id)));
             fields.push(deletionDetailField('Requested on', metadata.requested_on ? formatLogTimestamp(metadata.requested_on) : escapeHtml(unavailable)));
             if (!outcome) fields.push(deletionDetailField('Review outcome', escapeHtml(unavailable), 'logs-detail-outcome'));
-            fields.push(deletionDetailField(rejected || !outcome ? 'Reviewed by' : 'Approved by', escapeHtml(deletionAccountLabel(log.username || log.fullName, log.idNumber))));
+            fields.push(deletionDetailField(rejected || !outcome ? 'Reviewed by' : 'Approved by', deletionPersonValue(log.fullName, log.username, log.idNumber)));
             fields.push(deletionDetailField(rejected || !outcome ? 'Reviewed on' : 'Approved on', formatLogTimestamp(log.created_at)));
             fields.push(deletionDetailField('Reason', escapeHtml(metadata.reason || unavailable), 'logs-detail-reason'));
         }

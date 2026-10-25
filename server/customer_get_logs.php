@@ -14,9 +14,13 @@ if (!isset($_SESSION['auth_user_id']) || ($_SESSION['auth_role'] ?? '') !== 'cus
 session_guard_touch();
 
 try {
+    $type = $_GET['type'] ?? 'authentication';
+    if (!is_string($type) || !in_array($type, ['authentication', 'activity'], true)) {
+        throw new InvalidArgumentException('Invalid log type.');
+    }
     $filters = logs_request_filters($_GET);
     $filters['role'] = '';
-    echo json_encode(logs_fetch_page($connect, ['activity', 'authentication'], $filters, 'customer', $_SESSION['auth_user_id']));
+    echo json_encode(logs_fetch_page($connect, [$type], $filters, 'customer', $_SESSION['auth_user_id']));
 } catch (InvalidArgumentException $e) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);

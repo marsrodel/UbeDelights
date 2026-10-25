@@ -3,7 +3,7 @@
 $orders = [];
 
 $orderQuery = mysqli_query($connect, "
-    SELECT o.*, CONCAT(u.first_name, ' ', u.last_name) AS customer_name
+    SELECT o.*, COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), o.customer_name) AS display_customer_name
     FROM orders o
     LEFT JOIN users u ON o.user_id = u.user_id
     ORDER BY o.order_date DESC
@@ -31,7 +31,7 @@ if ($orderQuery) {
         $orders[] = [
             'order_id'   => intval($row['order_id']),
             'id'         => 'ORD-' . str_pad($row['order_id'], 3, '0', STR_PAD_LEFT),
-            'customer'   => $row['customer_name'] ?? 'Unknown',
+            'customer'   => $row['display_customer_name'] ?? $row['customer_name'] ?? 'Unknown',
             'date'       => date('F j, Y', strtotime($row['order_date'])),
             'updated_at' => $updatedAt,
             'status'     => $row['status'],

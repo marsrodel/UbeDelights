@@ -12,6 +12,50 @@ function log_deletion_event_details($summary, $metadata) {
     return rtrim((string)$summary) . ' [[DELETION_META_V1:' . base64_encode($json) . ']]';
 }
 
+function log_deletion_event_metadata($details) {
+    if (!preg_match('/\[\[DELETION_META_V1:([A-Za-z0-9+\/=]+)\]\]/', (string)$details, $match)) return null;
+    $json = base64_decode($match[1], true);
+    if ($json === false) return null;
+    $metadata = json_decode($json, true);
+    return is_array($metadata) && ($metadata['version'] ?? null) === 1 ? $metadata : null;
+}
+
+function log_deletion_requester_names($db, $requesterIdsByRequest) {
+    $ids = [];
+    foreach ($requesterIdsByRequest as $id) {
+        if ((string)$id !== '') $ids[(string)$id] = true;
+    }
+    if (!$ids) return [];
+
+    $requesterIds = array_keys($ids);
+    $placeholders = implode(',', array_fill(0, count($requesterIds), '?'));
+    $stmt = null;
+    $names = [];
+    try {
+        $stmt = mysqli_prepare($db, "SELECT idNumber, fullName, details FROM activity_logs WHERE action = 'DELETION_REQUEST' AND idNumber IN ($placeholders) ORDER BY id DESC");
+        if (!$stmt) return [];
+        $stmt->bind_param(str_repeat('s', count($requesterIds)), ...$requesterIds);
+        if (!$stmt->execute()) return [];
+        $result = $stmt->get_result();
+        if (!$result) return [];
+        while ($row = $result->fetch_assoc()) {
+            $metadata = log_deletion_event_metadata($row['details']);
+            $requestId = (int)($metadata['request_id'] ?? 0);
+            if ($requestId > 0 && isset($requesterIdsByRequest[$requestId]) &&
+                (string)$requesterIdsByRequest[$requestId] === (string)$row['idNumber'] &&
+                !isset($names[$requestId]) && trim((string)$row['fullName']) !== '') {
+                $names[$requestId] = trim($row['fullName']);
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('Could not load deletion requester name snapshots.');
+        return [];
+    } finally {
+        if ($stmt) $stmt->close();
+    }
+    return $names;
+}
+
 function log_category_for_action($action) {
     $authentication = [
         'login', 'logout', 'failed_login', 'login_blocked', 'login_pending', 'login_rejected',

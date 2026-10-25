@@ -7,7 +7,7 @@
     <title>Ube Delights - My Logs</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../css/dashboard.css?v=4.0">
-    <link rel="stylesheet" href="../css/customer_logs.css?v=1.1">
+    <link rel="stylesheet" href="../css/customer_logs.css?v=1.2">
     <link rel="stylesheet" href="../css/logs.css?v=1.0">
 </head>
 <body data-session-active="true">
@@ -41,6 +41,13 @@
     <main class="main-content">
         <div class="logs-card">
             <div class="filters-grid">
+                <div class="filter-field">
+                    <label for="logsTypeFilter">Log Type</label>
+                    <select id="logsTypeFilter">
+                        <option value="authentication" selected>Login &amp; Security Logs</option>
+                        <option value="activity">Activity Logs</option>
+                    </select>
+                </div>
                 <div class="filter-field">
                     <label for="logsSearch">Search</label>
                     <input type="text" id="logsSearch" placeholder="Search username, name, action...">
@@ -106,6 +113,6 @@
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/index.js"></script>
     <script src="../javascript/inspect.js"></script>
-    <script src="../javascript/customer_logs.js?v=2.0"></script>
+    <script src="../javascript/customer_logs.js?v=2.1"></script>
 </body>
 </html>

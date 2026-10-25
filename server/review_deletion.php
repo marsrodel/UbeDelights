@@ -3,6 +3,7 @@ session_start();
 include __DIR__ . '/db.php';
 require_once __DIR__ . '/user_logger.php';
 require_once __DIR__ . '/session_guard.php';
+require_once __DIR__ . '/account_deletion.php';
 
 header('Content-Type: application/json');
 session_guard_api_timeout();
@@ -104,6 +105,7 @@ if ($action === 'reject') {
         $logMessage = "$actorUsername rejected deletion request for {$target['username']} (ID: $targetId)";
         $requesterId = (string)$requestState['requested_by'];
         $requesterUsername = $requesterId;
+        $requesterNames = log_deletion_requester_names($connect, [$requestId => $requesterId]);
         $requesterStmt = mysqli_prepare($connect, "SELECT username FROM users WHERE user_id = ? LIMIT 1");
         if ($requesterStmt) {
             $requesterStmt->bind_param('s', $requesterId);
@@ -119,6 +121,7 @@ if ($action === 'reject') {
             'outcome' => 'rejected',
             'requested_by' => $requesterUsername,
             'requested_by_id' => $requesterId,
+            'requested_by_full_name' => $requesterNames[$requestId] ?? null,
             'requested_on' => $requestState['created_at'],
             'reason' => $requestState['reason'],
         ]);
@@ -143,62 +146,95 @@ if ($action === 'reject') {
     }
 }
 
-$escapedId = mysqli_real_escape_string($connect, $requestId);
-$result = mysqli_query($connect, "SELECT dr.*, u.username AS target_username, u.role AS target_role,
-        requester.username AS requested_by_username
-    FROM deletion_requests dr
-    JOIN users u ON u.user_id = dr.target_id_number
-    LEFT JOIN users requester ON requester.user_id = dr.requested_by
-    WHERE dr.id = '$escapedId' AND dr.status = 'pending'");
+try {
+    if (!mysqli_begin_transaction($connect)) {
+        throw new RuntimeException('Could not start the approval transaction.');
+    }
 
-if (!$result || mysqli_num_rows($result) === 0) {
-    echo json_encode(['success' => false, 'message' => 'Deletion request not found or already reviewed.']);
-    exit();
+    $requestStmt = $connect->prepare('SELECT target_id_number, requested_by, reason, status, created_at FROM deletion_requests WHERE id = ? FOR UPDATE');
+    if (!$requestStmt) throw new RuntimeException('Could not load the deletion request.');
+    $requestStmt->bind_param('i', $requestId);
+    $requestStmt->execute();
+    $request = $requestStmt->get_result()->fetch_assoc();
+    $requestStmt->close();
+
+    if (!$request) {
+        mysqli_rollback($connect);
+        http_response_code(404);
+        echo json_encode(['success' => false, 'code' => 'request_not_found', 'message' => 'Deletion request was not found.']);
+        exit();
+    }
+    if ($request['status'] !== 'pending') {
+        mysqli_rollback($connect);
+        http_response_code(409);
+        echo json_encode(['success' => false, 'code' => 'request_already_reviewed', 'message' => 'This deletion request has already been reviewed. Refresh the page and try again.']);
+        exit();
+    }
+
+    $targetId = (string)$request['target_id_number'];
+    $targetStmt = $connect->prepare('SELECT username FROM users WHERE user_id = ? FOR UPDATE');
+    if (!$targetStmt) throw new RuntimeException('Could not load the target account.');
+    $targetStmt->bind_param('s', $targetId);
+    $targetStmt->execute();
+    $target = $targetStmt->get_result()->fetch_assoc();
+    $targetStmt->close();
+    if (!$target) {
+        mysqli_rollback($connect);
+        http_response_code(404);
+        echo json_encode(['success' => false, 'code' => 'target_not_found', 'message' => 'The target account could not be found; the request remains pending.']);
+        exit();
+    }
+
+    $reviewedBy = (string)$_SESSION['auth_user_id'];
+    $actorUsername = (string)($_SESSION['auth_username'] ?? 'Super Admin');
+    $requesterId = (string)$request['requested_by'];
+    $requesterNames = log_deletion_requester_names($connect, [$requestId => $requesterId]);
+    $requesterUsername = $requesterId;
+    $requesterStmt = $connect->prepare('SELECT username FROM users WHERE user_id = ? LIMIT 1');
+    if ($requesterStmt) {
+        $requesterStmt->bind_param('s', $requesterId);
+        $requesterStmt->execute();
+        $requesterRow = $requesterStmt->get_result()->fetch_assoc();
+        if (!empty($requesterRow['username'])) $requesterUsername = $requesterRow['username'];
+        $requesterStmt->close();
+    }
+
+    $updateStmt = $connect->prepare("UPDATE deletion_requests SET status = 'approved', reviewed_by = ?, reviewed_at = NOW() WHERE id = ? AND status = 'pending'");
+    if (!$updateStmt) throw new RuntimeException('Could not prepare the approval update.');
+    $updateStmt->bind_param('si', $reviewedBy, $requestId);
+    $updated = $updateStmt->execute();
+    $updatedRows = $updateStmt->affected_rows;
+    $updateStmt->close();
+    if (!$updated || $updatedRows !== 1) {
+        throw new RuntimeException('Could not update the deletion request.');
+    }
+
+    account_delete_with_history($connect, $targetId);
+
+    $logMessage = "$actorUsername approved deletion request for {$target['username']} (ID: $targetId)";
+    $logMessage = log_deletion_event_details($logMessage, [
+        'kind' => 'deletion_review',
+        'request_id' => $requestId,
+        'outcome' => 'approved',
+        'requested_by' => $requesterUsername,
+        'requested_by_id' => $requesterId,
+        'requested_by_full_name' => $requesterNames[$requestId] ?? null,
+        'requested_on' => $request['created_at'],
+        'reason' => $request['reason'],
+    ]);
+    if (!log_activity('DELETION_REVIEW', $logMessage, 'Deletion Requests', $reviewedBy, $actorUsername)) {
+        throw new RuntimeException('Could not record the approval activity log.');
+    }
+    if (!mysqli_commit($connect)) {
+        throw new RuntimeException('Could not save the approval.');
+    }
+
+    echo json_encode(['success' => true, 'message' => 'Deletion request approved. The account has been deleted. Order history remains available.']);
+} catch (Throwable $e) {
+    mysqli_rollback($connect);
+    error_log('Deletion request approval failed: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'code' => 'approval_failed', 'message' => 'The deletion request could not be approved. The account remains unchanged; please try again.']);
 }
-
-$request = mysqli_fetch_assoc($result);
-$reviewedBy = $_SESSION['auth_user_id'];
-$reviewedAt = date('Y-m-d H:i:s');
-$newStatus = $action === 'approve' ? 'approved' : 'rejected';
-
-$update = mysqli_query($connect, "UPDATE deletion_requests
-    SET status = '$newStatus', reviewed_by = '$reviewedBy', reviewed_at = '$reviewedAt'
-    WHERE id = '$escapedId'");
-
-if (!$update) {
-    echo json_encode(['success' => false, 'message' => 'Failed to update deletion request.']);
-    exit();
-}
-
-if ($action === 'approve') {
-    $targetId = mysqli_real_escape_string($connect, $request['target_id_number']);
-
-    mysqli_query($connect, "DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM orders WHERE user_id = '$targetId')");
-    mysqli_query($connect, "DELETE FROM orders WHERE user_id = '$targetId'");
-    mysqli_query($connect, "DELETE FROM otp_requests WHERE idNumber = '$targetId'");
-    mysqli_query($connect, "DELETE FROM login_otp WHERE idNumber = '$targetId'");
-    mysqli_query($connect, "DELETE FROM admin_privileges WHERE idNumber = '$targetId'");
-    mysqli_query($connect, "UPDATE deletion_requests SET target_id_number = NULL WHERE target_id_number = '$targetId'");
-    mysqli_query($connect, "DELETE FROM users WHERE user_id = '$targetId'");
-}
-
-$logMessage = "{$_SESSION['auth_username']} {$newStatus} deletion request for {$request['target_username']} (ID: {$request['target_id_number']})";
-$requesterId = (string)$request['requested_by'];
-$requesterUsername = !empty($request['requested_by_username']) ? $request['requested_by_username'] : $requesterId;
-$logMessage = log_deletion_event_details($logMessage, [
-    'kind' => 'deletion_review',
-    'request_id' => $requestId,
-    'outcome' => $newStatus,
-    'requested_by' => $requesterUsername,
-    'requested_by_id' => $requesterId,
-    'requested_on' => $request['created_at'],
-    'reason' => $request['reason'],
-]);
-log_activity('DELETION_REVIEW', $logMessage, 'Deletion Requests', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
-
-$label = $action === 'approve' ? 'approved' : 'rejected';
-$msg = $action === 'approve' ? "Deletion request approved. The account has been deleted." : "Deletion request rejected. The account has been dismissed.";
-echo json_encode(['success' => true, 'message' => $msg]);
 
 mysqli_close($connect);
-?>

@@ -56,17 +56,19 @@ try {
     foreach ([$superAdmin, $admin] as $index => $session) {
         [$status, $html] = logs_test_request('../views/admin/system_logs.php', [], $session, false);
         verify_logs_endpoint($status === 200 && strpos($html, '<h1>Logs</h1>') !== false && strpos($html, '<title>Logs -') !== false, 'The admin page was not renamed to Logs.');
-        verify_logs_endpoint(strpos($html, '<option value="system" selected>System Logs</option>') !== false, 'The rendered page does not default to System Logs.');
-        verify_logs_endpoint(strpos($html, '<option value="authentication">Login &amp; Security Logs</option>') !== false && strpos($html, '<option value="activity">Activity Logs</option>') !== false, 'The log-type selector is incomplete.');
+        verify_logs_endpoint(strpos($html, '<option value="authentication" selected>Login &amp; Security Logs</option>') !== false, 'The rendered page does not default to Login & Security Logs.');
+        verify_logs_endpoint(strpos($html, '<option value="activity">Activity Logs</option>') !== false && strpos($html, '<option value="system">System Logs</option>') !== false, 'The log-type selector is incomplete.');
         preg_match('/<select id="logsRoleFilter">(.*?)<\/select>/s', $html, $roleFilter);
         verify_logs_endpoint((strpos($roleFilter[1], 'value="super_admin"') !== false) === ($index === 0), 'The role filter exposes restricted options.');
     }
     [$status, $html] = logs_test_request('../views/activity_logs.php', [], $customer, false);
     verify_logs_endpoint($status === 200 && strpos($html, 'Ube Delights - My Logs') !== false && strpos($html, '<th>Log Type</th>') !== false, 'The customer My Logs page did not render.');
+    preg_match('/<select id="logsTypeFilter">(.*?)<\/select>/s', $html, $customerTypeFilter);
+    verify_logs_endpoint(!empty($customerTypeFilter[1]) && strpos($customerTypeFilter[1], '<option value="authentication" selected>Login &amp; Security Logs</option>') !== false && strpos($customerTypeFilter[1], '<option value="activity">Activity Logs</option>') !== false && strpos($customerTypeFilter[1], 'value="system"') === false, 'Customer Log Type options are incorrect.');
 
     foreach ([$superAdmin, $admin] as $session) {
         [$status, $response] = logs_test_request('admin_get_logs.php', [], $session);
-        verify_logs_endpoint($status === 200 && $response['success'] && $response['type'] === 'system', 'System Logs is not the default.');
+        verify_logs_endpoint($status === 200 && $response['success'] && $response['type'] === 'authentication', 'Login & Security Logs is not the default.');
     }
     foreach (['system', 'authentication', 'activity'] as $type) {
         [$status, $response] = logs_test_request('admin_get_logs.php', ['type' => $type, 'limit' => 100], $admin);
@@ -83,9 +85,16 @@ try {
     }
     [$status, $own] = logs_test_request('customer_get_logs.php', ['limit' => 100], $customer);
     verify_logs_endpoint($status === 200 && $own['success'], 'Customer log retrieval failed.');
-    foreach ($own['logs'] as $row) verify_logs_endpoint($row['idNumber'] === $customerId && $row['role'] === 'customer' && $row['log_type'] !== 'system', 'Customer received another account event.');
-    [$status, $tampered] = logs_test_request('customer_get_logs.php', ['idNumber' => 'other-account', 'user_id' => 'other-account', 'role' => 'super_admin', 'type' => 'system', 'limit' => 100], $customer);
+    foreach ($own['logs'] as $row) verify_logs_endpoint($row['idNumber'] === $customerId && $row['role'] === 'customer' && $row['log_type'] === 'authentication', 'Customer default included another account or log type.');
+    [$status, $activity] = logs_test_request('customer_get_logs.php', ['type' => 'activity', 'limit' => 100], $customer);
+    verify_logs_endpoint($status === 200 && $activity['success'], 'Customer Activity Logs retrieval failed.');
+    foreach ($activity['logs'] as $row) verify_logs_endpoint($row['idNumber'] === $customerId && $row['role'] === 'customer' && $row['log_type'] === 'activity', 'Customer Activity Logs included another account or log type.');
+    [$status, $tampered] = logs_test_request('customer_get_logs.php', ['idNumber' => 'other-account', 'user_id' => 'other-account', 'role' => 'super_admin', 'type' => 'authentication', 'limit' => 100], $customer);
     verify_logs_endpoint($status === 200 && $own['logs'] === $tampered['logs'] && $own['pagination'] === $tampered['pagination'], 'Customer request parameters changed account scope.');
+    foreach ([['type' => 'system'], ['type' => ['activity']], ['type' => 'unknown']] as $invalid) {
+        [$status, $response] = logs_test_request('customer_get_logs.php', $invalid, $customer);
+        verify_logs_endpoint($status === 400 && !$response['success'], 'Customer accessed an invalid or restricted log type.');
+    }
 
     foreach ([['admin_get_logs.php', null], ['customer_get_logs.php', null], ['admin_get_logs.php', $customer], ['customer_get_logs.php', $admin], ['admin_get_logs.php', $inactive], ['customer_get_logs.php', $inactiveCustomer]] as $case) {
         [$status, $response] = logs_test_request($case[0], [], $case[1]);
