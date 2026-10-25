@@ -1,0 +1,19 @@
+/* Keep select arrows clear of the right border across admin pages. */
+.admin-body select:not([multiple]) {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 10px center;
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    padding-right: 34px;
+}
+
+/* Pagination controls need a smaller arrow and text reserve. */
+.admin-body .per-page-group select:not([multiple]),
+.admin-body .per-page-select select:not([multiple]) {
+    background-position: right 6px center;
+    background-size: 12px 12px;
+    padding-right: 28px;
+}

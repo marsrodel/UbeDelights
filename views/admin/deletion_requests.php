@@ -83,6 +83,7 @@ if ($connect) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
     <link rel="stylesheet" href="../../css/user_management.css?v=2.3">
+    <link rel="stylesheet" href="../../css/admin_selects.css?v=1.1">
 </head>
 <body class="admin-body">
 <?php $activePage = 'deletion_requests'; include '_sidebar.php'; ?>

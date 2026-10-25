@@ -129,6 +129,7 @@ if ($isSuperAdmin) {
     <title><?php echo $isSuperAdmin ? 'Super Admin' : 'Admin'; ?> Dashboard - Ube Delights</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.2">
+    <link rel="stylesheet" href="../../css/admin_selects.css?v=1.1">
 </head>
 <body class="admin-body">
 <?php $activePage = 'dashboard'; include '_sidebar.php'; ?>

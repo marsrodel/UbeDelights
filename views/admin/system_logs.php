@@ -18,6 +18,7 @@ if ($connect) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../../css/admin_security.css?v=1.5">
     <link rel="stylesheet" href="../../css/logs.css?v=2.2">
+    <link rel="stylesheet" href="../../css/admin_selects.css?v=1.1">
 </head>
 <body class="admin-body">
 <?php $activePage = 'system_logs'; include '_sidebar.php'; ?>
