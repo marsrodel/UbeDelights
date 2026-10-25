@@ -103,7 +103,8 @@ async function flushPromises() {
 function createTab({ clock, storage, channels, enabled = true, fetchHandler = null, id }) {
     const nodes = new Map([
         ['session-countdown', new Element()],
-        ['session-continue-btn', new Element()]
+        ['session-continue-btn', new Element()],
+        ['session-renewal-error', new Element()]
     ]);
     const documentListeners = {};
     const windowListeners = {};
@@ -199,22 +200,63 @@ async function run() {
             return { status: 200, data: { success: true } };
         }
     });
+    await clock.advanceTo(120000);
+    tab.document.fire('click');
+    await flushPromises();
     await clock.advanceTo(240000);
+    assert.equal(tab.document.body.appended, undefined);
+    await clock.advanceTo(360000);
     const overlay = tab.document.body.appended;
     assert.equal(overlay.style.display, 'flex');
-    assert.equal(tab.nodes.get('session-countdown').textContent, '60');
-    tab.nodes.get('session-continue-btn').fire('click');
+    assert.equal(tab.nodes.get('session-countdown').textContent, '01:00');
+    tab.document.fire('mousemove');
+    assert.equal(tab.nodes.get('session-countdown').textContent, '01:00');
+    tab.document.fire('click');
+    assert.equal(overlay.style.display, 'flex');
+    assert.equal(tab.nodes.get('session-countdown').textContent, '01:00');
     await flushPromises();
     assert.equal(overlay.style.display, 'flex');
+    assert.equal(tab.nodes.get('session-renewal-error').style.display, 'block');
     tab.nodes.get('session-continue-btn').fire('click');
+    tab.document.fire('click'); // The button click bubbles; send only one renewal.
     await flushPromises();
+    assert.equal(tab.requests.filter(request => request.action === 'continue').length, 2);
     assert.equal(overlay.style.display, 'none');
-    await clock.advanceTo(480000);
-    assert.equal(overlay.style.display, 'flex');
-    await clock.advanceTo(540000);
+    assert.equal(tab.nodes.get('session-renewal-error').style.display, 'none');
+
+    for (const [warningAt, eventName] of [[600000, 'keydown'], [840000, 'wheel'], [1080000, 'scroll'], [1320000, 'touchstart']]) {
+        await clock.advanceTo(warningAt);
+        assert.equal(overlay.style.display, 'flex');
+        assert.equal(tab.nodes.get('session-countdown').textContent, '01:00');
+        tab.document.fire(eventName);
+        await flushPromises();
+        assert.equal(overlay.style.display, 'none');
+    }
+
+    await clock.advanceTo(1620000);
     assert.equal(tab.requests.filter(request => request.action === 'expire').length, 1);
-    await clock.advanceTo(541100);
+    await clock.advanceTo(1621100);
     assert.equal(tab.location.href, '/UbeDelights/views/login.php?error=timeout');
+
+    const expiredClock = new FakeClock();
+    const expiredTab = createTab({
+        clock: expiredClock,
+        storage: new SharedStorage(),
+        channels: new SharedChannels().createClass(),
+        id: 'expired',
+        fetchHandler(action) {
+            if (action === 'continue') return { status: 401, data: { success: false, code: 'session_timeout', login_url: '/UbeDelights/views/login.php?error=timeout' } };
+            return { status: 200, data: { success: true } };
+        }
+    });
+    await expiredClock.advanceTo(240000);
+    assert.equal(expiredTab.nodes.get('session-countdown').textContent, '01:00');
+    await expiredClock.advanceTo(241000);
+    assert.equal(expiredTab.nodes.get('session-countdown').textContent, '00:59');
+    expiredTab.document.fire('click');
+    await flushPromises();
+    assert.equal(expiredTab.location.href, '/UbeDelights/views/login.php?error=timeout');
+    assert.equal(expiredTab.document.body.appended.style.display, 'flex');
 
     const sharedClock = new FakeClock();
     const sharedStorage = new SharedStorage();
@@ -225,20 +267,14 @@ async function run() {
     activeTab.document.fire('mousemove');
     await flushPromises();
     await sharedClock.advanceTo(240000);
-    assert.equal(idleTab.document.body.appended, undefined);
-    await sharedClock.advanceTo(479000);
     assert.equal(idleTab.document.body.appended.style.display, 'flex');
-    await sharedClock.advanceTo(480000);
-    activeTab.document.fire('mousemove');
-    await flushPromises();
-    assert.equal(idleTab.document.body.appended.style.display, 'flex');
-    assert.equal(idleTab.nodes.get('session-countdown').textContent, '300');
-    activeTab.nodes.get('session-continue-btn').fire('click');
+    assert.equal(idleTab.nodes.get('session-countdown').textContent, '01:00');
+    activeTab.document.fire('click');
     await flushPromises();
     assert.equal(activeTab.document.body.appended.style.display, 'none');
     assert.equal(idleTab.document.body.appended.style.display, 'none');
 
-    console.log('PASS: public pages stay inactive; warning, Continue, server retry, timeout redirect, and cross-tab activity work.');
+    console.log('PASS: deliberate activity, warning renewal, retry, timeout redirect, and cross-tab dismissal work.');
 }
 
 run().catch(error => {

@@ -123,7 +123,7 @@ $categories = [
     <script src="../javascript/index.js"></script>
     <script src="../javascript/dashboard.js"></script>
     <script src="../javascript/shop.js"></script>
-    <script src="../javascript/session_timeout.js?v=1.0"></script>
+    <script src="../javascript/session_timeout.js?v=1.2"></script>
     <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/inspect.js"></script>
 </body>

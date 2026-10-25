@@ -56,4 +56,4 @@ if ($isSuperAdmin && $connect) {
             <a onclick="getAdminLogout()" class="sidebar-logout"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></a>
         </div>
     </aside>
-    <script src="../../javascript/session_timeout.js?v=1.0"></script>
+    <script src="../../javascript/session_timeout.js?v=1.2"></script>

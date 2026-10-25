@@ -272,7 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/login.js?v=2.1"></script>
-    <script src="../javascript/session_timeout.js?v=1.0"></script>
+    <script src="../javascript/session_timeout.js?v=1.2"></script>
     <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/inspect.js"></script>
 </body>

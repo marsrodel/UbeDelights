@@ -22,12 +22,14 @@
     var countdownTimer = null;
     var heartbeatTimer = null;
     var warningShown = false;
+    var renewalPending = false;
     var expiryRequestPending = false;
     var heartbeatPending = false;
     var lastHeartbeatAt = Date.now();
     var channel = null;
     var warningOverlay = null;
     var continueButton = null;
+    var renewalError = null;
     var lastPublishedActivityAt = 0;
     var lastTimerUpdateAt = 0;
     var activityPublishTimer = null;
@@ -56,14 +58,17 @@
             warningOverlay.innerHTML = '<div style="background:#fff;border-radius:12px;padding:32px 28px;max-width:400px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.18);">'
                 + '<div style="font-size:40px;color:#dc2626;margin-bottom:12px;"><i class="fa-solid fa-clock"></i></div>'
                 + '<h3 style="margin:0 0 8px;font-size:18px;color:#1f2937;">Session Expiring Soon</h3>'
-                + '<p style="margin:0 0 16px;color:#6b7280;font-size:14px;">Your session will expire in <strong id="session-countdown">60</strong> seconds due to inactivity.</p>'
+                + '<p style="margin:0 0 16px;color:#6b7280;font-size:14px;">Your session will expire in <strong id="session-countdown">01:00</strong> due to inactivity.</p>'
+                + '<p id="session-renewal-error" role="alert" style="display:none;margin:0 0 12px;color:#dc2626;font-size:13px;"></p>'
                 + '<button id="session-continue-btn" style="background:#6B21A8;color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Continue</button>'
                 + '</div>';
             document.body.appendChild(warningOverlay);
             continueButton = document.getElementById('session-continue-btn');
+            renewalError = document.getElementById('session-renewal-error');
             continueButton.addEventListener('click', continueSession);
         }
         warningShown = true;
+        showRenewalError('');
         warningOverlay.style.display = 'flex';
         updateCountdown();
         if (!countdownTimer) countdownTimer = setInterval(updateCountdown, 1000);
@@ -73,16 +78,25 @@
         var countdown = document.getElementById('session-countdown');
         if (!countdown) return;
         var remaining = Math.max(0, Math.ceil((lastActivityAt + TIMEOUT_MS - Date.now()) / 1000));
-        countdown.textContent = String(remaining);
+        var minutes = Math.floor(remaining / 60);
+        var seconds = remaining % 60;
+        countdown.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
     }
 
     function hideWarning() {
         warningShown = false;
+        showRenewalError('');
         if (warningOverlay) warningOverlay.style.display = 'none';
         if (countdownTimer) {
             clearInterval(countdownTimer);
             countdownTimer = null;
         }
+    }
+
+    function showRenewalError(message) {
+        if (!renewalError) return;
+        renewalError.textContent = message;
+        renewalError.style.display = message ? 'block' : 'none';
     }
 
     function redirectToLogin(url) {
@@ -98,14 +112,14 @@
     function handleMessage(message) {
         if (!message || typeof message !== 'object') return;
         var messageTime = Number.isFinite(Number(message.at)) ? Math.min(Number(message.at), Date.now()) : 0;
-        if (message.type === 'activity' && messageTime > lastActivityAt) {
+        if (message.type === 'activity' && !warningShown && messageTime > lastActivityAt) {
             lastActivityAt = messageTime;
             writeStoredActivity(lastActivityAt);
             scheduleTimers();
             return;
         }
-        if (message.type === 'continue' && messageTime >= lastActivityAt) {
-            lastActivityAt = messageTime;
+        if (message.type === 'continue' && messageTime > 0 && Date.now() - messageTime < WARNING_MS) {
+            lastActivityAt = Math.max(lastActivityAt, messageTime);
             writeStoredActivity(lastActivityAt);
             hideWarning();
             scheduleTimers();
@@ -131,6 +145,10 @@
     }
 
     function noteActivity() {
+        if (warningShown) {
+            continueSession();
+            return;
+        }
         var now = Date.now();
         lastActivityAt = now;
         if (now - lastPublishedActivityAt >= 1000) {
@@ -176,7 +194,9 @@
     }
 
     function continueSession() {
-        if (!continueButton || continueButton.disabled) return;
+        if (!warningShown || renewalPending) return;
+        renewalPending = true;
+        showRenewalError('');
         continueButton.disabled = true;
         requestActivity('continue').then(function (result) {
             if (result.ok) {
@@ -186,8 +206,13 @@
                 hideWarning();
                 sendMessage({ type: 'continue', at: lastActivityAt });
                 scheduleTimers();
+            } else if (result.status !== 401 && warningShown) {
+                showRenewalError('Could not renew your session. Please try again.');
             }
-        }).catch(function () {}).finally(function () {
+        }).catch(function () {
+            if (warningShown) showRenewalError('Could not renew your session. Please try again.');
+        }).finally(function () {
+            renewalPending = false;
             if (continueButton) continueButton.disabled = false;
         });
     }
@@ -223,7 +248,10 @@
         if (now - lastHeartbeatAt < minimumInterval) return;
         heartbeatPending = true;
         lastHeartbeatAt = now;
-        requestActivity('heartbeat').catch(function () {}).finally(function () {
+        var activityAt = lastActivityAt;
+        requestActivity('heartbeat').then(function (result) {
+            if (result.ok) sendMessage({ type: 'continue', at: activityAt });
+        }).catch(function () {}).finally(function () {
             heartbeatPending = false;
         });
     }
@@ -245,7 +273,7 @@
     window.addEventListener('storage', function (event) {
         if (event.key === ACTIVITY_KEY) {
             var timestamp = Number.isFinite(Number(event.newValue)) ? Math.min(Number(event.newValue), Date.now()) : 0;
-            if (Number.isFinite(timestamp) && timestamp > lastActivityAt) {
+            if (!warningShown && Number.isFinite(timestamp) && timestamp > lastActivityAt) {
                 lastActivityAt = timestamp;
                 scheduleTimers();
             }
@@ -254,11 +282,11 @@
         }
     });
 
-    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart', 'pointerdown'].forEach(function (eventName) {
-        document.addEventListener(eventName, noteActivity, { passive: true });
+    ['keydown', 'click', 'scroll', 'wheel', 'touchstart'].forEach(function (eventName) {
+        document.addEventListener(eventName, noteActivity, { passive: true, capture: eventName === 'scroll' });
     });
 
     heartbeatTimer = setInterval(function () { sendHeartbeat(false); }, HEARTBEAT_MS);
-    sendMessage({ type: 'activity', at: initialActivity });
+    sendMessage({ type: 'continue', at: initialActivity });
     scheduleTimers();
 })();

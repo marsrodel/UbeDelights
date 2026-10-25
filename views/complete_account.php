@@ -309,7 +309,7 @@ $otpExpiryTs = $otpExpiry;
 
     <script src="../javascript/disable_back.js"></script>
     <script src="../javascript/register.js"></script>
-    <script src="../javascript/session_timeout.js?v=1.0"></script>
+    <script src="../javascript/session_timeout.js?v=1.2"></script>
     <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/complete_account.js"></script>
     <script src="../javascript/inspect.js"></script>

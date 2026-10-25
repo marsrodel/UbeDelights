@@ -601,7 +601,7 @@ $questionGroups = fetch_question_groups();
   </footer>
   <script src="../javascript/disable_back.js"></script>
   <script src="../javascript/forgot_password.js?v=1.1"></script>
-  <script src="../javascript/session_timeout.js?v=1.0"></script>
+  <script src="../javascript/session_timeout.js?v=1.2"></script>
   <script src="../javascript/routing.js?v=3.0"></script>
   <script src="../javascript/inspect.js"></script>
 </body>
