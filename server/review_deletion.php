@@ -43,7 +43,7 @@ if ($action === 'reject') {
             throw new RuntimeException('Could not start the review transaction.');
         }
 
-        $requestStmt = mysqli_prepare($connect, "SELECT target_id_number, status FROM deletion_requests WHERE id = ? FOR UPDATE");
+        $requestStmt = mysqli_prepare($connect, "SELECT target_id_number, status, requested_by, reason, created_at FROM deletion_requests WHERE id = ? FOR UPDATE");
         if (!$requestStmt) throw new RuntimeException('Could not load the deletion request.');
         mysqli_stmt_bind_param($requestStmt, 'i', $requestId);
         if (!mysqli_stmt_execute($requestStmt)) {
@@ -102,6 +102,26 @@ if ($action === 'reject') {
 
         $actorUsername = (string)($_SESSION['auth_username'] ?? 'Super Admin');
         $logMessage = "$actorUsername rejected deletion request for {$target['username']} (ID: $targetId)";
+        $requesterId = (string)$requestState['requested_by'];
+        $requesterUsername = $requesterId;
+        $requesterStmt = mysqli_prepare($connect, "SELECT username FROM users WHERE user_id = ? LIMIT 1");
+        if ($requesterStmt) {
+            $requesterStmt->bind_param('s', $requesterId);
+            if ($requesterStmt->execute()) {
+                $requesterRow = $requesterStmt->get_result()->fetch_assoc();
+                if ($requesterRow && !empty($requesterRow['username'])) $requesterUsername = $requesterRow['username'];
+            }
+            $requesterStmt->close();
+        }
+        $logMessage = log_deletion_event_details($logMessage, [
+            'kind' => 'deletion_review',
+            'request_id' => $requestId,
+            'outcome' => 'rejected',
+            'requested_by' => $requesterUsername,
+            'requested_by_id' => $requesterId,
+            'requested_on' => $requestState['created_at'],
+            'reason' => $requestState['reason'],
+        ]);
         if (!log_activity('DELETION_REVIEW', $logMessage, 'Deletion Requests', $reviewedBy, $actorUsername)) {
             $failureMessage = 'Could not record the activity log. The request remains pending; please try again.';
             throw new RuntimeException('Activity log write failed.');
@@ -124,9 +144,11 @@ if ($action === 'reject') {
 }
 
 $escapedId = mysqli_real_escape_string($connect, $requestId);
-$result = mysqli_query($connect, "SELECT dr.*, u.username AS target_username, u.role AS target_role
+$result = mysqli_query($connect, "SELECT dr.*, u.username AS target_username, u.role AS target_role,
+        requester.username AS requested_by_username
     FROM deletion_requests dr
     JOIN users u ON u.user_id = dr.target_id_number
+    LEFT JOIN users requester ON requester.user_id = dr.requested_by
     WHERE dr.id = '$escapedId' AND dr.status = 'pending'");
 
 if (!$result || mysqli_num_rows($result) === 0) {
@@ -161,6 +183,17 @@ if ($action === 'approve') {
 }
 
 $logMessage = "{$_SESSION['auth_username']} {$newStatus} deletion request for {$request['target_username']} (ID: {$request['target_id_number']})";
+$requesterId = (string)$request['requested_by'];
+$requesterUsername = !empty($request['requested_by_username']) ? $request['requested_by_username'] : $requesterId;
+$logMessage = log_deletion_event_details($logMessage, [
+    'kind' => 'deletion_review',
+    'request_id' => $requestId,
+    'outcome' => $newStatus,
+    'requested_by' => $requesterUsername,
+    'requested_by_id' => $requesterId,
+    'requested_on' => $request['created_at'],
+    'reason' => $request['reason'],
+]);
 log_activity('DELETION_REVIEW', $logMessage, 'Deletion Requests', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
 
 $label = $action === 'approve' ? 'approved' : 'rejected';

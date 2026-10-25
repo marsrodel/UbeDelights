@@ -5,6 +5,13 @@ function log_activity($action, $details, $module = 'General', $idNumber = null, 
     return log_write_event(log_category_for_action($action), $action, $details, $module, $idNumber, $username);
 }
 
+function log_deletion_event_details($summary, $metadata) {
+    $metadata['version'] = 1;
+    $json = json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
+    if ($json === false) return $summary;
+    return rtrim((string)$summary) . ' [[DELETION_META_V1:' . base64_encode($json) . ']]';
+}
+
 function log_category_for_action($action) {
     $authentication = [
         'login', 'logout', 'failed_login', 'login_blocked', 'login_pending', 'login_rejected',

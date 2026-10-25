@@ -3310,6 +3310,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!item) return;
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
+                var directDeleteReasonGroup = document.getElementById('directDeleteReasonGroup');
+                document.getElementById('directDeleteReason').value = '';
+                document.getElementById('directDeleteReasonError').textContent = '';
+                if (directDeleteReasonGroup) directDeleteReasonGroup.style.display = '';
                 document.getElementById('blockUserId').value = userId;
                 document.getElementById('blockAction').value = 'delete-user';
                 document.getElementById('blockModalTitle').textContent = 'Confirm Delete';
@@ -3349,7 +3353,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
             var pendingDeletionUserId = '';
             var pendingDeletionReason = '';
+            var pendingDirectDeletionReason = '';
             var pendingResetNewPassword = '';
+
+            var directDeleteReasonInput = document.getElementById('directDeleteReason');
+            if (directDeleteReasonInput) {
+                directDeleteReasonInput.addEventListener('input', function() {
+                    document.getElementById('directDeleteReasonError').textContent = '';
+                });
+            }
+
+            var blockModal = document.getElementById('blockModal');
+            if (blockModal) {
+                var directDeleteReasonObserver = new MutationObserver(function() {
+                    if (!blockModal.classList.contains('active')) {
+                        var reasonGroup = document.getElementById('directDeleteReasonGroup');
+                        if (reasonGroup) reasonGroup.style.display = 'none';
+                        document.getElementById('directDeleteReason').value = '';
+                        document.getElementById('directDeleteReasonError').textContent = '';
+                    }
+                });
+                directDeleteReasonObserver.observe(blockModal, { attributes: true, attributeFilter: ['class'] });
+            }
 
             var requestDeletionModal = document.getElementById('requestDeletionModal');
             if (requestDeletionModal) {
@@ -3399,6 +3424,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!item || item.disabled) return;
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
+                var directDeleteReasonGroup = document.getElementById('directDeleteReasonGroup');
+                if (directDeleteReasonGroup) directDeleteReasonGroup.style.display = 'none';
                 document.getElementById('blockUserId').value = userId;
                 document.getElementById('blockAction').value = 'block';
                 document.getElementById('blockModalTitle').textContent = 'Confirm Status Change';
@@ -3412,6 +3439,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!item || item.disabled) return;
                 e.stopPropagation();
                 var userId = item.getAttribute('data-id');
+                var directDeleteReasonGroup = document.getElementById('directDeleteReasonGroup');
+                if (directDeleteReasonGroup) directDeleteReasonGroup.style.display = 'none';
                 var allData = typeof allUsers !== 'undefined' ? allUsers : [];
                 var targetUser = allData.find(function(u) { return u.id === userId; });
 
@@ -3483,6 +3512,16 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('blockConfirmBtn').addEventListener('click', function() {
                 var userId = document.getElementById('blockUserId').value;
                 var action = document.getElementById('blockAction').value;
+                if (action === 'delete-user') {
+                    var deleteReason = (document.getElementById('directDeleteReason').value || '').trim();
+                    if (!deleteReason) {
+                        document.getElementById('directDeleteReasonError').textContent = 'A reason is required.';
+                        return;
+                    }
+                    pendingDirectDeletionReason = deleteReason;
+                } else {
+                    pendingDirectDeletionReason = '';
+                }
                 closeModal('blockModal');
                 document.getElementById('blockPasswordUserId').value = userId;
                 document.getElementById('blockPasswordAction').value = action;
@@ -3752,6 +3791,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 var fd = new FormData();
                 fd.append('user_id', targetUserId);
                 fd.append('action', 'delete_user');
+                fd.append('reason', pendingDirectDeletionReason);
+                pendingDirectDeletionReason = '';
 
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '../../server/user_management.php', true);

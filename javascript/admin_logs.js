@@ -12,6 +12,7 @@
     var activeRequest = null;
     var requestNumber = 0;
     var noticeCallback = null;
+    var deletionDetailsByKey = Object.create(null);
 
     function escapeHtml(str) {
         return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -30,6 +31,103 @@
 
     function cleanLogDetails(details) {
         return String(details || '').replace(/\s*\|\s*Browser:.*$/i, '').trim();
+    }
+
+    function parseLogDetails(details) {
+        var raw = String(details || '');
+        var marker = '[[DELETION_META_V1:';
+        var markerStart = raw.indexOf(marker);
+        if (markerStart === -1) return { summary: cleanLogDetails(raw), metadata: null };
+
+        var payloadStart = markerStart + marker.length;
+        var markerEnd = raw.indexOf(']]', payloadStart);
+        if (markerEnd === -1) return { summary: cleanLogDetails(raw), metadata: null };
+
+        var metadata = null;
+        try {
+            var binary = atob(raw.slice(payloadStart, markerEnd));
+            var encoded = '';
+            for (var i = 0; i < binary.length; i++) {
+                encoded += '%' + ('0' + binary.charCodeAt(i).toString(16)).slice(-2);
+            }
+            metadata = JSON.parse(decodeURIComponent(encoded));
+        } catch (e) {
+            metadata = null;
+        }
+
+        var visibleDetails = raw.slice(0, markerStart) + raw.slice(markerEnd + 2);
+        return { summary: cleanLogDetails(visibleDetails), metadata: metadata };
+    }
+
+    function isDeletionAction(action) {
+        return ['delete_user', 'deletion_request', 'deletion_review'].indexOf(String(action || '').toLowerCase()) !== -1;
+    }
+
+    function deletionAccountLabel(username, userId) {
+        var label = String(username || '').trim();
+        var id = String(userId || '').trim();
+        if (id) label += (label ? ' ' : '') + '(ID: ' + id + ')';
+        return label || 'Not recorded for this historical entry.';
+    }
+
+    function deletionDetailField(label, value, className) {
+        return '<div class="logs-detail-field' + (className ? ' ' + className : '') + '">' +
+            '<div class="logs-detail-label">' + escapeHtml(label) + '</div>' +
+            '<div class="logs-detail-value">' + value + '</div>' +
+            '</div>';
+    }
+
+    function showDeletionDetails(key) {
+        var entry = deletionDetailsByKey[key];
+        if (!entry) return;
+
+        var log = entry.log;
+        var metadata = entry.metadata || {};
+        var action = String(log.action || '').toLowerCase();
+        var unavailable = 'Not recorded for this historical entry.';
+        var fields = [];
+        var title = 'Deletion Details';
+
+        if (action === 'delete_user') {
+            title = 'Account Deletion Details';
+            fields.push(deletionDetailField('Deleted by', escapeHtml(deletionAccountLabel(log.username || log.fullName, log.idNumber))));
+            fields.push(deletionDetailField('Deleted on', formatLogTimestamp(log.created_at)));
+            fields.push(deletionDetailField('Reason', escapeHtml(metadata.reason || unavailable), 'logs-detail-reason'));
+        } else if (action === 'deletion_request') {
+            title = 'Deletion Request Details';
+            var requesterUsername = metadata.requested_by || log.username || log.fullName;
+            var requesterId = metadata.requested_by_id || log.idNumber;
+            fields.push(deletionDetailField('Requested by', escapeHtml(deletionAccountLabel(requesterUsername, requesterId))));
+            fields.push(deletionDetailField('Requested on', formatLogTimestamp(metadata.requested_on || log.created_at)));
+            fields.push(deletionDetailField('Reason', escapeHtml(metadata.reason || unavailable), 'logs-detail-reason'));
+        } else {
+            var summary = entry.summary.toLowerCase();
+            var outcome = String(metadata.outcome || '').toLowerCase();
+            if (outcome !== 'approved' && outcome !== 'rejected') {
+                if (summary.indexOf('rejected deletion request') !== -1) outcome = 'rejected';
+                else if (summary.indexOf('approved deletion request') !== -1) outcome = 'approved';
+                else outcome = '';
+            }
+            var rejected = outcome === 'rejected';
+            title = rejected ? 'Deletion Request Review' : outcome === 'approved' ? 'Deletion Approval Details' : 'Deletion Request Review Details';
+            fields.push(deletionDetailField('Requested by', escapeHtml(deletionAccountLabel(metadata.requested_by, metadata.requested_by_id))));
+            fields.push(deletionDetailField('Requested on', metadata.requested_on ? formatLogTimestamp(metadata.requested_on) : escapeHtml(unavailable)));
+            if (!outcome) fields.push(deletionDetailField('Review outcome', escapeHtml(unavailable), 'logs-detail-outcome'));
+            fields.push(deletionDetailField(rejected || !outcome ? 'Reviewed by' : 'Approved by', escapeHtml(deletionAccountLabel(log.username || log.fullName, log.idNumber))));
+            fields.push(deletionDetailField(rejected || !outcome ? 'Reviewed on' : 'Approved on', formatLogTimestamp(log.created_at)));
+            fields.push(deletionDetailField('Reason', escapeHtml(metadata.reason || unavailable), 'logs-detail-reason'));
+        }
+
+        document.getElementById('deletionDetailsTitle').textContent = title;
+        document.getElementById('deletionDetailsBody').innerHTML = fields.join('');
+        document.getElementById('deletionDetailsModal').classList.add('active');
+        document.body.classList.add('logs-modal-open');
+    }
+
+    function closeDeletionDetails() {
+        var modal = document.getElementById('deletionDetailsModal');
+        if (modal) modal.classList.remove('active');
+        document.body.classList.remove('logs-modal-open');
     }
 
     function getRoleLabel(role) {
@@ -184,6 +282,7 @@
     function renderTable(logs) {
         var tbody = document.getElementById('logsTableBody');
         var isAuthentication = state.type === 'authentication';
+        deletionDetailsByKey = Object.create(null);
         function cell(label, content) {
             return '<td' + (isAuthentication ? ' data-label="' + escapeHtml(label) + '"' : '') + '>' + content + '</td>';
         }
@@ -196,6 +295,13 @@
             var browser = (log.browser || 'Unknown').replace(/\s+[0-9.]+$/, '');
             var timestamp = isAuthentication ? log.time_in : log.created_at;
             var timestampLabel = isAuthentication ? 'Time In' : 'Timestamp';
+            var parsedDetails = parseLogDetails(log.details);
+            var detailsHtml = escapeHtml(parsedDetails.summary || '\u2014');
+            if (state.type === 'activity' && isDeletionAction(log.action)) {
+                var detailsKey = String(log.log_type || state.type) + ':' + String(log.id);
+                deletionDetailsByKey[detailsKey] = { log: log, metadata: parsedDetails.metadata, summary: parsedDetails.summary };
+                detailsHtml += ' <button type="button" class="log-view-more" data-deletion-details-key="' + escapeHtml(detailsKey) + '">View more</button>';
+            }
             var html = '<tr>' +
                 cell('User ID', escapeHtml(log.idNumber || '\u2014')) +
                 cell('Name', escapeHtml(log.fullName || log.username || 'System')) +
@@ -208,7 +314,7 @@
                 html += cell('Time Out', log.time_out === 'active' ? '<span class="log-active">Active</span>' : formatLogTimestamp(log.time_out));
             }
             return html + cell('IP Address', '<code class="ip-badge">' + escapeHtml(ip) + '</code>') +
-                cell('Details', escapeHtml(cleanLogDetails(log.details) || '\u2014')) + '</tr>';
+                cell('Details', detailsHtml) + '</tr>';
         }).join('');
         updateActionColumnTier();
     }
@@ -322,7 +428,19 @@
             if (event.target === this) closeNotice();
         });
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') closeNotice();
+            if (event.key === 'Escape') {
+                closeNotice();
+                closeDeletionDetails();
+            }
+        });
+        document.getElementById('logsTableBody').addEventListener('click', function(event) {
+            var button = event.target.closest('[data-deletion-details-key]');
+            if (button) showDeletionDetails(button.getAttribute('data-deletion-details-key'));
+        });
+        document.getElementById('deletionDetailsCloseBtn').addEventListener('click', closeDeletionDetails);
+        document.getElementById('deletionDetailsDoneBtn').addEventListener('click', closeDeletionDetails);
+        document.getElementById('deletionDetailsModal').addEventListener('click', function(event) {
+            if (event.target === this) closeDeletionDetails();
         });
         loadLogs();
     });

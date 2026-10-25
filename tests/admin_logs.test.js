@@ -86,7 +86,7 @@ class Request {
     }
 }
 const context = vm.createContext({
-    document, window: {}, URLSearchParams, XMLHttpRequest: Request,
+    document, window: {}, URLSearchParams, XMLHttpRequest: Request, atob,
     setTimeout: () => 1, clearTimeout: () => {}
 });
 nodes.get('logsTypeFilter').value = 'activity';
@@ -186,6 +186,101 @@ assert.equal((nodes.get('logsTableBody').innerHTML.match(/<td(?:\s|>)/g) || []).
 assert.doesNotMatch(nodes.get('logsTableBody').innerHTML, /log-severity/);
 assert.match(nodes.get('logsTableBody').innerHTML, /10:00 AM/);
 
+const deletionMetadata = metadata => ' [[DELETION_META_V1:' + Buffer.from(JSON.stringify(metadata), 'utf8').toString('base64') + ']]';
+function openDeletionDetails() {
+    const match = nodes.get('logsTableBody').innerHTML.match(/data-deletion-details-key="([^"]+)"/);
+    assert.ok(match, 'Deletion log should have a View more link.');
+    const button = { getAttribute: () => match[1] };
+    nodes.get('logsTableBody').fire('click', {
+        target: { closest: selector => selector === '[data-deletion-details-key]' ? button : null }
+    });
+    assert.equal(nodes.get('deletionDetailsModal').classes.has('active'), true);
+    return nodes.get('deletionDetailsBody').innerHTML;
+}
+function closeDeletionDetails() {
+    nodes.get('deletionDetailsDoneBtn').fire('click');
+    assert.equal(nodes.get('deletionDetailsModal').classes.has('active'), false);
+}
+
+const directDeleteLog = {
+    ...authRow, id: 501, log_type: 'activity', idNumber: '2026-0012', username: 'edrian_123',
+    fullName: 'Edrian Prones', role: 'super_admin', module: 'User Management', action: 'DELETE_USER',
+    created_at: '2026-10-20 14:30:00', details: 'edrian_123 deleted marsrodel_123 (ID: 2026-0013)' +
+        deletionMetadata({ kind: 'direct_delete', reason: 'Policy request: <script>bad()</script>' }) +
+        ' | Browser: Chrome 150.0.0.0 | OS: Windows'
+};
+reply([directDeleteLog]);
+assert.match(nodes.get('logsTableBody').innerHTML, /edrian_123 deleted marsrodel_123/);
+assert.match(nodes.get('logsTableBody').innerHTML, />View more</);
+assert.doesNotMatch(nodes.get('logsTableBody').innerHTML, /DELETION_META_V1|Browser:/);
+let detailHtml = openDeletionDetails();
+assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Account Deletion Details');
+assert.match(detailHtml, /Deleted by/);
+assert.match(detailHtml, /edrian_123/);
+assert.match(detailHtml, /Deleted on/);
+assert.match(detailHtml, /Reason/);
+assert.match(detailHtml, /&lt;script&gt;bad\(\)&lt;\/script&gt;/);
+closeDeletionDetails();
+
+const requestLog = {
+    ...directDeleteLog, id: 502, action: 'DELETION_REQUEST', username: 'admin_123', idNumber: '2026-0010',
+    fullName: 'Shania Bugahod', created_at: '2026-10-20 14:00:00',
+    details: 'admin_123 requested deletion of marsrodel_123 (ID: 2026-0013)' + deletionMetadata({
+        kind: 'deletion_request', request_id: 44, requested_by: 'admin_123', requested_by_id: '2026-0010',
+        requested_on: '2026-10-20 13:59:00', reason: 'Duplicate account'
+    })
+};
+reply([requestLog]);
+detailHtml = openDeletionDetails();
+assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Deletion Request Details');
+assert.match(detailHtml, /Requested by/);
+assert.match(detailHtml, /Requested on/);
+assert.match(detailHtml, /Duplicate account/);
+closeDeletionDetails();
+
+const approvedReviewLog = {
+    ...directDeleteLog, id: 503, action: 'DELETION_REVIEW', username: 'marsrodel_123',
+    idNumber: '2026-0013', created_at: '2026-10-20 14:30:00',
+    details: 'marsrodel_123 approved deletion request for marsrodel_123 (ID: 2026-0013)' + deletionMetadata({
+        kind: 'deletion_review', outcome: 'approved', requested_by: 'admin_123', requested_by_id: '2026-0010',
+        requested_on: '2026-10-20 13:59:00', reason: 'Duplicate account'
+    })
+};
+reply([approvedReviewLog]);
+detailHtml = openDeletionDetails();
+assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Deletion Approval Details');
+assert.match(detailHtml, /Approved by/);
+assert.match(detailHtml, /Approved on/);
+assert.doesNotMatch(detailHtml, /Reviewed by/);
+closeDeletionDetails();
+
+const rejectedReviewLog = {
+    ...approvedReviewLog, id: 504,
+    details: 'marsrodel_123 rejected deletion request for marsrodel_123 (ID: 2026-0013)' + deletionMetadata({
+        kind: 'deletion_review', outcome: 'rejected', requested_by: 'admin_123', requested_by_id: '2026-0010',
+        requested_on: '2026-10-20 13:59:00', reason: 'Duplicate account'
+    })
+};
+reply([rejectedReviewLog]);
+detailHtml = openDeletionDetails();
+assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Deletion Request Review');
+assert.match(detailHtml, /Reviewed by/);
+assert.match(detailHtml, /Reviewed on/);
+assert.doesNotMatch(detailHtml, /Approved by/);
+closeDeletionDetails();
+
+reply([{ ...rejectedReviewLog, id: 505, details: 'marsrodel_123 rejected deletion request for an older entry' }]);
+detailHtml = openDeletionDetails();
+assert.match(detailHtml, /Not recorded for this historical entry\./);
+closeDeletionDetails();
+
+reply([{ ...rejectedReviewLog, id: 506, details: 'marsrodel_123 rejectedd deletion request for an older entry' }]);
+detailHtml = openDeletionDetails();
+assert.equal(nodes.get('deletionDetailsTitle').textContent, 'Deletion Request Review Details');
+assert.match(detailHtml, /Review outcome/);
+assert.doesNotMatch(detailHtml, /Approved by/);
+closeDeletionDetails();
+
 nodes.get('btnClearLogsFilter').fire('click');
 assert.equal(current().url.searchParams.get('type'), 'activity');
 for (const key of ['search', 'role', 'date_from', 'date_to']) assert.equal(current().url.searchParams.has(key), false);
@@ -201,4 +296,4 @@ assert.equal(nodes.get('successModal').classes.has('active'), true);
 nodes.get('successModalOkBtn').fire('click');
 assert.equal(nodes.get('successModal').classes.has('active'), false);
 assert.equal(document.body.classes.has('logs-modal-open'), false);
-console.log('PASS: log selector, defaults, filters, pagination, timestamps, escaping, request races, and Notice modal.');
+console.log('PASS: log selector, defaults, filters, pagination, timestamps, escaping, deletion details, request races, and Notice modal.');

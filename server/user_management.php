@@ -511,6 +511,11 @@ try {
                 throw new Exception('Only super admins can delete user accounts');
             }
 
+            $deleteReason = trim((string)($_POST['reason'] ?? ''));
+            if ($deleteReason === '') {
+                throw new Exception('A reason is required to delete an account.');
+            }
+
             // Get user details
             $stmt = $connect->prepare("SELECT username, role FROM users WHERE user_id = ?");
             $stmt->bind_param("s", $userId);
@@ -539,7 +544,12 @@ try {
             $del_stmt = $connect->prepare("DELETE FROM users WHERE user_id = ?");
             $del_stmt->bind_param("s", $userId);
             if ($del_stmt->execute()) {
-                log_activity('DELETE_USER', "{$_SESSION['auth_username']} deleted {$target_user['username']} (ID: $userId)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
+                $summary = "{$_SESSION['auth_username']} deleted {$target_user['username']} (ID: $userId)";
+                $details = log_deletion_event_details($summary, [
+                    'kind' => 'direct_delete',
+                    'reason' => $deleteReason,
+                ]);
+                log_activity('DELETE_USER', $details, 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
                 $response = ['success' => true, 'message' => "User {$target_user['username']} has been deleted successfully"];
             } else {
                 throw new Exception('Failed to delete user');

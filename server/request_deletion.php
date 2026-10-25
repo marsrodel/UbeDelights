@@ -76,7 +76,28 @@ $escapedReason = mysqli_real_escape_string($connect, $reason);
 $insert = mysqli_query($connect, "INSERT INTO deletion_requests (target_id_number, requested_by, reason) VALUES ('$escapedTarget', '$escapedRequestedBy', '$escapedReason')");
 
 if ($insert) {
-    log_activity('DELETION_REQUEST', "{$_SESSION['auth_username']} requested deletion of {$target['username']} (ID: $targetId)", 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
+    $requestId = (int)mysqli_insert_id($connect);
+    $requestedOn = date('Y-m-d H:i:s');
+    $timeStmt = $connect->prepare("SELECT created_at FROM deletion_requests WHERE id = ?");
+    if ($timeStmt) {
+        $timeStmt->bind_param('i', $requestId);
+        if ($timeStmt->execute()) {
+            $timeRow = $timeStmt->get_result()->fetch_assoc();
+            if ($timeRow && !empty($timeRow['created_at'])) $requestedOn = $timeRow['created_at'];
+        }
+        $timeStmt->close();
+    }
+
+    $summary = "{$_SESSION['auth_username']} requested deletion of {$target['username']} (ID: $targetId)";
+    $details = log_deletion_event_details($summary, [
+        'kind' => 'deletion_request',
+        'request_id' => $requestId,
+        'requested_by' => $_SESSION['auth_username'],
+        'requested_by_id' => $userId,
+        'requested_on' => $requestedOn,
+        'reason' => $reason,
+    ]);
+    log_activity('DELETION_REQUEST', $details, 'User Management', $_SESSION['auth_user_id'], $_SESSION['auth_username']);
     echo json_encode(['success' => true, 'message' => 'Deletion request submitted for super admin review.']);
 } else {
     echo json_encode(['success' => false, 'message' => 'Failed to submit deletion request.']);

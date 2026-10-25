@@ -294,6 +294,11 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
             </div>
             <div class="modal-body" style="padding:0 24px 24px;">
                 <p id="blockModalMessage" style="color:var(--text-secondary); font-size:0.95rem;">Block this user? They will not be able to log in.</p>
+                <div class="form-group" id="directDeleteReasonGroup" style="display:none;">
+                    <label for="directDeleteReason">Reason for deletion <span class="required">*</span></label>
+                    <textarea id="directDeleteReason" rows="4" placeholder="Explain why this account is being deleted"></textarea>
+                    <p id="directDeleteReasonError" class="inline-error"></p>
+                </div>
                 <input type="hidden" id="blockUserId">
                 <input type="hidden" id="blockAction">
             </div>
@@ -548,7 +553,7 @@ if ($connect && ($_SESSION['auth_role'] ?? '') === 'admin') {
     <script src="../../javascript/admin_security.js?v=4.0"></script>
     <script src="../../javascript/admin_notifications.js"></script>
     <script>var allUsers = <?php echo json_encode($users); ?>; var currentUserRole = <?php echo json_encode($_SESSION['auth_role'] ?? 'admin'); ?>; var currentUserId = <?php echo json_encode($_SESSION['auth_user_id'] ?? ''); ?>; var myPrivileges = <?php echo json_encode($myPrivileges); ?>; var stagingSACount = <?php echo (int)$stagingSACount; ?>;</script>
-    <script src="../../javascript/user_management.js?v=4.6"></script>
+    <script src="../../javascript/user_management.js?v=4.7"></script>
     <script src="../../javascript/inspect.js?v=2.0"></script>
 </body>
 </html>
