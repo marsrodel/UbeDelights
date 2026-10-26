@@ -36,7 +36,7 @@ function createStorage(initial = {}) {
     };
 }
 
-function loadLoginPage(error) {
+function loadLoginPage(error, savedLoginState = {}) {
     const username = new Element('username');
     const password = new Element('password');
     const eyeicon = new Element('eyeicon');
@@ -84,7 +84,7 @@ function loadLoginPage(error) {
         login_username: 'marsrodel_123',
         login_password: 'cached-secret'
     });
-    const localStorage = createStorage();
+    const localStorage = createStorage(savedLoginState);
     const context = vm.createContext({
         document, window, sessionStorage, localStorage, URL, URLSearchParams, Date,
         history: window.history, setInterval: () => 1, clearInterval() {}, alert() {}
@@ -93,17 +93,32 @@ function loadLoginPage(error) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, '../javascript/login.js'), 'utf8'), context);
     (documentListeners.DOMContentLoaded || []).forEach(listener => listener());
 
-    return { username, password, sessionStorage };
+    return { username, password, forgot, orSeparator, sessionStorage, localStorage };
 }
 
-const timeoutPage = loadLoginPage('timeout');
+const timeoutPage = loadLoginPage('timeout', { login_err_count: '1' });
 assert.equal(timeoutPage.sessionStorage.getItem('login_password'), null);
 assert.equal(timeoutPage.password.value, '');
 assert.equal(timeoutPage.sessionStorage.getItem('login_username'), 'marsrodel_123');
 assert.equal(timeoutPage.username.value, 'marsrodel_123');
+assert.equal(timeoutPage.localStorage.getItem('login_err_count'), '1');
+assert.equal(timeoutPage.forgot.style.display, 'none');
+assert.equal(timeoutPage.orSeparator.style.display, 'none');
 
-const failedLoginPage = loadLoginPage('pass');
+const timeoutWithOldFailures = loadLoginPage('timeout', { login_err_count: '2' });
+assert.equal(timeoutWithOldFailures.localStorage.getItem('login_err_count'), '2');
+assert.equal(timeoutWithOldFailures.forgot.style.display, 'none');
+
+const timeoutDuringLockout = loadLoginPage('timeout', {
+    login_err_count: '2',
+    lock_deadline: String(Date.now() + 15000)
+});
+assert.equal(timeoutDuringLockout.forgot.style.display, 'none');
+
+const failedLoginPage = loadLoginPage('pass', { login_err_count: '1' });
 assert.equal(failedLoginPage.sessionStorage.getItem('login_password'), 'cached-secret');
 assert.equal(failedLoginPage.password.value, 'cached-secret');
+assert.equal(failedLoginPage.localStorage.getItem('login_err_count'), '2');
+assert.equal(failedLoginPage.forgot.style.display, 'block');
 
-console.log('PASS: timeout clears the cached login password while preserving username and normal failed-login restoration.');
+console.log('PASS: timeout clears the cached password without showing Forgot Password or counting as a failed login.');

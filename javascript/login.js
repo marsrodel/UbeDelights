@@ -331,6 +331,11 @@ document.addEventListener('DOMContentLoaded', function(){
       return;
     case 'timeout':
       showErrorMessage('username', 'Your session has expired due to inactivity. Please log in again.');
+      if (forgot) forgot.style.display = 'none';
+      if (orSep) orSep.style.display = 'none';
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
       return;
     case 'incomplete':
       // Incomplete account — redirect to complete account flow
@@ -510,13 +515,13 @@ function disableLoginBackPrevention() {
     }
   } catch(e) {}
 
-  // Ensure Forgot Password UI is visible while locked
-  if (orSep) {
+  // A session timeout is not a failed login attempt.
+  if (orSep && !isSessionTimeoutLogin) {
     orSep.style.display = 'flex';
     orSep.style.justifyContent = 'center';
     orSep.style.alignItems = 'center';
   }
-  if (forgot) {
+  if (forgot && !isSessionTimeoutLogin) {
     forgot.style.display = 'block';
     // Disable the Forgot Password link while locked
     try {

@@ -3,6 +3,7 @@ include '../server/db.php';
 include '../server/mail_helper.php';
 session_start();
 require_once __DIR__ . '/../server/user_logger.php';
+require_once __DIR__ . '/../server/password_recovery.php';
 
 if (isset($_SESSION['auth_user_id'])) {
     header('Location: ./index.php');
@@ -10,15 +11,39 @@ if (isset($_SESSION['auth_user_id'])) {
 }
 
 /* ── Helpers ── */
-function fetch_user_full($connect, $user_id) {
-    $sql = "SELECT user_id, email, username, q1, a1, q2, a2, q3, a3, status FROM users WHERE user_id = ? LIMIT 1";
-    $stmt = mysqli_prepare($connect, $sql);
-    mysqli_stmt_bind_param($stmt, 's', $user_id);
-    mysqli_stmt_execute($stmt);
-    $res = mysqli_stmt_get_result($stmt);
-    $row = $res ? mysqli_fetch_assoc($res) : null;
-    mysqli_stmt_close($stmt);
-    return $row;
+function password_recovery_stop($url, $isJson = false, $message = 'Please return to the previous step.') {
+    if ($isJson) {
+        http_response_code(403);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => $message, 'redirect' => $url]);
+    } else {
+        header('Location: ' . $url);
+    }
+    exit();
+}
+
+function password_recovery_require_account($connect, $isJson = false) {
+    if (empty($_SESSION['fp_user_id'])) {
+        password_recovery_clear_session();
+        password_recovery_stop('./forgot_password.php?step=1', $isJson, 'Your recovery session has ended. Please start again.');
+    }
+
+    $account = password_recovery_find_account($connect, $_SESSION['fp_user_id']);
+    if ($account['error'] !== null) {
+        password_recovery_clear_session();
+        password_recovery_stop('./forgot_password.php?step=1&error=' . $account['error'], $isJson, 'This account is no longer eligible for password recovery.');
+    }
+    return $account['user'];
+}
+
+function password_recovery_require_step($step, $isJson = false) {
+    $allowedStep = password_recovery_required_step($_SESSION, $step);
+    if ($allowedStep === 2) {
+        password_recovery_stop('./forgot_password.php?step=2', $isJson, 'Verify your email code first.');
+    }
+    if ($allowedStep === 3 && $step >= 4) {
+        password_recovery_stop('./forgot_password.php?step=3', $isJson, 'Answer your security questions first.');
+    }
 }
 
 function mask_id($id) {
@@ -78,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* Step 1: Verify ID */
     if ($action === 'verify_id') {
+        password_recovery_clear_session();
         $idnum = isset($_POST['id_number']) ? trim($_POST['id_number']) : '';
         if ($idnum === '') {
             header('Location: ./forgot_password.php?step=1&error=empty_id');
@@ -87,15 +113,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: ./forgot_password.php?step=1&error=invalid_id');
             exit();
         }
-        $user = fetch_user_full($connect, $idnum);
-        if (!$user) {
-            header('Location: ./forgot_password.php?step=1&error=unknown_id');
+        $account = password_recovery_find_account($connect, $idnum);
+        if ($account['error'] !== null) {
+            header('Location: ./forgot_password.php?step=1&error=' . $account['error']);
             exit();
         }
-        if ($user['status'] === 'blocked') {
-            header('Location: ./forgot_password.php?step=1&error=blocked_id');
-            exit();
-        }
+        $user = $account['user'];
 
         // Generate real 6-digit OTP
         $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -138,6 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         $_SESSION['fp_otp_expiry'] = strtotime($expiresAt);
         $_SESSION['fp_otp_attempts'] = 0;
+        $_SESSION['fp_otp_verified'] = false;
+        $_SESSION['fp_security_verified'] = false;
 
         header('Location: ./forgot_password.php?step=2');
         exit();
@@ -145,10 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* Step 2: Verify OTP */
     if ($action === 'verify_otp') {
-        if (!isset($_SESSION['fp_user_id'])) {
-            header('Location: ./forgot_password.php?step=1');
-            exit();
-        }
+        password_recovery_require_account($connect);
         $otp = isset($_POST['otp_code']) ? trim($_POST['otp_code']) : '';
         if ($otp === '') {
             header('Location: ./forgot_password.php?step=2&error=otp_empty');
@@ -212,25 +234,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // OTP verified — mark as used
         $mark = mysqli_prepare($connect, 'UPDATE otp_requests SET used = 1 WHERE id = ?');
         mysqli_stmt_bind_param($mark, 'i', $otpId);
-        mysqli_stmt_execute($mark);
+        $marked = mysqli_stmt_execute($mark) && mysqli_stmt_affected_rows($mark) === 1;
         mysqli_stmt_close($mark);
+        if (!$marked) {
+            header('Location: ./forgot_password.php?step=2&error=otp_none');
+            exit();
+        }
 
         log_activity('otp_verified', 'Password reset verification code accepted.', 'Password Recovery', $idnum);
         unset($_SESSION['fp_otp_attempts']);
+        $_SESSION['fp_otp_verified'] = true;
+        $_SESSION['fp_security_verified'] = false;
         header('Location: ./forgot_password.php?step=3');
         exit();
     }
 
     /* Step 2: Resend OTP */
     if ($action === 'resend_otp') {
-        if (!isset($_SESSION['fp_user_id'])) {
-            header('Location: ./forgot_password.php?step=1');
-            exit();
-        }
+        $user = password_recovery_require_account($connect);
 
         $idnum = $_SESSION['fp_user_id'];
-        $email = $_SESSION['fp_email'] ?? '';
-        $username = $_SESSION['fp_username'] ?? '';
+        $email = $user['email'];
+        $username = $user['username'];
+        $_SESSION['fp_otp_verified'] = false;
+        $_SESSION['fp_security_verified'] = false;
+        $_SESSION['fp_email'] = $email;
+        $_SESSION['fp_username'] = $username;
+        $_SESSION['fp_qa'] = [
+            'q1' => $user['q1'], 'a1' => $user['a1'],
+            'q2' => $user['q2'], 'a2' => $user['a2'],
+            'q3' => $user['q3'], 'a3' => $user['a3']
+        ];
 
         // Generate new OTP
         $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
@@ -272,14 +306,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* Step 3: Verify Security Questions */
     if ($action === 'verify_security') {
-        if (!isset($_SESSION['fp_user_id']) || !isset($_SESSION['fp_qa'])) {
+        password_recovery_require_account($connect, $isJson);
+        password_recovery_require_step(3, $isJson);
+        if (!empty($_SESSION['fp_security_verified'])) {
             if ($isJson) {
                 header('Content-Type: application/json');
-                echo json_encode(['success' => false, 'message' => 'Session expired. Please start over.']);
+                echo json_encode(['success' => true]);
             } else {
-                header('Location: ./forgot_password.php?step=1');
+                header('Location: ./forgot_password.php?step=4');
             }
             exit();
+        }
+        if (!isset($_SESSION['fp_qa'])) {
+            password_recovery_clear_session();
+            password_recovery_stop('./forgot_password.php?step=1', $isJson, 'Your recovery session has ended. Please start again.');
         }
 
         if ($isJson) {
@@ -339,6 +379,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($isJson) {
             header('Content-Type: application/json');
             if ($correct >= 2) {
+                $_SESSION['fp_security_verified'] = true;
                 unset($_SESSION['fp_qa']);
                 echo json_encode(['success' => true, 'answerResults' => $answerResults, 'correctCount' => $correct]);
             } else {
@@ -352,6 +393,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ./forgot_password.php?step=3&error=not_enough');
                 exit();
             }
+            $_SESSION['fp_security_verified'] = true;
             unset($_SESSION['fp_qa']);
             header('Location: ./forgot_password.php?step=4');
         }
@@ -360,10 +402,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* Step 4: Reset Password */
     if ($action === 'reset_password') {
-        if (!isset($_SESSION['fp_user_id'])) {
-            header('Location: ./forgot_password.php?step=1');
-            exit();
-        }
+        password_recovery_require_account($connect);
+        password_recovery_require_step(4);
         $newPw = isset($_POST['new_password']) ? $_POST['new_password'] : '';
         $confPw = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
 
@@ -382,18 +422,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $hash = password_hash($newPw, PASSWORD_DEFAULT);
         $user_id = $_SESSION['fp_user_id'];
-        $stmt = mysqli_prepare($connect, "UPDATE users SET password_hash = ? WHERE user_id = ?");
+        $stmt = mysqli_prepare($connect, "UPDATE users SET password_hash = ? WHERE user_id = ? AND status = 'active' AND is_active = 1 AND is_incomplete = 0");
         mysqli_stmt_bind_param($stmt, 'ss', $hash, $user_id);
         $ok = mysqli_stmt_execute($stmt);
+        $updated = $ok ? mysqli_stmt_affected_rows($stmt) : 0;
         mysqli_stmt_close($stmt);
 
-        if (!$ok) {
+        if ($ok && $updated !== 1) {
+            password_recovery_require_account($connect);
+        }
+        if (!$ok || $updated !== 1) {
             header('Location: ./forgot_password.php?step=4&error=save');
             exit();
         }
 
         log_activity('password_reset_completed', 'Account password reset completed.', 'Password Recovery', $user_id, $_SESSION['fp_username'] ?? null);
-        unset($_SESSION['fp_user_id'], $_SESSION['fp_email'], $_SESSION['fp_username'], $_SESSION['fp_qa']);
+        password_recovery_clear_session();
         header('Location: ./forgot_password.php?reset=success');
         exit();
     }
@@ -403,9 +447,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $currentStep = isset($_GET['step']) ? (int)$_GET['step'] : 1;
 if ($currentStep < 1 || $currentStep > 4) $currentStep = 1;
 
-/* Redirect to step 1 if no session data for higher steps */
-if ($currentStep >= 2 && !isset($_SESSION['fp_user_id'])) {
-    $currentStep = 1;
+/* A URL or hidden form step cannot skip recovery verification. */
+if ($currentStep >= 2) {
+    password_recovery_require_account($connect);
+    password_recovery_require_step($currentStep);
 }
 
 $maskedId = isset($_SESSION['fp_user_id']) ? mask_id($_SESSION['fp_user_id']) : '';
@@ -600,7 +645,7 @@ $questionGroups = fetch_question_groups();
     <p>&copy; 2026 Ube Delights. All rights reserved.</p>
   </footer>
   <script src="../javascript/disable_back.js"></script>
-  <script src="../javascript/forgot_password.js?v=1.1"></script>
+  <script src="../javascript/forgot_password.js?v=1.2"></script>
   <script src="../javascript/session_timeout.js?v=1.2"></script>
   <script src="../javascript/routing.js?v=3.0"></script>
   <script src="../javascript/inspect.js"></script>

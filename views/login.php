@@ -241,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                     <div class="auth-alt">
-                        <p id="forgot-section" class="forgot">Forgot Password? <a onclick="getForgotPassword()">Reset Here</a></p>
+                        <p id="forgot-section" class="forgot" style="display:none">Forgot Password? <a onclick="getForgotPassword()">Reset Here</a></p>
                     </div>
                     <div id="lockout-timer" class="lockout-timer"></div>
                     <button class="btn" type="submit">Login</button>
@@ -271,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script src="../javascript/disable_back.js"></script>
-    <script src="../javascript/login.js?v=2.1"></script>
+    <script src="../javascript/login.js?v=2.2"></script>
     <script src="../javascript/session_timeout.js?v=1.2"></script>
     <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/inspect.js"></script>

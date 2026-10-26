@@ -397,6 +397,10 @@
       else if (error === 'invalid_id') showFieldError('id_number', 'Please enter ID in format: xxxx-xxxx');
       else if (error === 'unknown_id') showFieldError('id_number', 'ID not found');
       else if (error === 'blocked_id') showFieldError('id_number', 'Your account is blocked. Please contact an administrator.');
+      else if (error === 'pending_id') showFieldError('id_number', 'Your account is still pending approval. Please wait for approval.');
+      else if (error === 'incomplete_id') showFieldError('id_number', 'This account setup is not complete yet. Please complete it before resetting your password.');
+      else if (error === 'expired_id') showFieldError('id_number', 'Your account invitation has expired. Please contact an administrator.');
+      else if (error === 'inactive_id') showFieldError('id_number', 'This account is not active. Please contact an administrator.');
     }
 
     if (step === '2') {
@@ -562,6 +566,11 @@
             credentials: 'same-origin'
           });
           var data = await res.json();
+
+          if (data.redirect) {
+            window.location.href = data.redirect;
+            return;
+          }
 
           if (data.success) {
             window.location.href = 'forgot_password.php?step=4';
