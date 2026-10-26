@@ -46,7 +46,8 @@ function loadLoginPage(error, savedLoginState = {}) {
     const form = new Element('form');
     form.querySelectorAll = () => [];
     const fieldGroup = new Element();
-    fieldGroup.parentNode = { insertBefore() {} };
+    const insertedErrors = [];
+    fieldGroup.parentNode = { insertBefore(element) { insertedErrors.push(element); } };
     username.parentNode = fieldGroup;
 
     const nodes = new Map([
@@ -93,7 +94,7 @@ function loadLoginPage(error, savedLoginState = {}) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, '../javascript/login.js'), 'utf8'), context);
     (documentListeners.DOMContentLoaded || []).forEach(listener => listener());
 
-    return { username, password, forgot, orSeparator, sessionStorage, localStorage };
+    return { username, password, forgot, orSeparator, lockoutTimer, insertedErrors, sessionStorage, localStorage };
 }
 
 const timeoutPage = loadLoginPage('timeout', { login_err_count: '1' });
@@ -120,5 +121,14 @@ assert.equal(failedLoginPage.sessionStorage.getItem('login_password'), 'cached-s
 assert.equal(failedLoginPage.password.value, 'cached-secret');
 assert.equal(failedLoginPage.localStorage.getItem('login_err_count'), '2');
 assert.equal(failedLoginPage.forgot.style.display, 'block');
+assert.equal(failedLoginPage.lockoutTimer.textContent, 'Incorrect username or password.');
 
-console.log('PASS: timeout clears the cached password without showing Forgot Password or counting as a failed login.');
+const blockedCustomerOrAdmin = loadLoginPage('blocked');
+assert.equal(blockedCustomerOrAdmin.insertedErrors[0].textContent, 'Your account is blocked. Contact an admin or super admin.');
+assert.equal(blockedCustomerOrAdmin.forgot.style.display, 'none');
+
+const blockedSuperAdmin = loadLoginPage('blocked_super_admin');
+assert.equal(blockedSuperAdmin.insertedErrors[0].textContent, 'Your account is blocked. Contact a super admin.');
+assert.equal(blockedSuperAdmin.forgot.style.display, 'none');
+
+console.log('PASS: timeout and blocked-login messages retain their expected behavior.');

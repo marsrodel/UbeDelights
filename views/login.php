@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 1) Find user by username (case-sensitive) or email
     // Use BINARY for username to enforce case sensitivity. Email remains as-is.
-    $sqlUser = "SELECT user_id, username, first_name, last_name, email, password_hash, is_active, role, status, 0 AS is_staging FROM users WHERE (BINARY username = ? OR email = ?) LIMIT 1";
+    $sqlUser = "SELECT user_id, username, first_name, last_name, email, password_hash, is_active, is_incomplete, role, status, 0 AS is_staging FROM users WHERE (BINARY username = ? OR email = ?) LIMIT 1";
     $stmtUser = mysqli_prepare($connect, $sqlUser);
     mysqli_stmt_bind_param($stmtUser, 'ss', $login, $login);
     mysqli_stmt_execute($stmtUser);
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // If not found in users, check staging_accounts
     if (!$user) {
-        $sqlStaging = "SELECT user_id, username, '' AS first_name, '' AS last_name, email, password_hash, 0 AS is_active, role, 'incomplete' AS status, 1 AS is_staging, expires_at FROM staging_accounts WHERE (BINARY username = ? OR email = ?) LIMIT 1";
+        $sqlStaging = "SELECT user_id, username, '' AS first_name, '' AS last_name, email, password_hash, 0 AS is_active, 1 AS is_incomplete, role, 'incomplete' AS status, 1 AS is_staging, expires_at FROM staging_accounts WHERE (BINARY username = ? OR email = ?) LIMIT 1";
         $stmtStaging = mysqli_prepare($connect, $sqlStaging);
         mysqli_stmt_bind_param($stmtStaging, 'ss', $login, $login);
         mysqli_stmt_execute($stmtStaging);
@@ -59,15 +59,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+    $userId = (string)$user['user_id'];
+
+    // Verify the password before revealing account status or role.
+    if (!password_verify($password, $user['password_hash'])) {
+        log_activity('failed_login', 'Wrong password attempt', 'Authentication', $userId, $user['username']);
+        $u = urlencode($login);
+        header("Location: ./login.php?error=pass&u=$u");
+        exit();
+    }
+
+    // Blocked accounts cannot enter the account-completion flow.
+    if ($user['status'] === 'blocked') {
+        log_activity('login_blocked', 'Blocked user attempted login', 'Authentication', $userId, $user['username']);
+        $blockedError = $user['role'] === 'super_admin' ? 'blocked_super_admin' : 'blocked';
+        header('Location: ./login.php?error=' . $blockedError);
+        exit();
+    }
+
+    if ($user['status'] === 'pending') {
+        log_activity('login_blocked', 'Pending user attempted login', 'Authentication', $userId, $user['username']);
+        header('Location: ./login.php?error=pending');
+        exit();
+    }
+
     // Incomplete accounts: send OTP and redirect to complete account flow
     if ($user['status'] === 'incomplete' || ($user['is_incomplete'] ?? 0) == 1 || !empty($user['is_staging'])) {
-        if (!password_verify($password, $user['password_hash'])) {
-            log_activity('failed_login', 'Wrong password attempt', 'Authentication', (string)$user['user_id'], $user['username']);
-            $u = urlencode($login);
-            header("Location: ./login.php?error=pass&u=$u");
-            exit();
-        }
-        $userId = (string)$user['user_id'];
         $_SESSION['auth_user_id'] = $userId;
         $_SESSION['auth_username'] = $user['username'];
         $_SESSION['auth_role'] = $user['role'];
@@ -104,29 +121,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mail_send_message($user['email'], $subject, $emailBody, $otp);
 
         header('Location: ./complete_account.php?step=1');
-        exit();
-    }
-
-    $userId = (string)$user['user_id'];
-
-    // 2) Verify password FIRST (lockout and attempt counting are handled in JavaScript)
-    if (!password_verify($password, $user['password_hash'])) {
-        log_activity('failed_login', 'Wrong password attempt', 'Authentication', $userId, $user['username']);
-        $u = urlencode($login);
-        header("Location: ./login.php?error=pass&u=$u");
-        exit();
-    }
-
-    // 3) Password correct — check account status
-    if ($user['status'] === 'blocked') {
-        log_activity('login_blocked', 'Blocked user attempted login', 'Authentication', $userId, $user['username']);
-        header('Location: ./login.php?error=blocked');
-        exit();
-    }
-
-    if ($user['status'] === 'pending') {
-        log_activity('login_blocked', 'Pending user attempted login', 'Authentication', $userId, $user['username']);
-        header('Location: ./login.php?error=pending');
         exit();
     }
 
@@ -271,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script src="../javascript/disable_back.js"></script>
-    <script src="../javascript/login.js?v=2.2"></script>
+    <script src="../javascript/login.js?v=2.3"></script>
     <script src="../javascript/session_timeout.js?v=1.2"></script>
     <script src="../javascript/routing.js?v=3.0"></script>
     <script src="../javascript/inspect.js"></script>

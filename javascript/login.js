@@ -316,7 +316,10 @@ document.addEventListener('DOMContentLoaded', function(){
       showErrorMessage('username', 'Your account is inactive.');
       return;
     case 'blocked':
-      showErrorMessage('username', 'Your account is blocked. Contact a super admin.');
+    case 'blocked_super_admin':
+      showErrorMessage('username', err === 'blocked_super_admin'
+        ? 'Your account is blocked. Contact a super admin.'
+        : 'Your account is blocked. Contact an admin or super admin.');
       if (forgot) forgot.style.display = 'none';
       if (orSep) orSep.style.display = 'none';
       return;
